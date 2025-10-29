@@ -8,14 +8,33 @@ Use Google's latest Gemini model for development tasks.
 - Need a different perspective from Claude
 - Processing lots of code files at once
 
-## Model
-Uses: **Latest Gemini model** (automatically selected for best results)
+## Model Selection
+
+**I (Claude) will choose the appropriate model tier:**
+
+- **Flash models** - For quick code reviews, simple analysis, fast responses
+  - Best for: Performance checks, pattern finding, quick opinions
+  - I'll use the latest available Flash model
+
+- **Pro models** - For complex coding tasks, deep analysis, architecture reviews
+  - Best for: Large refactors, security audits, complex optimizations
+  - I'll use the latest available Pro model
 
 ## How I (Claude) Call Gemini
 
-When you ask me to use Gemini, I'll execute the Gemini CLI in headless mode:
+When you ask me to use Gemini, I will:
+1. Determine task complexity (quick → Flash, complex → Pro)
+2. Look up the latest available model in that tier
+3. Execute Gemini CLI with that model:
 
 ```bash
+# Quick tasks - I'll use latest Flash model
+gemini -m <latest-flash-model> -p "Your request here" --output-format json
+
+# Complex tasks - I'll use latest Pro model
+gemini -m <latest-pro-model> -p "Your request here" --output-format json
+
+# Or use your configured default
 gemini -p "Your request here" --output-format json
 ```
 
@@ -115,10 +134,10 @@ Context:
 - Response time getting slower
 - Files: src/api/*.py (20 files)
 
-Me (Claude): Let me call Gemini to analyze the performance...
+Me (Claude): Let me call Gemini with the latest Flash model for quick performance analysis...
 
-[I execute headless command]
-gemini -p "Analyze these FastAPI files for performance issues. Focus on database queries, caching, and bottlenecks. Files: [src/api/ contents]" --output-format json
+[I look up and use the latest Flash model for speed]
+gemini -m <latest-flash-model> -p "Analyze these FastAPI files for performance issues. Focus on database queries, caching, and bottlenecks. Files: [src/api/ contents]" --output-format json
 
 [Gemini returns]
 {
@@ -137,10 +156,10 @@ Me (Claude): Here's what Gemini found. Let me implement these fixes for you.
 ```
 You: Ask Gemini to review all TypeScript files for security issues
 
-Me (Claude): I'll send all .ts files to Gemini for security analysis...
+Me (Claude): I'll send all .ts files to Gemini with the latest Pro model for deep security analysis...
 
-[I execute]
-gemini -p "Review these TypeScript files for security vulnerabilities: SQL injection, XSS, exposed secrets, input validation. Files: [all .ts files]" --output-format json --yolo
+[I look up and use the latest Pro model for thorough security review]
+gemini -m <latest-pro-model> -p "Review these TypeScript files for security vulnerabilities: SQL injection, XSS, exposed secrets, input validation. Files: [all .ts files]" --output-format json --yolo
 
 [Gemini analyzes 150 files and returns]
 {
@@ -209,15 +228,24 @@ I'll handle the communication and bring back the response!
 When you ask me to use Gemini, I:
 
 1. **Take your question** and prepare the prompt
-2. **Execute Gemini CLI** in headless mode:
+2. **Assess complexity** and choose model tier:
+   - Flash tier for quick analysis
+   - Pro tier for deep/complex tasks
+3. **Look up the latest available model** in that tier
+4. **Execute Gemini CLI** in headless mode:
    ```bash
-   gemini -p "your prompt" --output-format json
+   # Flash tier (fast) - I'll use the latest Flash model available
+   gemini -m <latest-flash-model> -p "your prompt" --output-format json
+
+   # Pro tier (thorough) - I'll use the latest Pro model available
+   gemini -m <latest-pro-model> -p "your prompt" --output-format json
    ```
-3. **Parse Gemini's JSON response**
-4. **Present results** to you clearly
-5. **Help implement** any suggestions
+5. **Parse Gemini's JSON response**
+6. **Present results** to you clearly
+7. **Help implement** any suggestions
 
 **CLI Options I Use:**
+- `-m model-name` - Specify which Gemini model (I'll use latest Flash or Pro)
 - `-p "prompt"` - Send prompt in headless mode
 - `--output-format json` - Get structured output
 - `--yolo` - Auto-proceed without confirmations (when appropriate)

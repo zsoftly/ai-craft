@@ -51,7 +51,7 @@ chmod +x install.sh
 
 The installer detects your AI CLIs and installs to the correct location:
 - **Claude Code** → `~/.claude/agents/`
-- **Gemini CLI** → `~/.gemini/system.md`
+- **Gemini CLI** → `~/.gemini/GEMINI.md`
 - **OpenAI Codex** → `~/.codex/instructions.md`
 
 ## Usage

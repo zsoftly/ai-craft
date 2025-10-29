@@ -9,14 +9,33 @@ Use Gemini for data analysis, log processing, and pattern recognition.
 - CSV/JSON analysis
 - Performance metrics analysis
 
-## Model
-Uses: **Latest Gemini model** (automatically selected for best performance)
+## Model Selection
+
+**I (Claude) will choose the appropriate model tier:**
+
+- **Flash models** - For fast log analysis, simple pattern finding, quick data insights
+  - Best for: Error logs, CSV analysis, usage patterns, metrics review
+  - I'll use the latest available Flash model
+
+- **Pro models** - For complex data analysis, deep pattern recognition, predictive insights
+  - Best for: Large-scale trend analysis, anomaly detection, complex correlations
+  - I'll use the latest available Pro model
 
 ## How I (Claude) Call Gemini for Data Analysis
 
-When you ask me to analyze data with Gemini, I execute:
+When you ask me to analyze data with Gemini, I will:
+1. Determine analysis complexity (simple → Flash, complex → Pro)
+2. Look up the latest available model in that tier
+3. Execute Gemini CLI with that model:
 
 ```bash
+# Quick analysis (Flash - most data tasks) - I'll use latest Flash model
+gemini -m <latest-flash-model> -p "Analyze this data: [your data/logs]" --output-format json
+
+# Deep analysis (Pro - complex patterns) - I'll use latest Pro model
+gemini -m <latest-pro-model> -p "Analyze this data: [your data/logs]" --output-format json
+
+# Or use your configured default
 gemini -p "Analyze this data: [your data/logs]" --output-format json
 ```
 
@@ -72,10 +91,10 @@ Ask Gemini to analyze user activity:
 ```
 You: Can Gemini analyze logs/error.log from the past month?
 
-Me (Claude): Let me send the error logs to Gemini for analysis...
+Me (Claude): Let me send the error logs to Gemini with the latest Flash model for quick analysis...
 
-[I execute]
-gemini -p "Analyze this error log for patterns, top errors, and root causes. Find: frequency, timing patterns, affected endpoints. Log: [error.log contents]" --output-format json --yolo
+[I look up and use the latest Flash model for fast log processing]
+gemini -m <latest-flash-model> -p "Analyze this error log for patterns, top errors, and root causes. Find: frequency, timing patterns, affected endpoints. Log: [error.log contents]" --output-format json --yolo
 
 [Gemini returns]
 {
@@ -103,10 +122,10 @@ Me (Claude): Here's what Gemini found. The database timeout is your biggest issu
 ```
 You: Have Gemini analyze data/users.csv (50,000 users)
 
-Me (Claude): I'll send the user data to Gemini for pattern analysis...
+Me (Claude): I'll send the user data to Gemini with the latest Pro model for deep behavioral analysis...
 
-[I execute]
-gemini -p "Analyze this user data CSV for behavioral patterns, drop-offs, usage trends, and churn factors. Find actionable insights. Data: [users.csv contents]" --output-format json
+[I look up and use the latest Pro model for complex pattern recognition]
+gemini -m <latest-pro-model> -p "Analyze this user data CSV for behavioral patterns, drop-offs, usage trends, and churn factors. Find actionable insights. Data: [users.csv contents]" --output-format json
 
 [Gemini analyzes and returns]
 {
@@ -247,15 +266,24 @@ No need to split up files!
 When you ask me to use Gemini for data analysis, I:
 
 1. **Read your data** (logs, CSV, metrics, etc.)
-2. **Execute Gemini CLI** in headless mode:
+2. **Assess complexity** and choose model tier:
+   - Flash tier for most data tasks (fast, accurate)
+   - Pro tier for complex patterns and deep insights
+3. **Look up the latest available model** in that tier
+4. **Execute Gemini CLI** in headless mode:
    ```bash
-   gemini -p "Analyze this data: [data]" --output-format json --yolo
+   # Flash tier (most data analysis) - I'll use latest Flash model
+   gemini -m <latest-flash-model> -p "Analyze this data: [data]" --output-format json --yolo
+
+   # Pro tier (complex patterns) - I'll use latest Pro model
+   gemini -m <latest-pro-model> -p "Analyze this data: [data]" --output-format json --yolo
    ```
-3. **Parse Gemini's analysis** from JSON response
-4. **Present insights** clearly to you
-5. **Help implement** recommended fixes
+5. **Parse Gemini's analysis** from JSON response
+6. **Present insights** clearly to you
+7. **Help implement** recommended fixes
 
 **CLI Options for Data Analysis:**
+- `-m model-name` - Specify which Gemini model (I'll use latest Flash or Pro)
 - `-p "prompt"` - Send data analysis request
 - `--output-format json` - Get structured insights
 - `--yolo` - Auto-proceed (Gemini handles large data automatically)

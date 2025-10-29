@@ -249,14 +249,14 @@ fi
 if [ "$GEMINI_INSTALLED" = true ]; then
     update_agents "$GEMINI_DIR" "Gemini CLI"
 
-    # Also update system.md if needed
-    if [ -f "$GEMINI_DIR/system.md" ]; then
+    # Also update GEMINI.md if needed (automatically loaded, no env var needed)
+    if [ -f "$GEMINI_DIR/GEMINI.md" ]; then
         echo ""
-        print_info "[Checking Gemini system.md]"
+        print_info "[Checking Gemini GEMINI.md]"
 
-        # Regenerate system.md
-        temp_system_md=$(mktemp)
-        cat > "$temp_system_md" << 'EOF'
+        # Regenerate GEMINI.md
+        temp_gemini_md=$(mktemp)
+        cat > "$temp_gemini_md" << 'EOF'
 # AI Craft Agents for Gemini
 
 You have access to structured workflow agents. When the user references an agent with @, provide guidance based on these workflows:
@@ -268,23 +268,23 @@ EOF
         for agent in agents/*.md; do
             if [ -f "$agent" ]; then
                 agent_name=$(basename "$agent" .md)
-                echo "### @$agent_name" >> "$temp_system_md"
+                echo "### @$agent_name" >> "$temp_gemini_md"
                 # Extract first header section (up to 10 lines) or use fallback
-                head -20 "$agent" | grep -A 5 "^##" | head -10 >> "$temp_system_md" 2>/dev/null || \
-                    echo "Agent documentation" >> "$temp_system_md"
-                echo "" >> "$temp_system_md"
+                head -20 "$agent" | grep -A 5 "^##" | head -10 >> "$temp_gemini_md" 2>/dev/null || \
+                    echo "Agent documentation" >> "$temp_gemini_md"
+                echo "" >> "$temp_gemini_md"
             fi
         done
 
-        # Check if system.md has custom changes
-        if file_has_custom_changes "$temp_system_md" "$GEMINI_DIR/system.md"; then
-            prompt_user_action "system.md" "$temp_system_md" "$GEMINI_DIR/system.md"
+        # Check if GEMINI.md has custom changes
+        if file_has_custom_changes "$temp_gemini_md" "$GEMINI_DIR/GEMINI.md"; then
+            prompt_user_action "GEMINI.md" "$temp_gemini_md" "$GEMINI_DIR/GEMINI.md"
         else
-            cp "$temp_system_md" "$GEMINI_DIR/system.md"
-            print_success "   [OK] Updated system.md"
+            cp "$temp_gemini_md" "$GEMINI_DIR/GEMINI.md"
+            print_success "   [OK] Updated GEMINI.md"
         fi
 
-        rm -f "$temp_system_md"
+        rm -f "$temp_gemini_md"
     fi
 fi
 

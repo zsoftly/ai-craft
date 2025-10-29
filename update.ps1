@@ -252,14 +252,14 @@ if ($claudeInstalled) {
 if ($geminiInstalled) {
     Update-Agents $geminiDir "Gemini CLI"
 
-    # Also update system.md if needed
-    if (Test-Path "$geminiDir\system.md") {
+    # Also update GEMINI.md if needed (automatically loaded, no env var needed)
+    if (Test-Path "$geminiDir\GEMINI.md") {
         Write-Host ""
-        Write-Host "[Checking Gemini system.md]" -ForegroundColor Blue
+        Write-Host "[Checking Gemini GEMINI.md]" -ForegroundColor Blue
 
-        # Regenerate system.md
-        $tempSystemMd = New-TemporaryFile
-        $systemContent = @"
+        # Regenerate GEMINI.md
+        $tempGeminiMd = New-TemporaryFile
+        $geminiContent = @"
 # AI Craft Agents for Gemini
 
 You have access to structured workflow agents. When the user references an agent with @, provide guidance based on these workflows:
@@ -267,11 +267,11 @@ You have access to structured workflow agents. When the user references an agent
 ## Available Agents
 
 "@
-        Set-Content -Path $tempSystemMd -Value $systemContent
+        Set-Content -Path $tempGeminiMd -Value $geminiContent
 
         foreach ($agent in Get-ChildItem -Path "agents\*.md") {
             $agentName = $agent.BaseName
-            Add-Content -Path $tempSystemMd -Value "### @$agentName"
+            Add-Content -Path $tempGeminiMd -Value "### @$agentName"
 
             # Extract agent summary (match bash: grep -A 5 = matching line + 5 after, max 10 total)
             try {
@@ -288,7 +288,7 @@ You have access to structured workflow agents. When the user references an agent
                         $endIndex = [Math]::Min($i + $linesToOutput, $agentContent.Count)
 
                         for ($j = $i; $j -lt $endIndex -and $totalLines -lt $maxTotalLines; $j++) {
-                            Add-Content -Path $tempSystemMd -Value $agentContent[$j]
+                            Add-Content -Path $tempGeminiMd -Value $agentContent[$j]
                             $totalLines++
                         }
 
@@ -298,23 +298,23 @@ You have access to structured workflow agents. When the user references an agent
                 }
 
                 if (-not $foundAnyHeader) {
-                    Add-Content -Path $tempSystemMd -Value "Agent documentation"
+                    Add-Content -Path $tempGeminiMd -Value "Agent documentation"
                 }
             }
             catch {
-                Add-Content -Path $tempSystemMd -Value "Agent documentation"
+                Add-Content -Path $tempGeminiMd -Value "Agent documentation"
             }
-            Add-Content -Path $tempSystemMd -Value ""
+            Add-Content -Path $tempGeminiMd -Value ""
         }
 
-        if (Test-CustomChanges $tempSystemMd "$geminiDir\system.md") {
-            Invoke-UserAction "system.md" $tempSystemMd "$geminiDir\system.md"
+        if (Test-CustomChanges $tempGeminiMd "$geminiDir\GEMINI.md") {
+            Invoke-UserAction "GEMINI.md" $tempGeminiMd "$geminiDir\GEMINI.md"
         } else {
-            Copy-Item -Path $tempSystemMd -Destination "$geminiDir\system.md" -Force
-            Write-Host "   [OK] Updated system.md" -ForegroundColor Green
+            Copy-Item -Path $tempGeminiMd -Destination "$geminiDir\GEMINI.md" -Force
+            Write-Host "   [OK] Updated GEMINI.md" -ForegroundColor Green
         }
 
-        Remove-Item $tempSystemMd -Force
+        Remove-Item $tempGeminiMd -Force
     }
 }
 

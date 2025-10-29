@@ -145,7 +145,7 @@ One command installs for all AI platforms:
 
 **Installation Paths (Auto-detected):**
 - **Claude Code**: `~/.claude/agents/*.md` (for @ references)
-- **Gemini CLI**: `~/.gemini/system.md` (custom system instructions)
+- **Gemini CLI**: `~/.gemini/GEMINI.md` (automatically loaded context file)
 - **OpenAI Codex**: `~/.codex/instructions.md` (global instructions)
 
 **How It Works:**
@@ -191,9 +191,8 @@ Can you ask Gemini to check for performance issues?
 #### In Gemini CLI
 
 ```bash
-export GEMINI_SYSTEM_MD=true
 gemini
-# Agents automatically available via system instructions
+# Agents automatically loaded from ~/.gemini/GEMINI.md - no configuration needed
 ```
 
 #### In OpenAI Codex
@@ -214,7 +213,7 @@ Just create a markdown file:
 nano ~/.claude/agents/my-agent.md
 
 # For Gemini CLI
-# Add to ~/.gemini/system.md
+# Add to ~/.gemini/GEMINI.md
 
 # For OpenAI Codex
 # Add to ~/.codex/instructions.md
@@ -256,9 +255,9 @@ Then reference it: `@my-agent Do something`
 
 ### Gemini CLI
 
-**System Instructions:**
-- Agents consolidated into `~/.gemini/system.md`
-- Set `GEMINI_SYSTEM_MD=true` to enable
+**Context Files (GEMINI.md):**
+- Agents consolidated into `~/.gemini/GEMINI.md`
+- Automatically loaded - no environment variables needed
 - Available in all Gemini CLI conversations
 - Automatically applied as context
 
@@ -292,7 +291,7 @@ No build commands needed - just markdown files!
 ls ~/.claude/agents/
 
 # Verify Gemini CLI installation
-cat ~/.gemini/system.md
+cat ~/.gemini/GEMINI.md
 
 # Verify OpenAI Codex installation
 cat ~/.codex/instructions.md

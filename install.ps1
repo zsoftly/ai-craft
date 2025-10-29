@@ -76,9 +76,9 @@ if ($GEMINI_INSTALLED) {
     Write-Color "[Installing for Gemini CLI...]" "Blue"
     New-Item -ItemType Directory -Force -Path $GEMINI_DIR | Out-Null
 
-    # Create system.md with agent instructions
-    $systemMdPath = Join-Path $GEMINI_DIR "system.md"
-    $systemMdContent = @"
+    # Create GEMINI.md with agent instructions (automatically loaded, no env var needed)
+    $geminiMdPath = Join-Path $GEMINI_DIR "GEMINI.md"
+    $geminiMdContent = @"
 # AI Craft Agents for Gemini
 
 You have access to structured workflow agents. When the user references an agent with @, provide guidance based on these workflows:
@@ -87,12 +87,12 @@ You have access to structured workflow agents. When the user references an agent
 
 "@
 
-    Set-Content -Path $systemMdPath -Value $systemMdContent
+    Set-Content -Path $geminiMdPath -Value $geminiMdContent
 
     # Append agent summaries
     foreach ($agent in (Get-ChildItem "agents\*.md")) {
         $agentName = $agent.BaseName
-        Add-Content -Path $systemMdPath -Value "`n### @$agentName"
+        Add-Content -Path $geminiMdPath -Value "`n### @$agentName"
 
         # Extract agent summary (match bash: grep -A 5 = matching line + 5 after, max 10 total)
         try {
@@ -109,7 +109,7 @@ You have access to structured workflow agents. When the user references an agent
                     $endIndex = [Math]::Min($i + $linesToOutput, $agentContent.Count)
 
                     for ($j = $i; $j -lt $endIndex -and $totalLines -lt $maxTotalLines; $j++) {
-                        Add-Content -Path $systemMdPath -Value $agentContent[$j]
+                        Add-Content -Path $geminiMdPath -Value $agentContent[$j]
                         $totalLines++
                     }
 
@@ -119,19 +119,19 @@ You have access to structured workflow agents. When the user references an agent
             }
 
             if (-not $foundAnyHeader) {
-                Add-Content -Path $systemMdPath -Value "Agent documentation"
+                Add-Content -Path $geminiMdPath -Value "Agent documentation"
             }
         }
         catch {
-            Add-Content -Path $systemMdPath -Value "Agent documentation"
+            Add-Content -Path $geminiMdPath -Value "Agent documentation"
         }
-        Add-Content -Path $systemMdPath -Value ""
+        Add-Content -Path $geminiMdPath -Value ""
     }
 
     # Also copy full agents for reference
     try {
         Copy-Item "agents\*.md" -Destination $GEMINI_DIR -Force
-        Write-Color "   [OK] Installed to: $GEMINI_DIR\system.md" "Green"
+        Write-Color "   [OK] Installed to: $GEMINI_DIR\GEMINI.md" "Green"
     }
     catch {
         Write-Color "   [ERROR] Failed to copy files to $GEMINI_DIR" "Red"
@@ -189,7 +189,7 @@ Write-Host ""
 # Summary
 Write-Color "[Installed agents for:]" "Cyan"
 if ($CLAUDE_INSTALLED) { Write-Host "   - Claude Code: $CLAUDE_DIR" }
-if ($GEMINI_INSTALLED) { Write-Host "   - Gemini CLI: $GEMINI_DIR\system.md" }
+if ($GEMINI_INSTALLED) { Write-Host "   - Gemini CLI: $GEMINI_DIR\GEMINI.md" }
 if ($CODEX_INSTALLED) { Write-Host "   - OpenAI Codex: $CODEX_DIR\instructions.md" }
 
 if (-not $CLAUDE_INSTALLED -and -not $GEMINI_INSTALLED -and -not $CODEX_INSTALLED) {
@@ -222,9 +222,8 @@ if ($CLAUDE_INSTALLED) {
 if ($GEMINI_INSTALLED) {
     Write-Host ""
     Write-Color "  Gemini CLI:" "Blue"
-    Write-Host "    Set GEMINI_SYSTEM_MD=true in your environment"
-    Write-Host "    `$env:GEMINI_SYSTEM_MD=`"true`""
-    Write-Host "    Then agents will be available automatically"
+    Write-Host "    Agents automatically loaded from $env:USERPROFILE\.gemini\GEMINI.md"
+    Write-Host "    No configuration needed - just use Gemini CLI as normal"
 }
 
 if ($CODEX_INSTALLED) {

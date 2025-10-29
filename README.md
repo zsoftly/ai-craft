@@ -36,7 +36,7 @@ The installer automatically detects which AI CLIs you have installed and configu
 
 **Detects and installs for:**
 - **Claude Code** → `~/.claude/agents/` (if Claude Code is installed)
-- **Gemini CLI** → `~/.gemini/system.md` (if Gemini CLI is installed)
+- **Gemini CLI** → `~/.gemini/GEMINI.md` (if Gemini CLI is installed)
 - **OpenAI Codex** → `~/.codex/instructions.md` (if Codex is installed)
 
 **No AI CLIs detected?** The installer will create `~/.aicraft/agents/` as a fallback.
@@ -60,8 +60,8 @@ ls ~/.claude/agents/
 
 **For Gemini CLI:**
 ```bash
-# Check system.md was created
-cat ~/.gemini/system.md | head -10
+# Check GEMINI.md was created
+cat ~/.gemini/GEMINI.md | head -10
 ```
 
 **For OpenAI Codex:**
@@ -90,7 +90,7 @@ The installer automatically detects which AI CLIs you have installed and configu
 
 **Detects and installs for:**
 - **Claude Code** → `%USERPROFILE%\.claude\agents\` (if Claude Code is installed)
-- **Gemini CLI** → `%USERPROFILE%\.gemini\system.md` (if Gemini CLI is installed)
+- **Gemini CLI** → `%USERPROFILE%\.gemini\GEMINI.md` (if Gemini CLI is installed)
 - **OpenAI Codex** → `%USERPROFILE%\.codex\instructions.md` (if Codex is installed)
 
 **No AI CLIs detected?** The installer will create `%USERPROFILE%\.aicraft\agents\` as a fallback.
@@ -124,8 +124,8 @@ Get-ChildItem "$env:USERPROFILE\.claude\agents\"
 
 **For Gemini CLI:**
 ```powershell
-# Check system.md was created
-Get-Content "$env:USERPROFILE\.gemini\system.md" | Select-Object -First 10
+# Check GEMINI.md was created
+Get-Content "$env:USERPROFILE\.gemini\GEMINI.md" | Select-Object -First 10
 ```
 
 **For OpenAI Codex:**
@@ -200,17 +200,10 @@ Use agents with the `@` symbol:
 
 ### Gemini CLI
 
-Enable system instructions:
+Agents are automatically loaded from `~/.gemini/GEMINI.md`:
 
 ```bash
-export GEMINI_SYSTEM_MD=true
-gemini  # Agents loaded automatically
-```
-
-Or set in your shell profile (`~/.bashrc` or `~/.zshrc`):
-```bash
-echo 'export GEMINI_SYSTEM_MD=true' >> ~/.bashrc
-source ~/.bashrc
+gemini  # Agents loaded automatically - no configuration needed
 ```
 
 ### OpenAI Codex

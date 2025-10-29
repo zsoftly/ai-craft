@@ -82,8 +82,8 @@ if [ "$GEMINI_INSTALLED" = true ]; then
     print_info "[Installing for Gemini CLI...]"
     mkdir -p "$GEMINI_DIR"
 
-    # Create system.md with agent instructions
-    cat > "$GEMINI_DIR/system.md" << 'EOF'
+    # Create GEMINI.md with agent instructions (automatically loaded, no env var needed)
+    cat > "$GEMINI_DIR/GEMINI.md" << 'EOF'
 # AI Craft Agents for Gemini
 
 You have access to structured workflow agents. When the user references an agent with @, provide guidance based on these workflows:
@@ -96,17 +96,17 @@ EOF
     for agent in agents/*.md; do
         if [ -f "$agent" ]; then
             agent_name=$(basename "$agent" .md)
-            echo "### @$agent_name" >> "$GEMINI_DIR/system.md"
+            echo "### @$agent_name" >> "$GEMINI_DIR/GEMINI.md"
             # Extract first header section (up to 10 lines) or use fallback
-            head -20 "$agent" | grep -A 5 "^##" | head -10 >> "$GEMINI_DIR/system.md" 2>/dev/null || \
-                echo "Agent documentation" >> "$GEMINI_DIR/system.md"
-            echo "" >> "$GEMINI_DIR/system.md"
+            head -20 "$agent" | grep -A 5 "^##" | head -10 >> "$GEMINI_DIR/GEMINI.md" 2>/dev/null || \
+                echo "Agent documentation" >> "$GEMINI_DIR/GEMINI.md"
+            echo "" >> "$GEMINI_DIR/GEMINI.md"
         fi
     done
 
     # Also copy full agents for reference
     if cp agents/*.md "$GEMINI_DIR/" 2>/dev/null; then
-        print_success "   [OK] Installed to: $GEMINI_DIR/system.md"
+        print_success "   [OK] Installed to: $GEMINI_DIR/GEMINI.md"
     else
         print_error "   [ERROR] Failed to copy files to $GEMINI_DIR"
         exit 1
@@ -151,7 +151,7 @@ echo ""
 # Summary
 print_header "[Installed agents for:]"
 [ "$CLAUDE_INSTALLED" = true ] && echo "   - Claude Code: $CLAUDE_DIR"
-[ "$GEMINI_INSTALLED" = true ] && echo "   - Gemini CLI: $GEMINI_DIR/system.md"
+[ "$GEMINI_INSTALLED" = true ] && echo "   - Gemini CLI: $GEMINI_DIR/GEMINI.md"
 [ "$CODEX_INSTALLED" = true ] && echo "   - OpenAI Codex: $CODEX_DIR/instructions.md"
 
 if [ "$CLAUDE_INSTALLED" = false ] && [ "$GEMINI_INSTALLED" = false ] && [ "$CODEX_INSTALLED" = false ]; then
@@ -181,9 +181,8 @@ fi
 if [ "$GEMINI_INSTALLED" = true ]; then
     echo ""
     print_info "  Gemini CLI:"
-    echo "    Set GEMINI_SYSTEM_MD=true in your environment"
-    echo "    export GEMINI_SYSTEM_MD=true"
-    echo "    Then agents will be available automatically"
+    echo "    Agents automatically loaded from ~/.gemini/GEMINI.md"
+    echo "    No configuration needed - just use Gemini CLI as normal"
 fi
 
 if [ "$CODEX_INSTALLED" = true ]; then
