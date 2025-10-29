@@ -8,62 +8,39 @@ AI Craft provides structured workflow prompts and simple markdown agents for sof
 
 ## Repository Structure
 
-This repository contains both workflow documentation and executable agent implementations:
+This repository contains simple markdown agents for multiple AI platforms:
 
-- `claude/` - Complete 5-phase development workflows for Claude AI (primary content)
-- `chatgpt/` - Placeholder for ChatGPT workflows (coming soon)
-- `gemini/` - Placeholder for Gemini workflows (coming soon)
 - `agents/` - **Simple markdown agents** for multiple AI platforms
   - `dev-agent.md` - Application Development agent
   - `tdd-agent.md` - Test-Driven Development agent
   - `gemini-dev.md` - Gemini development agent
   - `gemini-data.md` - Gemini data analysis agent
   - `code-review-agent.md` - Code Review agent
+  - `git-workflow-agent.md` - Git workflow agent
+  - `inter-ai-communication.md` - Inter-AI communication patterns
   - `README.md` - Agent usage guide
-- `install.sh` - Multi-platform installation script
+- `install.sh` / `install.ps1` - Multi-platform installation scripts (Linux/macOS/Windows)
+- `update.sh` / `update.ps1` - Smart update scripts with custom change detection
+- `lib/colors.sh` - Shared color library for bash scripts
 
-## Core Architecture: 5-Phase Workflow System
+## Core Architecture: Agent-Based Workflows
 
-All Claude workflows follow a consistent 5-phase structure designed to enforce separation between analysis, planning, implementation, validation, and deployment:
+All agents follow structured workflows designed to enforce separation between analysis, planning, implementation, validation, and deployment:
 
-### Phase Pattern
+### Agent Philosophy
 
-Each workflow defines phases with:
-- **When to use** - Context for when this phase applies
-- **Instructions** - Specific directives formatted as bullet points
+Each agent provides:
+- **Purpose** - Clear use case definition
+- **When to use** - Context for when this agent applies
+- **Instructions** - Specific directives formatted as structured workflows
 - **Key principles**:
-  - Analysis phases explicitly instruct "Do not write any code yet"
+  - Analysis phases explicitly separate thinking from coding
   - Implementation phases enforce quality gates (lint, compile, test after each block)
   - Review phases prevent over-engineering for pre-customer stage
   - Final phases handle deployment and team handoff
+  - Sub-agent delegation for heavy analysis work (context optimization)
 
-### Available Workflows
-
-1. **Application Development** (`application-development.md`)
-   - General-purpose feature development
-   - Phases: Analysis → Plan Review → Implementation → Code Review → PR Handoff
-
-2. **Test-Driven Development** (`test-driven-development.md`)
-   - Classic Red-Green-Refactor TDD cycle
-   - Phases: Requirements Analysis → Test Design Review → Red (Write Failing Tests) → Green (Minimal Implementation) → Refactor
-
-3. **Infrastructure as Code** (`infrastructure-as-code.md`)
-   - Terraform/CloudFormation/Pulumi development
-   - Phases: Infrastructure Analysis → Security/Compliance Review → IaC Implementation → Testing/Validation → Deployment Strategy
-
-4. **CI/CD Pipelines** (`cicd-pipelines.md`)
-   - GitHub Actions, Jenkins, GitLab CI, Azure DevOps
-   - Phases: Pipeline Analysis → Strategy/Security Review → Pipeline Implementation → Testing/Validation → Deployment/Documentation
-
-5. **Configuration Management** (`configuration-management.md`)
-   - Environment config, secrets management, feature flags
-   - Phases: Configuration Analysis → Security/Strategy Review → Config Implementation → Testing/Validation → Deployment/Documentation
-
-6. **Code Review** (`code-review.md`)
-   - Git-based code review using diff analysis
-   - Single-phase workflow focused on identifying issues with specific format requirements
-
-## Common Patterns Across Workflows
+## Common Patterns Across Agents
 
 ### Quality Gates
 Implementation phases consistently enforce:
@@ -86,25 +63,34 @@ When reviewing code, use this specific format:
 - Why it's likely incorrect
 - Recommended fix (only if simple)
 
+### Context Optimization
+For large codebases or complex analysis, agents use Claude's Task tool to spawn `general-purpose` sub-agents to:
+- Search through entire codebase efficiently
+- Analyze multiple files and dependencies
+- Return comprehensive findings
+- Save main conversation context for implementation
+
 ## Working with This Repository
 
-### Making Changes to Workflows
+### Making Changes to Agents
 
-When modifying workflow documents:
-1. Maintain the phase structure and formatting
+When modifying agent documents:
+1. Maintain the structured workflow formatting
 2. Keep instructions as concise bullet points
-3. Preserve the "When to use" context headers
-4. Ensure consistency with other workflows
+3. Preserve the "When to use" and "Purpose" sections
+4. Ensure consistency with other agents
 5. Include anti-over-engineering guidance in final phases
+6. Add context optimization for analysis-heavy phases
 
-### Creating New Workflows
+### Creating New Agents
 
-New workflows should:
-1. Follow the 5-phase pattern (or justify deviation like code-review.md)
+New agents should:
+1. Follow structured workflow patterns
 2. Include separation between analysis and implementation phases
 3. Add quality gates in implementation phases
 4. Include anti-over-engineering checks in final phases
-5. Use consistent formatting with existing workflows
+5. Use consistent formatting with existing agents
+6. Include sub-agent delegation where beneficial
 
 ### Documentation Standards
 
@@ -112,7 +98,8 @@ New workflows should:
 - Include code blocks with triple backticks for multi-line instructions
 - Keep bullet points concise and actionable
 - Use bold for phase names and key terms
-- Maintain consistent terminology across workflows
+- Maintain consistent terminology across agents
+- Never use emojis in generated code (only in conversational responses)
 
 ## Simple Markdown Agents
 
@@ -243,30 +230,29 @@ Then reference it: `@my-agent Do something`
 
 ### Key Files
 
-- `agents/dev-agent.md` - Development workflow agent
-- `agents/tdd-agent.md` - TDD workflow agent
-- `agents/gemini-dev.md` - Gemini development agent
-- `agents/gemini-data.md` - Gemini data analysis agent
-- `agents/code-review-agent.md` - Code review agent
+- `agents/dev-agent.md` - Development workflow agent (5-phase)
+- `agents/tdd-agent.md` - TDD workflow agent (Red-Green-Refactor)
+- `agents/gemini-dev.md` - Gemini development agent (performance & large codebases)
+- `agents/gemini-data.md` - Gemini data analysis agent (logs & patterns)
+- `agents/code-review-agent.md` - Code review agent (security & quality)
+- `agents/git-workflow-agent.md` - Git workflow agent (review, commit, push)
+- `agents/inter-ai-communication.md` - Inter-AI communication patterns
 - `agents/README.md` - Overview and examples
-- `install.sh` - Multi-platform installation script
+- `install.sh` / `install.ps1` - Multi-platform installation scripts
+- `update.sh` / `update.ps1` - Smart update scripts
+- `lib/colors.sh` - Shared color library
 
 ## Integration with AI Platforms
 
 ### Claude Code (Primary)
 
-**Documentation-Based:**
-- Copy entire phase instructions into Claude chat
-- Use `/resume` to maintain context across sessions
-- Workflows guide through structured development processes
-- Phases can be used sequentially or individually
-
 **Agent-Based (Recommended):**
 - Reference with `@` in Claude Code
-- No setup required - just run `./install.sh`
+- No setup required - just run `./install.sh` or `./install.ps1`
 - Claude + Gemini working together
 - Simple, non-technical approach
 - Easy to customize and extend
+- Smart update system preserves customizations
 
 ### Gemini CLI
 
@@ -323,3 +309,4 @@ nano agents/dev-agent.md
 
 # Changes take effect immediately
 ```
+- update the memory

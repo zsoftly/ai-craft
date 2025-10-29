@@ -4,10 +4,6 @@ Structured workflow prompts and simple agents for software development with Clau
 
 ## What's Included
 
-### 📋 Workflow Documentation
-Complete 5-phase development workflows for Claude AI.
-[View Claude Workflows →](./claude/)
-
 ### 🤖 Simple Agents
 Markdown-based agents you can use with `@` in Claude Code:
 - **@dev-agent** - 5-phase development workflow
