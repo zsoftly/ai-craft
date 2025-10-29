@@ -11,33 +11,45 @@ Use Gemini for data analysis, log processing, and pattern recognition.
 
 ## Model Selection
 
-**I (Claude) will choose the appropriate model tier:**
+**I (Claude) will use your configured Gemini model:**
 
 - **Flash models** - For fast log analysis, simple pattern finding, quick data insights
   - Best for: Error logs, CSV analysis, usage patterns, metrics review
-  - I'll use the latest available Flash model
+  - Example: `gemini-2.0-flash-exp`, `gemini-1.5-flash`
 
 - **Pro models** - For complex data analysis, deep pattern recognition, predictive insights
   - Best for: Large-scale trend analysis, anomaly detection, complex correlations
-  - I'll use the latest available Pro model
+  - Example: `gemini-2.0-pro-exp`, `gemini-1.5-pro`
+
+**How to check available models:**
+```bash
+# List available Gemini models
+gemini models list
+
+# Or check your current default model
+gemini config get model
+```
+
+I'll use the model configured in your Gemini CLI settings, or you can specify one when needed.
 
 ## How I (Claude) Call Gemini for Data Analysis
 
 When you ask me to analyze data with Gemini, I will:
 1. Determine analysis complexity (simple → Flash, complex → Pro)
-2. Look up the latest available model in that tier
-3. Execute Gemini CLI with that model:
+2. Execute Gemini CLI with appropriate model:
 
 ```bash
-# Quick analysis (Flash - most data tasks) - I'll use latest Flash model
-gemini -m <latest-flash-model> -p "Analyze this data: [your data/logs]" --output-format json
+# Quick analysis (Flash - most data tasks)
+gemini -m gemini-2.0-flash-exp -p "Analyze this data: [your data/logs]" --output-format json
 
-# Deep analysis (Pro - complex patterns) - I'll use latest Pro model
-gemini -m <latest-pro-model> -p "Analyze this data: [your data/logs]" --output-format json
+# Deep analysis (Pro - complex patterns)
+gemini -m gemini-2.0-pro-exp -p "Analyze this data: [your data/logs]" --output-format json
 
-# Or use your configured default
+# Or use your configured default model
 gemini -p "Analyze this data: [your data/logs]" --output-format json
 ```
+
+**Note:** Model names in examples may not be current. Check `gemini models list` for available models.
 
 This runs Gemini in headless mode and returns structured results I can present to you.
 
@@ -221,11 +233,14 @@ Step 3: "Claude, implement these optimizations"
 
 ## Code Style Rules
 
-### No Emojis in Generated Code
-- [NO] Never use emojis in source code, code comments, or commit messages
+### No Emojis in Application Source Code
+- [NO] Never use emojis in **application** source code, code comments, or commit messages
+- [OK] Emojis are acceptable in **user-facing tools** like installation scripts and CLI utilities
 - [OK] Emojis are fine in conversational responses to user
-- [OK] Use standard ASCII in code: +, -, *, >, <, =, |, etc.
-- [OK] Use text indicators in code: [OK], [FAIL], [WARN], [INFO], [SUCCESS], [ERROR], [DONE]
+- [OK] Use standard ASCII in application code: +, -, *, >, <, =, |, etc.
+- [OK] Use text indicators in application code: [OK], [FAIL], [WARN], [INFO], [SUCCESS], [ERROR], [DONE]
+
+**Clarification:** User-facing tools (like `install.sh`) can use emojis to improve UX. Application code (the software being built) should not.
 
 
 ---
@@ -296,3 +311,17 @@ Just ask me:
 ```
 
 I'll execute the command and bring back insights!
+
+## Gemini CLI Capabilities
+
+**Available Tools:**
+- `read_file` - Read file contents (perfect for log files, CSVs)
+- `search_file_content` - Search within files using patterns
+- `web_fetch` - Fetch content from web URLs
+
+**Limitations:**
+- Cannot write or edit files directly
+- Cannot run shell commands
+- Cannot execute code
+
+**Workflow:** When Gemini identifies patterns or issues in data, I (Claude) implement fixes using my full tool set (file editing, command execution, etc.).

@@ -129,18 +129,19 @@ gemini -p "prompt" --output-format json
 
 ### For Gemini
 
-Gemini needs shell tool access to call Claude. Two options:
+**Current Gemini CLI Capabilities:**
+- `read_file` - Read file contents
+- `search_file_content` - Search within files
+- `web_fetch` - Fetch web content
 
-#### Option 1: Enable in Gemini CLI settings
-```bash
-# Check Gemini CLI settings
-gemini settings
+**Gemini CLI Limitations:**
+- Cannot run shell commands (no `run_shell_command` tool)
+- Cannot write or edit files
+- Cannot execute code directly
 
-# Gemini needs "run_shell_command" or "Bash" tool enabled
-# This may require additional configuration
-```
+**Therefore:** Gemini cannot directly call Claude CLI. Use manual bridging pattern instead.
 
-#### Option 2: Manual bridging pattern
+#### Recommended Pattern: Manual Bridging
 Instead of Gemini directly calling Claude, use this pattern:
 
 ```
@@ -151,7 +152,43 @@ Claude → Claude: [Implements based on analysis]
 Claude → User: [Final result]
 ```
 
-This is the **recommended pattern** for now since it's simpler and works without additional tool permissions.
+This is the **recommended and only currently supported pattern** since Gemini CLI doesn't have shell access.
+
+## Security Note: Command Escaping
+
+**When using these CLI commands in scripts or automated workflows:**
+
+- Always properly escape user input
+- Use proper quoting for variables
+- Avoid directly interpolating untrusted input into commands
+- Validate input before passing to CLI tools
+
+**Examples:**
+```bash
+# [NO] Dangerous - unescaped user input
+user_code="$1"
+gemini -p "Analyze: $user_code"  # Unsafe!
+
+# [WARNING] This regex is VERY restrictive - for demonstration only!
+# It allows only: a-z, A-Z, 0-9, space, ( ) { }
+# It REJECTS: operators (+, -, *, /), quotes, semicolons, and most valid code
+# DO NOT use this pattern for real code validation!
+# For real use: read from file (shown below) or use comprehensive validation
+if [[ "$user_code" =~ ^[a-zA-Z0-9\ \(\)\{\}]+$ ]]; then
+    # Bash 4.4+
+    gemini -p "Analyze: ${user_code@Q}"
+    # OR Bash 3.x compatible
+    gemini -p "Analyze: $(printf '%q' "$user_code")"
+else
+    echo "Invalid input"
+    exit 1
+fi
+
+# [BEST] Safest approach - read from file instead of validating inline
+gemini -p "Analyze this code" --stdin < user_code.txt
+```
+
+**The examples in this document show simplified prompts. Always add appropriate escaping in production scripts.**
 
 ## Practical Usage
 
@@ -255,11 +292,14 @@ This avoids complex bidirectional tool permissions while maintaining collaborati
 
 ## Code Style Rules
 
-### No Emojis in Generated Code
-- [NO] Never use emojis in source code, code comments, or commit messages
+### No Emojis in Application Source Code
+- [NO] Never use emojis in **application** source code, code comments, or commit messages
+- [OK] Emojis are acceptable in **user-facing tools** like installation scripts and CLI utilities
 - [OK] Emojis are fine in conversational responses to user
-- [OK] Use standard ASCII in code: +, -, *, >, <, =, |, etc.
-- [OK] Use text indicators in code: [OK], [FAIL], [WARN], [INFO], [SUCCESS], [ERROR], [DONE]
+- [OK] Use standard ASCII in application code: +, -, *, >, <, =, |, etc.
+- [OK] Use text indicators in application code: [OK], [FAIL], [WARN], [INFO], [SUCCESS], [ERROR], [DONE]
+
+**Clarification:** User-facing tools (like `install.sh`) can use emojis to improve UX. Application code (the software being built) should not.
 
 
 ## Testing

@@ -16,12 +16,26 @@ Markdown-based agents you can use with `@` in Claude Code:
 
 ## Installation
 
+### Prerequisites
+
+**System Requirements:**
+- **Shell**: Bash 3.0+ or Zsh
+- **Operating Systems**: Linux, macOS, WSL2, Git Bash (Windows)
+- **Note**: This installer uses bashisms and is not POSIX sh compatible
+
+**Optional:**
+- Claude Code CLI (for `@` agent references)
+- Gemini CLI (for automatic agent context loading)
+- OpenAI Codex CLI (for global instructions)
+
+If no AI CLIs are detected, agents will be installed to `~/.aicraft/agents/` as a fallback.
+
 ### Linux / macOS
 
 #### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/ai-craft.git
+git clone https://github.com/zsoftly/ai-craft.git
 cd ai-craft
 ```
 
@@ -40,6 +54,12 @@ The installer automatically detects which AI CLIs you have installed and configu
 - **OpenAI Codex** → `~/.codex/instructions.md` (if Codex is installed)
 
 **No AI CLIs detected?** The installer will create `~/.aicraft/agents/` as a fallback.
+
+**Installation Behavior:**
+- Running `install.sh` **overwrites** existing agent files
+- **Automatic backups** are created before overwriting (timestamped)
+- Safe to run multiple times - your previous installation is always backed up
+- Backups are stored in the same directory with `.backup.<timestamp>` suffix
 
 #### Step 3: Verify Installation
 
@@ -75,7 +95,7 @@ cat ~/.codex/instructions.md | head -10
 #### Step 1: Clone the Repository
 
 ```powershell
-git clone https://github.com/yourusername/ai-craft.git
+git clone https://github.com/zsoftly/ai-craft.git
 cd ai-craft
 ```
 

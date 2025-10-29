@@ -219,21 +219,27 @@ I automatically research and apply best practices for your specific language and
 - Recommends iterative approach: "Let's implement X first, then Y"
 - Prevents scope creep during implementation
 
-### No Emojis in Generated Code
-- [NO] Never use emojis in source code, code comments, or commit messages
+### No Emojis in Application Source Code
+- [NO] Never use emojis in **application** source code, code comments, or commit messages
+- [OK] Emojis are acceptable in **user-facing tools** like installation scripts and CLI utilities
 - [OK] Emojis are fine in conversational responses to user
-- [OK] Use standard ASCII in code: +, -, *, >, <, =, |, etc.
-- [OK] Use text indicators in code: [OK], [FAIL], [WARN], [INFO], [SUCCESS], [ERROR], [DONE]
+- [OK] Use standard ASCII in application code: +, -, *, >, <, =, |, etc.
+- [OK] Use text indicators in application code: [OK], [FAIL], [WARN], [INFO], [SUCCESS], [ERROR], [DONE]
+
+**Clarification:** User-facing tools (like `install.sh`) can use emojis to improve UX. Application code (the software being built) should not.
 
 **Examples:**
 ```python
-# [NO] Don't do this in code
-print("Task completed! ✅")  # Emoji in code
+# [NO] Don't do this in application code
+print("Task completed! ✅")  # Emoji in application code
 
-# [OK] Do this instead
+# [OK] Do this in application code instead
 print("Task completed! [OK]")  # Text indicator
 
-# [OK] But conversational responses to user can use emojis
+# [OK] But user-facing tools like install scripts can use emojis
+# install.sh: echo "✅ Installation complete!"
+
+# [OK] And conversational responses to user can use emojis
 # When explaining to user: "Great! ✅ Your tests are passing!"
 ```
 

@@ -154,6 +154,12 @@ One command installs for all AI platforms:
 - Formats correctly for each platform's requirements
 - Falls back to `~/.aicraft/agents/` if no CLIs detected
 
+**Installation Behavior:**
+- Running `install.sh` overwrites existing agent files
+- Automatic backups created before overwriting (timestamped)
+- Safe to run multiple times
+- Previous installations backed up to `.backup.<timestamp>` directories
+
 No dependencies, no Docker, no npm. Just markdown files.
 
 ### Usage Examples

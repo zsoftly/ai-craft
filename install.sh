@@ -6,8 +6,69 @@
 # Exit on error or undefined variables
 set -eu
 
+# Parse command line arguments
+USE_EMOJI=true
+for arg in "$@"; do
+    case $arg in
+        --no-emoji)
+            USE_EMOJI=false
+            ;;
+        --help|-h)
+            echo "AI Craft Agents Installation Script"
+            echo ""
+            echo "Usage: $0 [OPTIONS]"
+            echo ""
+            echo "Options:"
+            echo "  --no-emoji    Disable emoji output (use ASCII indicators instead)"
+            echo "  --help, -h    Show this help message"
+            echo ""
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $arg"
+            echo "Use --help for usage information"
+            exit 1
+            ;;
+    esac
+done
+
+# Export emoji setting for use in color library
+export USE_EMOJI
+
+# Track installation state for cleanup
+INSTALL_STARTED=false
+BACKUP_DIR=""
+
+# Cleanup function
+cleanup() {
+    local exit_code=$?
+    if [ $exit_code -ne 0 ] && [ "$INSTALL_STARTED" = true ]; then
+        echo ""
+        # Use print_error if available, otherwise use plain echo
+        if type print_error &>/dev/null; then
+            print_error "[ERROR] Installation failed at step: $CURRENT_STEP"
+            if [ -n "$BACKUP_DIR" ] && [ -d "$BACKUP_DIR" ]; then
+                print_info "   Backup available at: $BACKUP_DIR"
+                print_info "   You can restore manually if needed"
+            fi
+            print_info "   Please check the error message above and try again"
+        else
+            echo "[ERROR] Installation failed at step: $CURRENT_STEP"
+            if [ -n "$BACKUP_DIR" ] && [ -d "$BACKUP_DIR" ]; then
+                echo "   Backup available at: $BACKUP_DIR"
+                echo "   You can restore manually if needed"
+            fi
+            echo "   Please check the error message above and try again"
+        fi
+    fi
+}
+
+# Set trap for cleanup on error or exit
+trap cleanup EXIT ERR
+
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CURRENT_STEP="Initialization"
 
 # Load shared color library
 if [ -f "$SCRIPT_DIR/lib/colors.sh" ]; then
@@ -25,6 +86,8 @@ fi
 print_header "Installing AI Craft Agents..."
 echo ""
 
+CURRENT_STEP="Checking prerequisites"
+
 # Check if agents directory exists
 if [ ! -d "agents" ]; then
     print_error "ERROR: agents/ directory not found!"
@@ -37,6 +100,42 @@ if ! ls agents/*.md &> /dev/null; then
     print_error "ERROR: No .md files found in agents/ directory!"
     exit 1
 fi
+
+CURRENT_STEP="Verifying agent files"
+
+# Verify file integrity
+print_info "[Verifying agent files...]"
+invalid_files=0
+for agent in agents/*.md; do
+    if [ -f "$agent" ]; then
+        # Check if file is readable
+        if [ ! -r "$agent" ]; then
+            print_warning "   [WARN] File not readable: $agent"
+            invalid_files=$((invalid_files + 1))
+            continue
+        fi
+
+        # Check if file is empty
+        if [ ! -s "$agent" ]; then
+            print_warning "   [WARN] File is empty: $agent"
+            invalid_files=$((invalid_files + 1))
+            continue
+        fi
+
+        # Check if file starts with markdown header
+        if ! head -1 "$agent" | grep -q "^#"; then
+            print_warning "   [WARN] File doesn't start with markdown header: $agent"
+            invalid_files=$((invalid_files + 1))
+        fi
+    fi
+done
+
+if [ $invalid_files -gt 0 ]; then
+    print_warning "   [WARN] Found $invalid_files suspicious file(s) - continuing anyway"
+else
+    print_success "   [OK] All agent files verified"
+fi
+echo ""
 
 # Installation paths for different AI CLIs
 CLAUDE_DIR="$HOME/.claude/agents"
@@ -65,7 +164,22 @@ fi
 
 # Install for Claude Code
 if [ "$CLAUDE_INSTALLED" = true ]; then
+    CURRENT_STEP="Installing for Claude Code"
+    INSTALL_STARTED=true
+
     print_info "[Installing for Claude Code...]"
+
+    # Create backup if directory already exists
+    if [ -d "$CLAUDE_DIR" ] && [ "$(ls -A "$CLAUDE_DIR" 2>/dev/null)" ]; then
+        BACKUP_DIR="$CLAUDE_DIR.backup.$(date +%Y%m%d_%H%M%S)"
+        mkdir -p "$BACKUP_DIR"
+        if cp -r "$CLAUDE_DIR"/* "$BACKUP_DIR/" 2>/dev/null; then
+            print_info "   [BACKUP] Previous installation backed up to: $BACKUP_DIR"
+        else
+            print_warning "   [WARN] Backup failed, but continuing installation"
+        fi
+    fi
+
     mkdir -p "$CLAUDE_DIR"
 
     # Copy agent files with error handling
@@ -73,49 +187,82 @@ if [ "$CLAUDE_INSTALLED" = true ]; then
         print_success "   [OK] Installed to: $CLAUDE_DIR"
     else
         print_error "   [ERROR] Failed to copy files to $CLAUDE_DIR"
+        print_error "   Reason: Permission denied or directory not writable"
         exit 1
     fi
 fi
 
 # Install for Gemini CLI
 if [ "$GEMINI_INSTALLED" = true ]; then
+    CURRENT_STEP="Installing for Gemini CLI"
+    INSTALL_STARTED=true
+
     print_info "[Installing for Gemini CLI...]"
+
+    # Create backup if GEMINI.md already exists
+    if [ -f "$GEMINI_DIR/GEMINI.md" ]; then
+        BACKUP_DIR="$GEMINI_DIR/backup.$(date +%Y%m%d_%H%M%S)"
+        mkdir -p "$BACKUP_DIR"
+        if cp "$GEMINI_DIR/GEMINI.md" "$BACKUP_DIR/" 2>/dev/null; then
+            print_info "   [BACKUP] Previous GEMINI.md backed up to: $BACKUP_DIR"
+        else
+            print_warning "   [WARN] Backup failed, but continuing installation"
+        fi
+    fi
+
     mkdir -p "$GEMINI_DIR"
 
     # Create GEMINI.md with agent instructions (automatically loaded, no env var needed)
-    cat > "$GEMINI_DIR/GEMINI.md" << 'EOF'
-# AI Craft Agents for Gemini
+    # Build content in memory first, then write once for better performance
+    GEMINI_CONTENT="# AI Craft Agents for Gemini
 
 You have access to structured workflow agents. When the user references an agent with @, provide guidance based on these workflows:
 
 ## Available Agents
 
-EOF
+"
 
     # Append agent summaries with error handling
     for agent in agents/*.md; do
         if [ -f "$agent" ]; then
             agent_name=$(basename "$agent" .md)
-            echo "### @$agent_name" >> "$GEMINI_DIR/GEMINI.md"
-            # Extract first header section (up to 10 lines) or use fallback
-            head -20 "$agent" | grep -A 5 "^##" | head -10 >> "$GEMINI_DIR/GEMINI.md" 2>/dev/null || \
-                echo "Agent documentation" >> "$GEMINI_DIR/GEMINI.md"
-            echo "" >> "$GEMINI_DIR/GEMINI.md"
+            GEMINI_CONTENT+="### @$agent_name"$'\n'
+            # Extract overview and usage sections more robustly
+            # Get content from first ## header, up to 15 lines total
+            agent_summary=$(awk 'BEGIN { count=0 } /^## / { found=1 } found { if (count >= 15) exit; print; count++ }' "$agent" 2>/dev/null) || \
+                agent_summary="Agent documentation - see $agent_name.md for details"
+            GEMINI_CONTENT+="$agent_summary"$'\n\n'
         fi
     done
 
-    # Also copy full agents for reference
-    if cp agents/*.md "$GEMINI_DIR/" 2>/dev/null; then
+    # Write content to file in one operation
+    if echo "$GEMINI_CONTENT" > "$GEMINI_DIR/GEMINI.md" 2>/dev/null; then
         print_success "   [OK] Installed to: $GEMINI_DIR/GEMINI.md"
     else
-        print_error "   [ERROR] Failed to copy files to $GEMINI_DIR"
+        print_error "   [ERROR] Failed to write to $GEMINI_DIR/GEMINI.md"
+        print_error "   Reason: Permission denied or directory not writable"
         exit 1
     fi
 fi
 
 # Install for OpenAI Codex CLI
 if [ "$CODEX_INSTALLED" = true ]; then
+    CURRENT_STEP="Installing for OpenAI Codex CLI"
+    INSTALL_STARTED=true
+
     print_info "[Installing for OpenAI Codex CLI...]"
+
+    # Create backup if instructions.md already exists
+    if [ -f "$CODEX_DIR/instructions.md" ]; then
+        BACKUP_DIR="$CODEX_DIR/backup.$(date +%Y%m%d_%H%M%S)"
+        mkdir -p "$BACKUP_DIR"
+        if cp "$CODEX_DIR/instructions.md" "$BACKUP_DIR/" 2>/dev/null; then
+            print_info "   [BACKUP] Previous instructions.md backed up to: $BACKUP_DIR"
+        else
+            print_warning "   [WARN] Backup failed, but continuing installation"
+        fi
+    fi
+
     mkdir -p "$CODEX_DIR"
 
     # Create instructions.md with agent guidance

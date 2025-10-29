@@ -43,7 +43,7 @@ Review changes, commit, and push using YOUR git credentials
 
 ```bash
 # Clone and install
-git clone https://github.com/yourusername/ai-craft.git
+git clone https://github.com/zsoftly/ai-craft.git
 cd ai-craft
 chmod +x install.sh
 ./install.sh
@@ -72,13 +72,18 @@ Reference agents with `@`:
 
 ## Working with Gemini
 
-Gemini (Google's latest model) is great for:
+Gemini (Google's model) is great for:
 - **Large files** - Massive context window (entire codebases!)
 - **Performance analysis** - Optimization specialist
 - **Data processing** - Logs, CSVs, metrics
 - **Fast responses** - Quick analysis
 
-I'll automatically use the latest Gemini model for best results.
+**Gemini CLI Tools:**
+- `read_file` - Read files
+- `search_file_content` - Search patterns
+- `web_fetch` - Fetch web content
+
+**Note:** Gemini cannot write files or run commands. Claude implements Gemini's suggestions.
 
 ### Simple Pattern
 

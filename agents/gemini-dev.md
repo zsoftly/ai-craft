@@ -10,33 +10,45 @@ Use Google's latest Gemini model for development tasks.
 
 ## Model Selection
 
-**I (Claude) will choose the appropriate model tier:**
+**I (Claude) will use your configured Gemini model:**
 
 - **Flash models** - For quick code reviews, simple analysis, fast responses
   - Best for: Performance checks, pattern finding, quick opinions
-  - I'll use the latest available Flash model
+  - Example: `gemini-2.0-flash-exp`, `gemini-1.5-flash`
 
 - **Pro models** - For complex coding tasks, deep analysis, architecture reviews
   - Best for: Large refactors, security audits, complex optimizations
-  - I'll use the latest available Pro model
+  - Example: `gemini-2.0-pro-exp`, `gemini-1.5-pro`
+
+**How to check available models:**
+```bash
+# List available Gemini models
+gemini models list
+
+# Or check your current default model
+gemini config get model
+```
+
+I'll use the model configured in your Gemini CLI settings, or you can specify one when needed.
 
 ## How I (Claude) Call Gemini
 
 When you ask me to use Gemini, I will:
 1. Determine task complexity (quick → Flash, complex → Pro)
-2. Look up the latest available model in that tier
-3. Execute Gemini CLI with that model:
+2. Execute Gemini CLI with appropriate model:
 
 ```bash
-# Quick tasks - I'll use latest Flash model
-gemini -m <latest-flash-model> -p "Your request here" --output-format json
+# Quick tasks - Use Flash model (faster)
+gemini -m gemini-2.0-flash-exp -p "Your request here" --output-format json
 
-# Complex tasks - I'll use latest Pro model
-gemini -m <latest-pro-model> -p "Your request here" --output-format json
+# Complex tasks - Use Pro model (more thorough)
+gemini -m gemini-2.0-pro-exp -p "Your request here" --output-format json
 
-# Or use your configured default
+# Or use your configured default model
 gemini -p "Your request here" --output-format json
 ```
+
+**Note:** Model names in examples may not be current. Check `gemini models list` for available models.
 
 **Context Optimization:**
 For complex inter-AI tasks or large analysis requests, I will use the Task tool to spawn a `general-purpose` sub-agent to:
@@ -252,11 +264,63 @@ When you ask me to use Gemini, I:
 
 That's it! No complex setup needed.
 
+## Gemini CLI Capabilities
+
+**Available Tools:**
+- `read_file` - Read file contents
+- `search_file_content` - Search within files using patterns
+- `web_fetch` - Fetch content from web URLs
+
+**Limitations:**
+- Cannot write or edit files directly
+- Cannot run shell commands
+- Cannot execute code
+
+**Workflow:** When Gemini identifies issues or optimizations, I (Claude) implement them using my full tool set (file editing, command execution, etc.).
+
+## Security Note: Command Escaping
+
+**When using CLI commands in scripts or automated workflows:**
+
+- Always properly escape user input
+- Use proper quoting for variables
+- Avoid directly interpolating untrusted input into commands
+- Validate input before passing to CLI tools
+
+**Examples:**
+```bash
+# [NO] Dangerous - no escaping
+user_input="some value"
+gemini -p "$user_input"  # Could break with special characters
+
+# [OK] Safe - proper quoting (Bash 4.4+)
+user_input="some value"
+gemini -p "${user_input@Q}"
+
+# [OK] Safe - proper quoting (Bash 3.x compatible)
+user_input="some value"
+gemini -p "$(printf '%q' "$user_input")"
+
+# [WARNING] This validation is VERY restrictive - for demonstration only!
+# Real code validation should be comprehensive or use file-based input (shown below)
+if [[ "$user_input" =~ ^[a-zA-Z0-9\ ]+$ ]]; then
+    gemini -p "$user_input"
+fi
+
+# [RECOMMENDED] Use file-based input instead of inline validation
+# This is safer and avoids escaping complexity entirely
+```
+
+**These agent examples show sanitized prompts. Always add appropriate escaping in production scripts.**
+
 ## Code Style Rules
 
-### No Emojis in Generated Code
-- [NO] Never use emojis in source code, code comments, or commit messages
+### No Emojis in Application Source Code
+- [NO] Never use emojis in **application** source code, code comments, or commit messages
+- [OK] Emojis are acceptable in **user-facing tools** like installation scripts and CLI utilities
 - [OK] Emojis are fine in conversational responses to user
-- [OK] Use standard ASCII in code: +, -, *, >, <, =, |, etc.
-- [OK] Use text indicators in code: [OK], [FAIL], [WARN], [INFO], [SUCCESS], [ERROR], [DONE]
+- [OK] Use standard ASCII in application code: +, -, *, >, <, =, |, etc.
+- [OK] Use text indicators in application code: [OK], [FAIL], [WARN], [INFO], [SUCCESS], [ERROR], [DONE]
+
+**Clarification:** User-facing tools (like `install.sh`) can use emojis to improve UX. Application code (the software being built) should not.
 
