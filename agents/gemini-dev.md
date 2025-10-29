@@ -19,6 +19,16 @@ When you ask me to use Gemini, I'll execute the Gemini CLI in headless mode:
 gemini -p "Your request here" --output-format json
 ```
 
+**Context Optimization:**
+For complex inter-AI tasks or large analysis requests, I will use the Task tool to spawn a `general-purpose` sub-agent to:
+- Prepare and format data for Gemini
+- Execute Gemini CLI commands
+- Parse and validate Gemini's responses
+- Return structured findings to me
+- Save your main conversation context for implementation work
+
+This allows me to delegate the Gemini communication while keeping your main context free.
+
 ### Simple Delegation
 Just ask me:
 

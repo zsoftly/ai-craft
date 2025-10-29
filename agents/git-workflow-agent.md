@@ -45,6 +45,14 @@ When you ask me to commit and push changes, I follow this workflow:
 
 ### Phase 1: Review Changes
 
+**Context Optimization:**
+For large changesets (100+ files or complex diffs), I will use the Task tool to spawn a `general-purpose` sub-agent to:
+- Analyze all uncommitted changes across the repository
+- Generate comprehensive diff summaries
+- Identify related changes that should be grouped
+- Return organized findings to me
+- Save your main context for the commit and push workflow
+
 **First, I determine the correct comparison base:**
 ```bash
 # Get current branch name

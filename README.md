@@ -20,14 +20,16 @@ Markdown-based agents you can use with `@` in Claude Code:
 
 ## Installation
 
-### Step 1: Clone the Repository
+### Linux / macOS
+
+#### Step 1: Clone the Repository
 
 ```bash
 git clone https://github.com/yourusername/ai-craft.git
 cd ai-craft
 ```
 
-### Step 2: Run the Installer
+#### Step 2: Run the Installer
 
 ```bash
 chmod +x install.sh
@@ -43,7 +45,7 @@ The installer automatically detects which AI CLIs you have installed and configu
 
 **No AI CLIs detected?** The installer will create `~/.aicraft/agents/` as a fallback.
 
-### Step 3: Verify Installation
+#### Step 3: Verify Installation
 
 **For Claude Code:**
 ```bash
@@ -71,6 +73,120 @@ cat ~/.gemini/system.md | head -10
 # Check instructions.md was created
 cat ~/.codex/instructions.md | head -10
 ```
+
+### Windows (PowerShell)
+
+#### Step 1: Clone the Repository
+
+```powershell
+git clone https://github.com/yourusername/ai-craft.git
+cd ai-craft
+```
+
+#### Step 2: Run the PowerShell Installer
+
+```powershell
+# Run the PowerShell installer
+.\install.ps1
+```
+
+The installer automatically detects which AI CLIs you have installed and configures them:
+
+**Detects and installs for:**
+- **Claude Code** → `%USERPROFILE%\.claude\agents\` (if Claude Code is installed)
+- **Gemini CLI** → `%USERPROFILE%\.gemini\system.md` (if Gemini CLI is installed)
+- **OpenAI Codex** → `%USERPROFILE%\.codex\instructions.md` (if Codex is installed)
+
+**No AI CLIs detected?** The installer will create `%USERPROFILE%\.aicraft\agents\` as a fallback.
+
+**Note:** If you encounter an execution policy error, you may need to allow script execution:
+
+```powershell
+# Allow scripts for current session only
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+# Then run the installer
+.\install.ps1
+```
+
+#### Step 3: Verify Installation
+
+**For Claude Code:**
+```powershell
+# List installed agents
+Get-ChildItem "$env:USERPROFILE\.claude\agents\"
+
+# You should see:
+# code-review-agent.md
+# dev-agent.md
+# gemini-data.md
+# gemini-dev.md
+# git-workflow-agent.md
+# inter-ai-communication.md
+# tdd-agent.md
+```
+
+**For Gemini CLI:**
+```powershell
+# Check system.md was created
+Get-Content "$env:USERPROFILE\.gemini\system.md" | Select-Object -First 10
+```
+
+**For OpenAI Codex:**
+```powershell
+# Check instructions.md was created
+Get-Content "$env:USERPROFILE\.codex\instructions.md" | Select-Object -First 10
+```
+
+## Updating Agents
+
+### Linux / macOS
+
+When agents are updated in the repository, use the smart update script:
+
+```bash
+chmod +x update.sh
+./update.sh
+```
+
+**Smart Features:**
+- ✓ Detects custom modifications you made to agents
+- ✓ Offers options: Overwrite, Keep, Diff, or Merge
+- ✓ Creates automatic backups before overwriting
+- ✓ Shows differences between versions
+- ✓ Opens diff viewer for manual merging
+
+**Update Options:**
+1. **Overwrite** - Replace with new version (backup created automatically)
+2. **Keep** - Keep your custom version
+3. **Diff** - View differences between versions
+4. **Merge** - Manual merge using your editor (VS Code, vim, nano)
+5. **Abort** - Cancel update
+
+### Windows (PowerShell)
+
+```powershell
+.\update.ps1
+```
+
+Same smart features as Linux/macOS version!
+
+**Update Options:**
+- Automatic backup creation
+- Diff viewing with VS Code or Notepad
+- Manual merge support
+- Safe rollback with backups
+
+### When to Update
+
+Run the update script when:
+- You pull latest changes from the repository
+- New agent features are released
+- Bug fixes or improvements are available
+
+The update script will safely handle your custom modifications.
+
+**Note for WSL Users:** Use the Linux/macOS update script (`./update.sh`) instead of the PowerShell version.
 
 ## Usage
 

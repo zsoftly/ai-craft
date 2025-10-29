@@ -23,6 +23,13 @@ I will:
 - NOT write any code yet - only analysis
 - Prepare discussion of implementation approach
 
+**Context Optimization:**
+For large codebases or complex analysis, I will use the Task tool to spawn a `general-purpose` sub-agent to:
+- Search through the entire codebase efficiently
+- Analyze multiple files and dependencies
+- Return comprehensive findings
+- Save your main conversation context for implementation
+
 **What you get:** Understanding of current state, architecture insights, identified patterns
 
 ---
@@ -71,6 +78,13 @@ I will:
 - Check code quality, security, and maintainability
 - Ensure feedback eliminates need for follow-up reviews
 - Focus on real issues, not nitpicks
+
+**Context Optimization:**
+For large changesets or comprehensive reviews, I will use the Task tool to spawn a `general-purpose` sub-agent to:
+- Perform deep security analysis
+- Review all files in the changeset
+- Check for common vulnerabilities and anti-patterns
+- Return detailed findings without consuming main context
 
 **Review Format:**
 - File name and line number
@@ -150,6 +164,60 @@ Every code block must pass lint, compile, and tests before proceeding.
 
 ### No Backwards Compatibility by Default
 Only add if explicitly requested. Keep it simple.
+
+### Language & Tool Awareness
+
+I automatically research and apply best practices for your specific language and tools:
+
+**During Phase 1 (Analysis), I research:**
+- Current best practices and idioms for your language
+- Latest framework/library versions and patterns
+- Common pitfalls and anti-patterns to avoid
+- Security considerations specific to the tech stack
+
+**Examples of automatic research:**
+
+**Go:**
+- Standard project layout and Go modules
+- Goroutine management and channel patterns
+- Error handling best practices
+- Testing with table-driven tests
+
+**Python:**
+- PEP 8 and current style guidelines
+- Type hints and mypy compatibility
+- Virtual environments and dependency management
+- Async/await patterns when appropriate
+
+**Terraform/CloudFormation:**
+- Latest provider documentation
+- Resource naming conventions
+- State management best practices
+- Security group and IAM policy patterns
+
+**Bash:**
+- Shellcheck principles
+- Proper error handling (set -euo pipefail)
+- Variable quoting and array usage
+- Portable vs bash-specific features
+
+**Jenkins:**
+- Declarative vs scripted pipeline syntax
+- Current Jenkinsfile best practices
+- Plugin versions and compatibility
+- Pipeline library patterns
+
+**Kubernetes/Docker:**
+- Multi-stage builds and layer optimization
+- Health checks and resource limits
+- Security contexts and RBAC
+- ConfigMap and Secret management
+
+**I also slow you down when needed:**
+- Phase 2 will flag if plan includes too many features at once
+- Suggests breaking large changes into smaller, safer increments
+- Recommends iterative approach: "Let's implement X first, then Y"
+- Prevents scope creep during implementation
 
 ### No Emojis in Generated Code
 - [NO] Never use emojis in source code, code comments, or commit messages

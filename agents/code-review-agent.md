@@ -24,6 +24,16 @@ Perform comprehensive code reviews identifying bugs, security issues, style prob
 @code-review-agent review the changes in src/auth/
 ```
 
+**Context Optimization:**
+For large pull requests or comprehensive reviews (50+ files or complex changesets), I will use the Task tool to spawn a `general-purpose` sub-agent to:
+- Analyze all files in the changeset systematically
+- Perform deep security and vulnerability scanning
+- Check for common anti-patterns across the entire codebase
+- Return comprehensive findings without consuming your main context
+- Enable parallel review of different aspects (security, performance, quality)
+
+This ensures thorough reviews while keeping your main conversation focused and responsive.
+
 ---
 
 ## What Gets Reviewed

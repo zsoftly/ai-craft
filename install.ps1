@@ -1,0 +1,229 @@
+# AI Craft Agents Installation Script for Windows
+# Installs agents to appropriate locations for Claude, Gemini, and OpenAI CLIs
+
+# Exit on error
+$ErrorActionPreference = "Stop"
+
+# Color helper function
+function Write-Color {
+    param(
+        [string]$Message,
+        [string]$Color = "White"
+    )
+    Write-Host $Message -ForegroundColor $Color
+}
+
+Write-Color "`nInstalling AI Craft Agents...`n" "Cyan"
+
+# Check if agents directory exists
+if (-not (Test-Path "agents")) {
+    Write-Color "ERROR: agents/ directory not found!" "Red"
+    Write-Host "Please run this script from the ai-craft root directory."
+    exit 1
+}
+
+# Check if agent files exist
+$agentFiles = Get-ChildItem "agents\*.md" -ErrorAction SilentlyContinue
+if (-not $agentFiles) {
+    Write-Color "ERROR: No .md files found in agents/ directory!" "Red"
+    exit 1
+}
+
+# Installation paths for different AI CLIs
+$HOME_DIR = $env:USERPROFILE
+$CLAUDE_DIR = Join-Path $HOME_DIR ".claude\agents"
+$GEMINI_DIR = Join-Path $HOME_DIR ".gemini"
+$CODEX_DIR = Join-Path $HOME_DIR ".codex"
+
+# Detect which CLIs are available
+$CLAUDE_INSTALLED = $false
+$GEMINI_INSTALLED = $false
+$CODEX_INSTALLED = $false
+
+# Check for Claude Code
+if ((Get-Command claude -ErrorAction SilentlyContinue) -or (Test-Path (Join-Path $HOME_DIR ".claude"))) {
+    $CLAUDE_INSTALLED = $true
+}
+
+# Check for Gemini CLI
+if ((Get-Command gemini -ErrorAction SilentlyContinue) -or (Test-Path (Join-Path $HOME_DIR ".gemini"))) {
+    $GEMINI_INSTALLED = $true
+}
+
+# Check for OpenAI Codex CLI
+if ((Get-Command codex -ErrorAction SilentlyContinue) -or (Test-Path (Join-Path $HOME_DIR ".codex"))) {
+    $CODEX_INSTALLED = $true
+}
+
+# Install for Claude Code
+if ($CLAUDE_INSTALLED) {
+    Write-Color "[Installing for Claude Code...]" "Blue"
+    New-Item -ItemType Directory -Force -Path $CLAUDE_DIR | Out-Null
+
+    try {
+        Copy-Item "agents\*.md" -Destination $CLAUDE_DIR -Force
+        Write-Color "   [OK] Installed to: $CLAUDE_DIR" "Green"
+    }
+    catch {
+        Write-Color "   [ERROR] Failed to copy files to $CLAUDE_DIR" "Red"
+        Write-Host $_.Exception.Message
+        exit 1
+    }
+}
+
+# Install for Gemini CLI
+if ($GEMINI_INSTALLED) {
+    Write-Color "[Installing for Gemini CLI...]" "Blue"
+    New-Item -ItemType Directory -Force -Path $GEMINI_DIR | Out-Null
+
+    # Create system.md with agent instructions
+    $systemMdPath = Join-Path $GEMINI_DIR "system.md"
+    $systemMdContent = @"
+# AI Craft Agents for Gemini
+
+You have access to structured workflow agents. When the user references an agent with @, provide guidance based on these workflows:
+
+## Available Agents
+
+"@
+
+    Set-Content -Path $systemMdPath -Value $systemMdContent
+
+    # Append agent summaries
+    foreach ($agent in (Get-ChildItem "agents\*.md")) {
+        $agentName = $agent.BaseName
+        Add-Content -Path $systemMdPath -Value "`n### @$agentName"
+
+        # Extract agent summary (first 20 lines, then grep for ## and get next 10)
+        try {
+            $agentContent = Get-Content $agent.FullName -Head 20
+            $foundHeader = $false
+            $lineCount = 0
+            foreach ($line in $agentContent) {
+                if ($line -match "^##") {
+                    $foundHeader = $true
+                }
+                if ($foundHeader) {
+                    Add-Content -Path $systemMdPath -Value $line
+                    $lineCount++
+                    if ($lineCount -ge 10) { break }
+                }
+            }
+            if (-not $foundHeader) {
+                Add-Content -Path $systemMdPath -Value "Agent documentation"
+            }
+        }
+        catch {
+            Add-Content -Path $systemMdPath -Value "Agent documentation"
+        }
+        Add-Content -Path $systemMdPath -Value ""
+    }
+
+    # Also copy full agents for reference
+    try {
+        Copy-Item "agents\*.md" -Destination $GEMINI_DIR -Force
+        Write-Color "   [OK] Installed to: $GEMINI_DIR\system.md" "Green"
+    }
+    catch {
+        Write-Color "   [ERROR] Failed to copy files to $GEMINI_DIR" "Red"
+        Write-Host $_.Exception.Message
+        exit 1
+    }
+}
+
+# Install for OpenAI Codex CLI
+if ($CODEX_INSTALLED) {
+    Write-Color "[Installing for OpenAI Codex CLI...]" "Blue"
+    New-Item -ItemType Directory -Force -Path $CODEX_DIR | Out-Null
+
+    # Create instructions.md with agent guidance
+    $instructionsMdPath = Join-Path $CODEX_DIR "instructions.md"
+    $instructionsMdContent = @"
+# AI Craft Development Agents
+
+Follow these structured workflows when developing:
+
+"@
+
+    Set-Content -Path $instructionsMdPath -Value $instructionsMdContent
+
+    # Append agent content
+    $agentCount = 0
+    $agentPaths = @("agents\dev-agent.md", "agents\tdd-agent.md", "agents\code-review-agent.md")
+
+    foreach ($agentPath in $agentPaths) {
+        if (Test-Path $agentPath) {
+            try {
+                $agentContent = Get-Content $agentPath -Raw
+                Add-Content -Path $instructionsMdPath -Value $agentContent
+                Add-Content -Path $instructionsMdPath -Value "`n---`n"
+                $agentCount++
+            }
+            catch {
+                # Continue to next agent
+            }
+        }
+    }
+
+    if ($agentCount -gt 0) {
+        Write-Color "   [OK] Installed to: $CODEX_DIR\instructions.md" "Green"
+    }
+    else {
+        Write-Color "   [WARN] No agent files found for Codex" "Yellow"
+    }
+}
+
+Write-Host ""
+Write-Color "[OK] Installation complete!" "Green"
+Write-Host ""
+
+# Summary
+Write-Color "[Installed agents for:]" "Cyan"
+if ($CLAUDE_INSTALLED) { Write-Host "   - Claude Code: $CLAUDE_DIR" }
+if ($GEMINI_INSTALLED) { Write-Host "   - Gemini CLI: $GEMINI_DIR\system.md" }
+if ($CODEX_INSTALLED) { Write-Host "   - OpenAI Codex: $CODEX_DIR\instructions.md" }
+
+if (-not $CLAUDE_INSTALLED -and -not $GEMINI_INSTALLED -and -not $CODEX_INSTALLED) {
+    Write-Color "   [WARN] No AI CLIs detected" "Yellow"
+    $fallbackPath = Join-Path $HOME_DIR ".aicraft\agents"
+    Write-Host "   Installing to fallback location: $fallbackPath"
+    New-Item -ItemType Directory -Force -Path $fallbackPath | Out-Null
+
+    try {
+        Copy-Item "agents\*.md" -Destination $fallbackPath -Force
+        Write-Color "   [OK] Installed to fallback location" "Green"
+    }
+    catch {
+        Write-Color "   [ERROR] Failed to copy files to fallback location" "Red"
+        Write-Host $_.Exception.Message
+        exit 1
+    }
+}
+
+Write-Host ""
+Write-Color "[USAGE]" "Cyan"
+
+if ($CLAUDE_INSTALLED) {
+    Write-Host ""
+    Write-Color "  Claude Code:" "Blue"
+    Write-Host "    @dev-agent Phase 1: Analyze my code"
+    Write-Host "    @gemini-dev Ask Gemini to check performance"
+}
+
+if ($GEMINI_INSTALLED) {
+    Write-Host ""
+    Write-Color "  Gemini CLI:" "Blue"
+    Write-Host "    Set GEMINI_SYSTEM_MD=true in your environment"
+    Write-Host "    `$env:GEMINI_SYSTEM_MD=`"true`""
+    Write-Host "    Then agents will be available automatically"
+}
+
+if ($CODEX_INSTALLED) {
+    Write-Host ""
+    Write-Color "  OpenAI Codex:" "Blue"
+    Write-Host "    Instructions loaded automatically"
+    Write-Host "    Agents guide all code generation"
+}
+
+Write-Host ""
+Write-Color "Happy coding!" "Green"

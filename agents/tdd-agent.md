@@ -23,6 +23,14 @@ I will:
 - Ensure test will fail for the RIGHT reason
 - NOT write any production code yet
 
+**Context Optimization:**
+For complex test scenarios or large test suites, I will use the Task tool to spawn a `general-purpose` sub-agent to:
+- Analyze existing test patterns in the codebase
+- Research test framework best practices
+- Generate comprehensive test cases for edge conditions
+- Return test specifications to me
+- Save your main context for implementation work
+
 **Test Naming Pattern:**
 ```
 should_<expected_behavior>_when_<condition>

@@ -22,6 +22,16 @@ gemini -p "Analyze this data: [your data/logs]" --output-format json
 
 This runs Gemini in headless mode and returns structured results I can present to you.
 
+**Context Optimization:**
+For large dataset analysis or complex data processing tasks, I will use the Task tool to spawn a `general-purpose` sub-agent to:
+- Read and prepare large log files or datasets
+- Execute Gemini CLI commands with the data
+- Parse and structure Gemini's analytical findings
+- Return actionable insights to me
+- Save your main conversation context for implementing fixes
+
+This allows efficient data analysis while keeping your main context focused on solutions.
+
 ## What Gemini Can Analyze
 
 ### Log Files
