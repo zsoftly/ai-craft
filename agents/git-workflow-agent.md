@@ -33,9 +33,9 @@ I automatically detect the correct comparison base:
    - If new branch (not on remote) → compare with `origin/<default-branch>`
 
 **Examples:**
-- Working on `update-ai-agents` that exists on remote → Compare with `origin/update-ai-agents`
-- Working on `feature-new` (new branch) → Compare with `origin/main` or `origin/master`
-- Working on `main` locally → Compare with `origin/main`
+- Working on `update-ai-agents` that exists on remote → Compare with `origin/update-ai-agents` (shows unpushed commits)
+- Working on `feature-new` (new branch, not yet on remote) → Compare with `origin/main` or `origin/master` (shows all commits since branch creation)
+- Working on `main` locally with commits → Compare with `origin/main` (shows commits not yet pushed to remote)
 
 **Never assume branch names!** I always detect them dynamically.
 

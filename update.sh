@@ -133,11 +133,11 @@ prompt_user_action() {
     echo "The installed version has been modified since installation."
     echo ""
     echo "Options:"
-    echo -e "  1) $(print_success "Overwrite") - Replace with new version (backup created)"
-    echo -e "  2) $(print_info "Keep") - Keep your custom version"
-    echo -e "  3) $(print_header "Diff") - Show differences"
-    echo -e "  4) $(print_warning "Merge") - Manual merge (opens in editor)"
-    echo -e "  5) $(print_error "Abort") - Stop update process"
+    echo -e "  1) ${GREEN}Overwrite${NC} - Replace with new version (backup created)"
+    echo -e "  2) ${BLUE}Keep${NC} - Keep your custom version"
+    echo -e "  3) ${CYAN}Diff${NC} - Show differences"
+    echo -e "  4) ${YELLOW}Merge${NC} - Manual merge (opens in editor)"
+    echo -e "  5) ${RED}Abort${NC} - Stop update process"
     echo ""
 
     while true; do
@@ -269,11 +269,9 @@ EOF
             if [ -f "$agent" ]; then
                 agent_name=$(basename "$agent" .md)
                 echo "### @$agent_name" >> "$temp_system_md"
-                if head -20 "$agent" | grep -A 5 "^##" | head -10 >> "$temp_system_md" 2>/dev/null; then
-                    :
-                else
+                # Extract first header section (up to 10 lines) or use fallback
+                head -20 "$agent" | grep -A 5 "^##" | head -10 >> "$temp_system_md" 2>/dev/null || \
                     echo "Agent documentation" >> "$temp_system_md"
-                fi
                 echo "" >> "$temp_system_md"
             fi
         done

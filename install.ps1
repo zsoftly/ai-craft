@@ -94,22 +94,31 @@ You have access to structured workflow agents. When the user references an agent
         $agentName = $agent.BaseName
         Add-Content -Path $systemMdPath -Value "`n### @$agentName"
 
-        # Extract agent summary (first 20 lines, then grep for ## and get next 10)
+        # Extract agent summary (match bash: grep -A 5 = matching line + 5 after, max 10 total)
         try {
             $agentContent = Get-Content $agent.FullName -Head 20
-            $foundHeader = $false
-            $lineCount = 0
-            foreach ($line in $agentContent) {
-                if ($line -match "^##") {
-                    $foundHeader = $true
-                }
-                if ($foundHeader) {
-                    Add-Content -Path $systemMdPath -Value $line
-                    $lineCount++
-                    if ($lineCount -ge 10) { break }
+            $totalLines = 0
+            $maxTotalLines = 10
+            $foundAnyHeader = $false
+
+            for ($i = 0; $i -lt $agentContent.Count -and $totalLines -lt $maxTotalLines; $i++) {
+                if ($agentContent[$i] -match "^##") {
+                    $foundAnyHeader = $true
+                    # Output matching line + next 5 lines (6 lines per match, like grep -A 5)
+                    $linesToOutput = [Math]::Min(6, $maxTotalLines - $totalLines)
+                    $endIndex = [Math]::Min($i + $linesToOutput, $agentContent.Count)
+
+                    for ($j = $i; $j -lt $endIndex -and $totalLines -lt $maxTotalLines; $j++) {
+                        Add-Content -Path $systemMdPath -Value $agentContent[$j]
+                        $totalLines++
+                    }
+
+                    # Skip past the lines we just output
+                    $i = $endIndex - 1
                 }
             }
-            if (-not $foundHeader) {
+
+            if (-not $foundAnyHeader) {
                 Add-Content -Path $systemMdPath -Value "Agent documentation"
             }
         }

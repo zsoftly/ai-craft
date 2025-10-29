@@ -273,10 +273,35 @@ You have access to structured workflow agents. When the user references an agent
             $agentName = $agent.BaseName
             Add-Content -Path $tempSystemMd -Value "### @$agentName"
 
-            $summary = Get-Content $agent.FullName | Select-Object -First 20 | Where-Object { $_ -match "^##" } | Select-Object -First 10
-            if ($summary) {
-                Add-Content -Path $tempSystemMd -Value $summary
-            } else {
+            # Extract agent summary (match bash: grep -A 5 = matching line + 5 after, max 10 total)
+            try {
+                $agentContent = Get-Content $agent.FullName -Head 20
+                $totalLines = 0
+                $maxTotalLines = 10
+                $foundAnyHeader = $false
+
+                for ($i = 0; $i -lt $agentContent.Count -and $totalLines -lt $maxTotalLines; $i++) {
+                    if ($agentContent[$i] -match "^##") {
+                        $foundAnyHeader = $true
+                        # Output matching line + next 5 lines (6 lines per match, like grep -A 5)
+                        $linesToOutput = [Math]::Min(6, $maxTotalLines - $totalLines)
+                        $endIndex = [Math]::Min($i + $linesToOutput, $agentContent.Count)
+
+                        for ($j = $i; $j -lt $endIndex -and $totalLines -lt $maxTotalLines; $j++) {
+                            Add-Content -Path $tempSystemMd -Value $agentContent[$j]
+                            $totalLines++
+                        }
+
+                        # Skip past the lines we just output
+                        $i = $endIndex - 1
+                    }
+                }
+
+                if (-not $foundAnyHeader) {
+                    Add-Content -Path $tempSystemMd -Value "Agent documentation"
+                }
+            }
+            catch {
                 Add-Content -Path $tempSystemMd -Value "Agent documentation"
             }
             Add-Content -Path $tempSystemMd -Value ""

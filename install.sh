@@ -97,13 +97,9 @@ EOF
         if [ -f "$agent" ]; then
             agent_name=$(basename "$agent" .md)
             echo "### @$agent_name" >> "$GEMINI_DIR/system.md"
-
-            # Extract agent summary with fallback
-            if head -20 "$agent" | grep -A 5 "^##" | head -10 >> "$GEMINI_DIR/system.md" 2>/dev/null; then
-                :  # Success, do nothing
-            else
+            # Extract first header section (up to 10 lines) or use fallback
+            head -20 "$agent" | grep -A 5 "^##" | head -10 >> "$GEMINI_DIR/system.md" 2>/dev/null || \
                 echo "Agent documentation" >> "$GEMINI_DIR/system.md"
-            fi
             echo "" >> "$GEMINI_DIR/system.md"
         fi
     done
