@@ -182,14 +182,21 @@ if [ "$CLAUDE_INSTALLED" = true ]; then
 
     mkdir -p "$CLAUDE_DIR"
 
-    # Copy agent files with error handling
-    if cp agents/*.md "$CLAUDE_DIR/" 2>/dev/null; then
-        print_success "   [OK] Installed to: $CLAUDE_DIR"
-    else
-        print_error "   [ERROR] Failed to copy files to $CLAUDE_DIR"
-        print_error "   Reason: Permission denied or directory not writable"
-        exit 1
-    fi
+    # Copy agent files with error handling (exclude README and GLOSSARY - they're just docs)
+    for agent in agents/*.md; do
+        if [ -f "$agent" ]; then
+            agent_name=$(basename "$agent")
+            # Skip documentation files
+            if [ "$agent_name" = "README.md" ] || [ "$agent_name" = "GLOSSARY.md" ]; then
+                continue
+            fi
+            if ! cp "$agent" "$CLAUDE_DIR/" 2>/dev/null; then
+                print_error "   [ERROR] Failed to copy $agent to $CLAUDE_DIR"
+                exit 1
+            fi
+        fi
+    done
+    print_success "   [OK] Installed to: $CLAUDE_DIR"
 fi
 
 # Install for Gemini CLI
@@ -222,15 +229,23 @@ You have access to structured workflow agents. When the user references an agent
 
 "
 
-    # Append agent summaries with error handling
+    # Append agent summaries with error handling (exclude README and GLOSSARY - they're just docs)
     for agent in agents/*.md; do
         if [ -f "$agent" ]; then
+            agent_basename=$(basename "$agent")
+            # Skip documentation files
+            if [ "$agent_basename" = "README.md" ] || [ "$agent_basename" = "GLOSSARY.md" ]; then
+                continue
+            fi
             agent_name=$(basename "$agent" .md)
-            GEMINI_CONTENT+="### @$agent_name"$'\n'
+            GEMINI_CONTENT+="### Agent: $agent_name"$'\n'
             # Extract overview and usage sections more robustly
             # Get content from first ## header, up to 15 lines total
             agent_summary=$(awk 'BEGIN { count=0 } /^## / { found=1 } found { if (count >= 15) exit; print; count++ }' "$agent" 2>/dev/null) || \
                 agent_summary="Agent documentation - see $agent_name.md for details"
+            # Remove inline @ references to prevent Gemini CLI import errors
+            # Gemini CLI treats any @word as an import directive, not just headers
+            agent_summary=$(echo "$agent_summary" | sed 's/@[a-z-][a-z-]*//g')
             GEMINI_CONTENT+="$agent_summary"$'\n\n'
         fi
     done
@@ -243,6 +258,10 @@ You have access to structured workflow agents. When the user references an agent
         print_error "   Reason: Permission denied or directory not writable"
         exit 1
     fi
+
+    # Note: We don't copy individual agent files because they contain inline @ references
+    # that Gemini CLI interprets as import directives, causing errors.
+    # GEMINI.md already contains cleaned summaries of all agents.
 fi
 
 # Install for OpenAI Codex CLI
@@ -306,13 +325,21 @@ if [ "$CLAUDE_INSTALLED" = false ] && [ "$GEMINI_INSTALLED" = false ] && [ "$COD
     echo "   Installing to fallback location: $HOME/.aicraft/agents"
     mkdir -p "$HOME/.aicraft/agents"
 
-    # Copy with error handling
-    if cp agents/*.md "$HOME/.aicraft/agents/" 2>/dev/null; then
-        print_success "   [OK] Installed to fallback location"
-    else
-        print_error "   [ERROR] Failed to copy files to fallback location"
-        exit 1
-    fi
+    # Copy with error handling (exclude README and GLOSSARY - they're just docs)
+    for agent in agents/*.md; do
+        if [ -f "$agent" ]; then
+            agent_name=$(basename "$agent")
+            # Skip documentation files
+            if [ "$agent_name" = "README.md" ] || [ "$agent_name" = "GLOSSARY.md" ]; then
+                continue
+            fi
+            if ! cp "$agent" "$HOME/.aicraft/agents/" 2>/dev/null; then
+                print_error "   [ERROR] Failed to copy $agent to fallback location"
+                exit 1
+            fi
+        fi
+    done
+    print_success "   [OK] Installed to fallback location"
 fi
 
 echo ""

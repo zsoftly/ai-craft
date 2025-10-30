@@ -61,7 +61,11 @@ if ($CLAUDE_INSTALLED) {
     New-Item -ItemType Directory -Force -Path $CLAUDE_DIR | Out-Null
 
     try {
-        Copy-Item "agents\*.md" -Destination $CLAUDE_DIR -Force
+        # Copy only actual agents (exclude GLOSSARY and README - they're in docs/ now)
+        Get-ChildItem "agents\*.md" | Where-Object {
+            $_.Name -ne "GLOSSARY.md" -and $_.Name -ne "README.md"
+        } | Copy-Item -Destination $CLAUDE_DIR -Force
+
         Write-Color "   [OK] Installed to: $CLAUDE_DIR" "Green"
     }
     catch {
@@ -89,10 +93,13 @@ You have access to structured workflow agents. When the user references an agent
 
     Set-Content -Path $geminiMdPath -Value $geminiMdContent
 
-    # Append agent summaries
-    foreach ($agent in (Get-ChildItem "agents\*.md")) {
+    # Append agent summaries (exclude GLOSSARY and README - they're in docs/ now)
+    foreach ($agent in (Get-ChildItem "agents\*.md" | Where-Object {
+        $_.Name -ne "GLOSSARY.md" -and $_.Name -ne "README.md"
+    })) {
         $agentName = $agent.BaseName
-        Add-Content -Path $geminiMdPath -Value "`n### @$agentName"
+        # Use "Agent:" prefix instead of "@" to avoid Gemini CLI import errors
+        Add-Content -Path $geminiMdPath -Value "`n### Agent: $agentName"
 
         # Extract agent summary (match bash: grep -A 5 = matching line + 5 after, max 10 total)
         try {
@@ -121,6 +128,12 @@ You have access to structured workflow agents. When the user references an agent
             if (-not $foundAnyHeader) {
                 Add-Content -Path $geminiMdPath -Value "Agent documentation"
             }
+
+            # Strip inline @ references to prevent Gemini CLI import errors
+            # Gemini CLI treats any @word as an import directive
+            $content = Get-Content -Path $geminiMdPath -Raw
+            $content = $content -replace '@[a-z-]+', ''
+            Set-Content -Path $geminiMdPath -Value $content
         }
         catch {
             Add-Content -Path $geminiMdPath -Value "Agent documentation"
@@ -128,16 +141,10 @@ You have access to structured workflow agents. When the user references an agent
         Add-Content -Path $geminiMdPath -Value ""
     }
 
-    # Also copy full agents for reference
-    try {
-        Copy-Item "agents\*.md" -Destination $GEMINI_DIR -Force
-        Write-Color "   [OK] Installed to: $GEMINI_DIR\GEMINI.md" "Green"
-    }
-    catch {
-        Write-Color "   [ERROR] Failed to copy files to $GEMINI_DIR" "Red"
-        Write-Host $_.Exception.Message
-        exit 1
-    }
+    # Note: We don't copy individual agent files because they contain inline @ references
+    # that Gemini CLI interprets as import directives, causing errors.
+    # GEMINI.md already contains cleaned summaries of all agents.
+    Write-Color "   [OK] Installed to: $GEMINI_DIR\GEMINI.md" "Green"
 }
 
 # Install for OpenAI Codex CLI
@@ -199,7 +206,11 @@ if (-not $CLAUDE_INSTALLED -and -not $GEMINI_INSTALLED -and -not $CODEX_INSTALLE
     New-Item -ItemType Directory -Force -Path $fallbackPath | Out-Null
 
     try {
-        Copy-Item "agents\*.md" -Destination $fallbackPath -Force
+        # Copy only actual agents (exclude GLOSSARY and README - they're in docs/ now)
+        Get-ChildItem "agents\*.md" | Where-Object {
+            $_.Name -ne "GLOSSARY.md" -and $_.Name -ne "README.md"
+        } | Copy-Item -Destination $fallbackPath -Force
+
         Write-Color "   [OK] Installed to fallback location" "Green"
     }
     catch {

@@ -12,7 +12,7 @@ Markdown-based agents you can use with `@` in Claude Code:
 - **@gemini-data** - Use Gemini for data analysis & logs
 - **@code-review-agent** - Code review and security checks
 
-[View Agents →](./agents/)
+[View Agents →](./docs/agents-overview.md)
 
 ## Installation
 
