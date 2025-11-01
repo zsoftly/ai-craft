@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-AI Craft provides structured workflow prompts and simple markdown agents for software development. Work with Claude for code implementation and Gemini for performance analysis and large data processing.
+AI Craft provides structured workflow prompts and simple markdown agents for software development. Work with Claude for code implementation, Gemini for performance analysis and large data processing, and OpenAI Codex for guided code generation.
 
 ## Repository Structure
 
@@ -20,7 +20,6 @@ This repository contains simple markdown agents for multiple AI platforms:
   - `inter-ai-communication.md` - Inter-AI communication patterns
   - `README.md` - Agent usage guide
 - `install.sh` / `install.ps1` - Multi-platform installation scripts (Linux/macOS/Windows)
-- `update.sh` / `update.ps1` - Smart update scripts with custom change detection
 - `lib/colors.sh` - Shared color library for bash scripts
 
 ## Core Architecture: Agent-Based Workflows
@@ -146,7 +145,7 @@ One command installs for all AI platforms:
 **Installation Paths (Auto-detected):**
 - **Claude Code**: `~/.claude/agents/*.md` (for @ references)
 - **Gemini CLI**: `~/.gemini/GEMINI.md` (automatically loaded context file)
-- **OpenAI Codex**: `~/.codex/instructions.md` (global instructions)
+- **OpenAI Codex**: `~/.codex/agents/*.md` (individual agent files)
 
 **How It Works:**
 - Script detects which AI CLIs are installed
@@ -222,7 +221,7 @@ nano ~/.claude/agents/my-agent.md
 # Add to ~/.gemini/GEMINI.md
 
 # For OpenAI Codex
-# Add to ~/.codex/instructions.md
+nano ~/.codex/agents/my-agent.md
 ```
 
 Structure it like the existing agents:
@@ -244,7 +243,6 @@ Then reference it: `@my-agent Do something`
 - `agents/inter-ai-communication.md` - Inter-AI communication patterns
 - `agents/README.md` - Overview and examples
 - `install.sh` / `install.ps1` - Multi-platform installation scripts
-- `update.sh` / `update.ps1` - Smart update scripts
 - `lib/colors.sh` - Shared color library
 
 ## Integration with AI Platforms
@@ -254,10 +252,9 @@ Then reference it: `@my-agent Do something`
 **Agent-Based (Recommended):**
 - Reference with `@` in Claude Code
 - No setup required - just run `./install.sh` or `./install.ps1`
-- Claude + Gemini working together
+- Works with Claude, Gemini, and OpenAI Codex
 - Simple, non-technical approach
-- Easy to customize and extend
-- Smart update system preserves customizations
+- Easy to customize and extend (fork the repo for custom changes)
 
 ### Gemini CLI
 
@@ -269,11 +266,11 @@ Then reference it: `@my-agent Do something`
 
 ### OpenAI Codex
 
-**Global Instructions:**
-- Development agents combined into `~/.codex/instructions.md`
-- Automatically loaded for all code generations
+**Agent Directory:**
+- Individual agent files in `~/.codex/agents/*.md`
+- Automatically discovered and loaded by Codex
 - Guides Codex to follow structured workflows
-- No per-session setup needed
+- Same structure as Claude Code (individual files)
 
 ### Cross-Platform Benefits
 
@@ -300,7 +297,7 @@ ls ~/.claude/agents/
 cat ~/.gemini/GEMINI.md
 
 # Verify OpenAI Codex installation
-cat ~/.codex/instructions.md
+ls ~/.codex/agents/
 ```
 
 ### Making Changes

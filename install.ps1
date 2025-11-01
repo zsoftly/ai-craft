@@ -66,6 +66,22 @@ if ($CLAUDE_INSTALLED) {
             $_.Name -ne "GLOSSARY.md" -and $_.Name -ne "README.md"
         } | Copy-Item -Destination $CLAUDE_DIR -Force
 
+        # Create .clignore to prevent Claude from scanning unwanted files
+        $clignorePath = Join-Path $CLAUDE_DIR ".clignore"
+        $clignoreContent = @"
+# Ignore backup files
+*.backup.*
+
+# Ignore non-agent files (keep only .md agents)
+*.json
+*.yaml
+*.yml
+*.txt
+*.log
+.DS_Store
+"@
+        Set-Content -Path $clignorePath -Value $clignoreContent
+
         Write-Color "   [OK] Installed to: $CLAUDE_DIR" "Green"
     }
     catch {
@@ -80,112 +96,213 @@ if ($GEMINI_INSTALLED) {
     Write-Color "[Installing for Gemini CLI...]" "Blue"
     New-Item -ItemType Directory -Force -Path $GEMINI_DIR | Out-Null
 
-    # Create GEMINI.md with agent instructions (automatically loaded, no env var needed)
+    # Create aicraft-agents directory
+    $aicraftAgentsDir = Join-Path $GEMINI_DIR "aicraft-agents"
+    New-Item -ItemType Directory -Force -Path $aicraftAgentsDir | Out-Null
+
+    # Always copy/overwrite individual agent files (we control these)
+    Write-Color "   [Copying agent files to $aicraftAgentsDir...]" "Blue"
+    Get-ChildItem "agents\*.md" | Where-Object {
+        $_.Name -ne "GLOSSARY.md" -and $_.Name -ne "README.md"
+    } | Copy-Item -Destination $aicraftAgentsDir -Force
+    Write-Color "   [OK] Agent files copied to: $aicraftAgentsDir" "Green"
+
+    # Smart GEMINI.md update: preserve user content, only manage our section
+    Write-Color "   [Updating GEMINI.md...]" "Blue"
     $geminiMdPath = Join-Path $GEMINI_DIR "GEMINI.md"
-    $geminiMdContent = @"
+
+    # Build our managed content section
+    $managedContent = @"
+<!-- AI-CRAFT-AGENTS-START - Do not edit between these markers, content will be updated automatically -->
+
 # AI Craft Agents for Gemini
 
-You have access to structured workflow agents. When the user references an agent with @, provide guidance based on these workflows:
+You have access to structured workflow agents that provide guidance for different development tasks. These agents define best practices, workflows, and patterns for software development.
+
+When the user asks for help with development tasks, apply the relevant agent's guidance to structure your response.
+
+Individual agent files are stored in: ~/.gemini/aicraft-agents/
 
 ## Available Agents
 
 "@
 
-    Set-Content -Path $geminiMdPath -Value $geminiMdContent
-
-    # Append agent summaries (exclude GLOSSARY and README - they're in docs/ now)
+    # Append agent summaries (exclude GLOSSARY and README)
     foreach ($agent in (Get-ChildItem "agents\*.md" | Where-Object {
         $_.Name -ne "GLOSSARY.md" -and $_.Name -ne "README.md"
     })) {
         $agentName = $agent.BaseName
-        # Use "Agent:" prefix instead of "@" to avoid Gemini CLI import errors
-        Add-Content -Path $geminiMdPath -Value "`n### Agent: $agentName"
+        $managedContent += "`n### Agent: $agentName`n`n"
 
-        # Extract agent summary (match bash: grep -A 5 = matching line + 5 after, max 10 total)
+        # Extract key sections: Brief description, Purpose, and When to Use
         try {
-            $agentContent = Get-Content $agent.FullName -Head 20
-            $totalLines = 0
-            $maxTotalLines = 10
-            $foundAnyHeader = $false
+            $agentContent = Get-Content $agent.FullName
 
-            for ($i = 0; $i -lt $agentContent.Count -and $totalLines -lt $maxTotalLines; $i++) {
-                if ($agentContent[$i] -match "^##") {
-                    $foundAnyHeader = $true
-                    # Output matching line + next 5 lines (6 lines per match, like grep -A 5)
-                    $linesToOutput = [Math]::Min(6, $maxTotalLines - $totalLines)
-                    $endIndex = [Math]::Min($i + $linesToOutput, $agentContent.Count)
+            # Get lines 3-4 (brief description after title and blank line)
+            $briefDesc = ($agentContent[2..3] | Out-String).Trim()
 
-                    for ($j = $i; $j -lt $endIndex -and $totalLines -lt $maxTotalLines; $j++) {
-                        Add-Content -Path $geminiMdPath -Value $agentContent[$j]
-                        $totalLines++
-                    }
-
-                    # Skip past the lines we just output
-                    $i = $endIndex - 1
+            # Extract Purpose section
+            $purposeLines = @()
+            $inPurpose = $false
+            foreach ($line in $agentContent) {
+                if ($line -match "^## Purpose$") {
+                    $inPurpose = $true
+                    continue
+                }
+                if ($inPurpose -and $line -match "^## (?!Purpose)") {
+                    break
+                }
+                if ($inPurpose) {
+                    $purposeLines += $line
                 }
             }
+            $purpose = ($purposeLines | Out-String).Trim()
 
-            if (-not $foundAnyHeader) {
-                Add-Content -Path $geminiMdPath -Value "Agent documentation"
+            # Extract When to Use section
+            $whenLines = @()
+            $inWhen = $false
+            foreach ($line in $agentContent) {
+                if ($line -match "^## When to Use$") {
+                    $inWhen = $true
+                    continue
+                }
+                if ($inWhen -and $line -match "^## (?!When to Use)") {
+                    break
+                }
+                if ($inWhen) {
+                    $whenLines += $line
+                }
+            }
+            $whenToUse = ($whenLines | Out-String).Trim()
+
+            # Combine sections
+            $agentSummary = "$briefDesc`n`n## Purpose`n$purpose`n`n## When to Use`n$whenToUse"
+
+            # Fallback if extraction fails
+            if ($agentSummary.Length -lt 20) {
+                $agentSummary = "Agent documentation - see $agentName.md for details"
             }
 
             # Strip inline @ references to prevent Gemini CLI import errors
-            # Gemini CLI treats any @word as an import directive
-            $content = Get-Content -Path $geminiMdPath -Raw
-            $content = $content -replace '@[a-z-]+', ''
-            Set-Content -Path $geminiMdPath -Value $content
+            $agentSummary = $agentSummary -replace '@[a-z-]+', ''
+
+            $managedContent += "$agentSummary`n`n"
         }
         catch {
-            Add-Content -Path $geminiMdPath -Value "Agent documentation"
+            $managedContent += "Agent documentation`n`n"
         }
-        Add-Content -Path $geminiMdPath -Value ""
     }
 
-    # Note: We don't copy individual agent files because they contain inline @ references
-    # that Gemini CLI interprets as import directives, causing errors.
-    # GEMINI.md already contains cleaned summaries of all agents.
-    Write-Color "   [OK] Installed to: $GEMINI_DIR\GEMINI.md" "Green"
+    $managedContent += "<!-- AI-CRAFT-AGENTS-END -->"
+
+    # Check if GEMINI.md exists and has our markers
+    if (Test-Path $geminiMdPath) {
+        $existingContent = Get-Content $geminiMdPath -Raw -ErrorAction SilentlyContinue
+
+        if ($existingContent -match "<!-- AI-CRAFT-AGENTS-START") {
+            # Markers exist - replace content between markers, preserve user content
+            Write-Color "   [Updating AI Craft section in existing GEMINI.md...]" "Blue"
+
+            # Create backup
+            $backupPath = "$geminiMdPath.backup.$((Get-Date).ToString('yyyyMMdd_HHmmss'))"
+            Copy-Item $geminiMdPath $backupPath
+            Write-Color "   [BACKUP] Created: $backupPath" "Blue"
+
+            # Extract content before markers
+            $beforeContent = ($existingContent -split '<!-- AI-CRAFT-AGENTS-START')[0]
+
+            # Extract content after markers (if exists)
+            $afterMatch = $existingContent -match '<!-- AI-CRAFT-AGENTS-END -->([\s\S]*?)$'
+            $afterContent = if ($afterMatch) { $Matches[1] } else { "" }
+
+            # Combine: user content before + our managed content + user content after
+            $newContent = $beforeContent + $managedContent + $afterContent
+            Set-Content -Path $geminiMdPath -Value $newContent
+
+            Write-Color "   [OK] Updated AI Craft section, preserved user content" "Green"
+        }
+        else {
+            # No markers - append our section to preserve existing user content
+            Write-Color "   [Appending AI Craft section to existing GEMINI.md...]" "Blue"
+
+            # Create backup
+            $backupPath = "$geminiMdPath.backup.$((Get-Date).ToString('yyyyMMdd_HHmmss'))"
+            Copy-Item $geminiMdPath $backupPath
+            Write-Color "   [BACKUP] Created: $backupPath" "Blue"
+
+            # Append our managed section
+            $newContent = $existingContent + "`n`n" + $managedContent
+            Set-Content -Path $geminiMdPath -Value $newContent
+
+            Write-Color "   [OK] Appended AI Craft section, preserved existing content" "Green"
+        }
+    }
+    else {
+        # No GEMINI.md - create new file with just our content
+        Write-Color "   [Creating new GEMINI.md...]" "Blue"
+        Set-Content -Path $geminiMdPath -Value $managedContent
+        Write-Color "   [OK] Created new GEMINI.md" "Green"
+    }
+
+    Write-Color "   [OK] Gemini CLI installation complete" "Green"
 }
 
 # Install for OpenAI Codex CLI
 if ($CODEX_INSTALLED) {
     Write-Color "[Installing for OpenAI Codex CLI...]" "Blue"
-    New-Item -ItemType Directory -Force -Path $CODEX_DIR | Out-Null
 
-    # Create instructions.md with agent guidance
-    $instructionsMdPath = Join-Path $CODEX_DIR "instructions.md"
-    $instructionsMdContent = @"
-# AI Craft Development Agents
+    $CODEX_AGENTS_DIR = Join-Path $CODEX_DIR "agents"
 
-Follow these structured workflows when developing:
-
-"@
-
-    Set-Content -Path $instructionsMdPath -Value $instructionsMdContent
-
-    # Append agent content
-    $agentCount = 0
-    $agentPaths = @("agents\dev-agent.md", "agents\tdd-agent.md", "agents\code-review-agent.md")
-
-    foreach ($agentPath in $agentPaths) {
-        if (Test-Path $agentPath) {
-            try {
-                $agentContent = Get-Content $agentPath -Raw
-                Add-Content -Path $instructionsMdPath -Value $agentContent
-                Add-Content -Path $instructionsMdPath -Value "`n---`n"
-                $agentCount++
-            }
-            catch {
-                # Continue to next agent
-            }
+    # Create backup if directory already exists
+    if ((Test-Path $CODEX_AGENTS_DIR) -and ((Get-ChildItem $CODEX_AGENTS_DIR -ErrorAction SilentlyContinue).Count -gt 0)) {
+        $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+        $BACKUP_DIR = "$CODEX_AGENTS_DIR.backup.$timestamp"
+        New-Item -ItemType Directory -Force -Path $BACKUP_DIR | Out-Null
+        try {
+            Copy-Item -Path "$CODEX_AGENTS_DIR\*" -Destination $BACKUP_DIR -Force
+            Write-Color "   [BACKUP] Previous installation backed up to: $BACKUP_DIR" "Blue"
+        }
+        catch {
+            Write-Color "   [WARN] Backup failed, but continuing installation" "Yellow"
         }
     }
 
-    if ($agentCount -gt 0) {
-        Write-Color "   [OK] Installed to: $CODEX_DIR\instructions.md" "Green"
+    New-Item -ItemType Directory -Force -Path $CODEX_AGENTS_DIR | Out-Null
+
+    try {
+        # Copy only actual agents (exclude GLOSSARY and README - they're just docs)
+        Get-ChildItem "agents\*.md" | Where-Object {
+            $_.Name -ne "GLOSSARY.md" -and $_.Name -ne "README.md"
+        } | Copy-Item -Destination $CODEX_AGENTS_DIR -Force
+
+        # Create .codexignore to prevent Codex from scanning unwanted files (saves API credits)
+        $codexignorePath = Join-Path $CODEX_AGENTS_DIR ".codexignore"
+        $codexignoreContent = @"
+# Ignore backup files
+*.backup.*
+
+# Ignore non-agent files (keep only .md agents)
+*.json
+*.yaml
+*.yml
+*.txt
+*.log
+.DS_Store
+
+# Common directories to exclude
+node_modules/
+dist/
+build/
+.git/
+"@
+        Set-Content -Path $codexignorePath -Value $codexignoreContent
+
+        Write-Color "   [OK] Installed to: $CODEX_AGENTS_DIR" "Green"
     }
-    else {
-        Write-Color "   [WARN] No agent files found for Codex" "Yellow"
+    catch {
+        Write-Color "   [ERROR] Failed to copy files to $CODEX_AGENTS_DIR" "Red"
+        Write-Host $_.Exception.Message
+        exit 1
     }
 }
 
@@ -197,7 +314,7 @@ Write-Host ""
 Write-Color "[Installed agents for:]" "Cyan"
 if ($CLAUDE_INSTALLED) { Write-Host "   - Claude Code: $CLAUDE_DIR" }
 if ($GEMINI_INSTALLED) { Write-Host "   - Gemini CLI: $GEMINI_DIR\GEMINI.md" }
-if ($CODEX_INSTALLED) { Write-Host "   - OpenAI Codex: $CODEX_DIR\instructions.md" }
+if ($CODEX_INSTALLED) { Write-Host "   - OpenAI Codex: $CODEX_DIR\agents" }
 
 if (-not $CLAUDE_INSTALLED -and -not $GEMINI_INSTALLED -and -not $CODEX_INSTALLED) {
     Write-Color "   [WARN] No AI CLIs detected" "Yellow"
@@ -240,8 +357,8 @@ if ($GEMINI_INSTALLED) {
 if ($CODEX_INSTALLED) {
     Write-Host ""
     Write-Color "  OpenAI Codex:" "Blue"
-    Write-Host "    Instructions loaded automatically"
-    Write-Host "    Agents guide all code generation"
+    Write-Host "    @dev-agent Phase 1: Analyze my code"
+    Write-Host "    @tdd-agent Implement with test-driven approach"
 }
 
 Write-Host ""

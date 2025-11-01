@@ -196,6 +196,21 @@ if [ "$CLAUDE_INSTALLED" = true ]; then
             fi
         fi
     done
+
+    # Create .clignore to prevent Claude from scanning unwanted files
+    cat > "$CLAUDE_DIR/.clignore" << 'EOF'
+# Ignore backup files
+*.backup.*
+
+# Ignore non-agent files (keep only .md agents)
+*.json
+*.yaml
+*.yml
+*.txt
+*.log
+.DS_Store
+EOF
+
     print_success "   [OK] Installed to: $CLAUDE_DIR"
 fi
 
@@ -206,30 +221,46 @@ if [ "$GEMINI_INSTALLED" = true ]; then
 
     print_info "[Installing for Gemini CLI...]"
 
-    # Create backup if GEMINI.md already exists
-    if [ -f "$GEMINI_DIR/GEMINI.md" ]; then
-        BACKUP_DIR="$GEMINI_DIR/backup.$(date +%Y%m%d_%H%M%S)"
-        mkdir -p "$BACKUP_DIR"
-        if cp "$GEMINI_DIR/GEMINI.md" "$BACKUP_DIR/" 2>/dev/null; then
-            print_info "   [BACKUP] Previous GEMINI.md backed up to: $BACKUP_DIR"
-        else
-            print_warning "   [WARN] Backup failed, but continuing installation"
-        fi
-    fi
-
+    # Create directories
     mkdir -p "$GEMINI_DIR"
+    mkdir -p "$GEMINI_DIR/aicraft-agents"
 
-    # Create GEMINI.md with agent instructions (automatically loaded, no env var needed)
-    # Build content in memory first, then write once for better performance
-    GEMINI_CONTENT="# AI Craft Agents for Gemini
+    # Always copy/overwrite individual agent files (we control these)
+    print_info "   [Copying agent files to $GEMINI_DIR/aicraft-agents/...]"
+    for agent in agents/*.md; do
+        if [ -f "$agent" ]; then
+            agent_basename=$(basename "$agent")
+            # Skip documentation files
+            if [ "$agent_basename" = "README.md" ] || [ "$agent_basename" = "GLOSSARY.md" ]; then
+                continue
+            fi
+            if ! cp "$agent" "$GEMINI_DIR/aicraft-agents/" 2>/dev/null; then
+                print_error "   [ERROR] Failed to copy $agent to $GEMINI_DIR/aicraft-agents/"
+                exit 1
+            fi
+        fi
+    done
+    print_success "   [OK] Agent files copied to: $GEMINI_DIR/aicraft-agents/"
 
-You have access to structured workflow agents. When the user references an agent with @, provide guidance based on these workflows:
+    # Smart GEMINI.md update: preserve user content, only manage our section
+    print_info "   [Updating GEMINI.md...]"
+
+    # Build our managed content section
+    MANAGED_CONTENT="<!-- AI-CRAFT-AGENTS-START - Do not edit between these markers, content will be updated automatically -->
+
+# AI Craft Agents for Gemini
+
+You have access to structured workflow agents that provide guidance for different development tasks. These agents define best practices, workflows, and patterns for software development.
+
+When the user asks for help with development tasks, apply the relevant agent's guidance to structure your response.
+
+Individual agent files are stored in: ~/.gemini/aicraft-agents/
 
 ## Available Agents
 
 "
 
-    # Append agent summaries with error handling (exclude README and GLOSSARY - they're just docs)
+    # Append agent summaries with error handling
     for agent in agents/*.md; do
         if [ -f "$agent" ]; then
             agent_basename=$(basename "$agent")
@@ -238,30 +269,80 @@ You have access to structured workflow agents. When the user references an agent
                 continue
             fi
             agent_name=$(basename "$agent" .md)
-            GEMINI_CONTENT+="### Agent: $agent_name"$'\n'
-            # Extract overview and usage sections more robustly
-            # Get content from first ## header, up to 15 lines total
-            agent_summary=$(awk 'BEGIN { count=0 } /^## / { found=1 } found { if (count >= 15) exit; print; count++ }' "$agent" 2>/dev/null) || \
+            MANAGED_CONTENT+="### Agent: $agent_name"$'\n\n'
+
+            # Extract key sections: Brief description, Purpose, and When to Use
+            brief_desc=$(sed -n '3,4p' "$agent" 2>/dev/null)
+            purpose=$(awk '/^## Purpose$/,/^## [^P]/ {if (!/^## [^P]/) print}' "$agent" 2>/dev/null)
+            when_to_use=$(awk '/^## When to Use$/,/^## [^W]/ {if (!/^## [^W]/) print}' "$agent" 2>/dev/null)
+
+            # Combine sections
+            agent_summary="${brief_desc}"$'\n\n'"${purpose}"$'\n\n'"${when_to_use}"
+
+            # Fallback if extraction fails
+            if [ -z "$agent_summary" ] || [ ${#agent_summary} -lt 20 ]; then
                 agent_summary="Agent documentation - see $agent_name.md for details"
+            fi
+
             # Remove inline @ references to prevent Gemini CLI import errors
-            # Gemini CLI treats any @word as an import directive, not just headers
             agent_summary=$(echo "$agent_summary" | sed 's/@[a-z-][a-z-]*//g')
-            GEMINI_CONTENT+="$agent_summary"$'\n\n'
+            MANAGED_CONTENT+="$agent_summary"$'\n\n'
         fi
     done
 
-    # Write content to file in one operation
-    if echo "$GEMINI_CONTENT" > "$GEMINI_DIR/GEMINI.md" 2>/dev/null; then
-        print_success "   [OK] Installed to: $GEMINI_DIR/GEMINI.md"
+    MANAGED_CONTENT+="<!-- AI-CRAFT-AGENTS-END -->"
+
+    # Check if GEMINI.md exists and has our markers
+    if [ -f "$GEMINI_DIR/GEMINI.md" ]; then
+        if grep -q "<!-- AI-CRAFT-AGENTS-START" "$GEMINI_DIR/GEMINI.md" 2>/dev/null; then
+            # Markers exist - replace content between markers, preserve user content
+            print_info "   [Updating AI Craft section in existing GEMINI.md...]"
+
+            # Create backup before modifying
+            BACKUP_FILE="$GEMINI_DIR/GEMINI.md.backup.$(date +%Y%m%d_%H%M%S)"
+            cp "$GEMINI_DIR/GEMINI.md" "$BACKUP_FILE"
+            print_info "   [BACKUP] Created: $BACKUP_FILE"
+
+            # Extract content before our markers
+            before_content=$(awk '/<!-- AI-CRAFT-AGENTS-START/,0 {exit} {print}' "$GEMINI_DIR/GEMINI.md")
+            # Extract content after our markers
+            after_content=$(awk '/<!-- AI-CRAFT-AGENTS-END -->/,0 {if (found) print; if (/<!-- AI-CRAFT-AGENTS-END -->/) found=1}' "$GEMINI_DIR/GEMINI.md")
+
+            # Combine: user content before + our managed content + user content after
+            {
+                echo "$before_content"
+                echo "$MANAGED_CONTENT"
+                echo "$after_content"
+            } > "$GEMINI_DIR/GEMINI.md"
+
+            print_success "   [OK] Updated AI Craft section, preserved user content"
+        else
+            # No markers - append our section to preserve existing user content
+            print_info "   [Appending AI Craft section to existing GEMINI.md...]"
+
+            # Create backup
+            BACKUP_FILE="$GEMINI_DIR/GEMINI.md.backup.$(date +%Y%m%d_%H%M%S)"
+            cp "$GEMINI_DIR/GEMINI.md" "$BACKUP_FILE"
+            print_info "   [BACKUP] Created: $BACKUP_FILE"
+
+            # Append our managed section
+            {
+                cat "$GEMINI_DIR/GEMINI.md"
+                echo ""
+                echo ""
+                echo "$MANAGED_CONTENT"
+            } > "$GEMINI_DIR/GEMINI.md.tmp" && mv "$GEMINI_DIR/GEMINI.md.tmp" "$GEMINI_DIR/GEMINI.md"
+
+            print_success "   [OK] Appended AI Craft section, preserved existing content"
+        fi
     else
-        print_error "   [ERROR] Failed to write to $GEMINI_DIR/GEMINI.md"
-        print_error "   Reason: Permission denied or directory not writable"
-        exit 1
+        # No GEMINI.md - create new file with just our content
+        print_info "   [Creating new GEMINI.md...]"
+        echo "$MANAGED_CONTENT" > "$GEMINI_DIR/GEMINI.md"
+        print_success "   [OK] Created new GEMINI.md"
     fi
 
-    # Note: We don't copy individual agent files because they contain inline @ references
-    # that Gemini CLI interprets as import directives, causing errors.
-    # GEMINI.md already contains cleaned summaries of all agents.
+    print_success "   [OK] Gemini CLI installation complete"
 fi
 
 # Install for OpenAI Codex CLI
@@ -271,43 +352,55 @@ if [ "$CODEX_INSTALLED" = true ]; then
 
     print_info "[Installing for OpenAI Codex CLI...]"
 
-    # Create backup if instructions.md already exists
-    if [ -f "$CODEX_DIR/instructions.md" ]; then
-        BACKUP_DIR="$CODEX_DIR/backup.$(date +%Y%m%d_%H%M%S)"
+    # Create backup if directory already exists
+    if [ -d "$CODEX_DIR/agents" ] && [ "$(ls -A "$CODEX_DIR/agents" 2>/dev/null)" ]; then
+        BACKUP_DIR="$CODEX_DIR/agents.backup.$(date +%Y%m%d_%H%M%S)"
         mkdir -p "$BACKUP_DIR"
-        if cp "$CODEX_DIR/instructions.md" "$BACKUP_DIR/" 2>/dev/null; then
-            print_info "   [BACKUP] Previous instructions.md backed up to: $BACKUP_DIR"
+        if cp -r "$CODEX_DIR/agents"/* "$BACKUP_DIR/" 2>/dev/null; then
+            print_info "   [BACKUP] Previous installation backed up to: $BACKUP_DIR"
         else
             print_warning "   [WARN] Backup failed, but continuing installation"
         fi
     fi
 
-    mkdir -p "$CODEX_DIR"
+    mkdir -p "$CODEX_DIR/agents"
 
-    # Create instructions.md with agent guidance
-    cat > "$CODEX_DIR/instructions.md" << 'EOF'
-# AI Craft Development Agents
-
-Follow these structured workflows when developing:
-
-EOF
-
-    # Append agent content with error handling
-    agent_count=0
-    for agent in agents/dev-agent.md agents/tdd-agent.md agents/code-review-agent.md; do
+    # Copy agent files with error handling (exclude README and GLOSSARY - they're just docs)
+    for agent in agents/*.md; do
         if [ -f "$agent" ]; then
-            if cat "$agent" >> "$CODEX_DIR/instructions.md" 2>/dev/null; then
-                echo -e "\n---\n" >> "$CODEX_DIR/instructions.md"
-                agent_count=$((agent_count + 1))
+            agent_name=$(basename "$agent")
+            # Skip documentation files
+            if [ "$agent_name" = "README.md" ] || [ "$agent_name" = "GLOSSARY.md" ]; then
+                continue
+            fi
+            if ! cp "$agent" "$CODEX_DIR/agents/" 2>/dev/null; then
+                print_error "   [ERROR] Failed to copy $agent to $CODEX_DIR/agents"
+                exit 1
             fi
         fi
     done
 
-    if [ $agent_count -gt 0 ]; then
-        print_success "   [OK] Installed to: $CODEX_DIR/instructions.md"
-    else
-        print_warning "   [WARN] No agent files found for Codex"
-    fi
+    # Create .codexignore to prevent Codex from scanning unwanted files (saves API credits)
+    cat > "$CODEX_DIR/agents/.codexignore" << 'EOF'
+# Ignore backup files
+*.backup.*
+
+# Ignore non-agent files (keep only .md agents)
+*.json
+*.yaml
+*.yml
+*.txt
+*.log
+.DS_Store
+
+# Common directories to exclude
+node_modules/
+dist/
+build/
+.git/
+EOF
+
+    print_success "   [OK] Installed to: $CODEX_DIR/agents"
 fi
 
 echo ""
@@ -318,7 +411,7 @@ echo ""
 print_header "[Installed agents for:]"
 [ "$CLAUDE_INSTALLED" = true ] && echo "   - Claude Code: $CLAUDE_DIR"
 [ "$GEMINI_INSTALLED" = true ] && echo "   - Gemini CLI: $GEMINI_DIR/GEMINI.md"
-[ "$CODEX_INSTALLED" = true ] && echo "   - OpenAI Codex: $CODEX_DIR/instructions.md"
+[ "$CODEX_INSTALLED" = true ] && echo "   - OpenAI Codex: $CODEX_DIR/agents"
 
 if [ "$CLAUDE_INSTALLED" = false ] && [ "$GEMINI_INSTALLED" = false ] && [ "$CODEX_INSTALLED" = false ]; then
     print_warning "   [WARN] No AI CLIs detected"
@@ -362,8 +455,8 @@ fi
 if [ "$CODEX_INSTALLED" = true ]; then
     echo ""
     print_info "  OpenAI Codex:"
-    echo "    Instructions loaded automatically"
-    echo "    Agents guide all code generation"
+    echo "    @dev-agent Phase 1: Analyze my code"
+    echo "    @tdd-agent Implement with test-driven approach"
 fi
 
 echo ""

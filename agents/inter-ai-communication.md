@@ -172,7 +172,6 @@ gemini -p "Analyze: $user_code"  # Unsafe!
 # [WARNING] This regex is VERY restrictive - for demonstration only!
 # It allows only: a-z, A-Z, 0-9, space, ( ) { }
 # It REJECTS: operators (+, -, *, /), quotes, semicolons, and most valid code
-# DO NOT use this pattern for real code validation!
 # For real use: read from file (shown below) or use comprehensive validation
 if [[ "$user_code" =~ ^[a-zA-Z0-9\ \(\)\{\}]+$ ]]; then
     # Bash 4.4+

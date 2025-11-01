@@ -1,20 +1,6 @@
 # AI Craft
 
-Structured workflow prompts and simple agents for software development with Claude and Gemini.
-
-## What's Included
-
-### 🤖 Simple Agents
-Markdown-based agents you can use with `@` in Claude Code:
-- **@dev-agent** - 5-phase development workflow
-- **@tdd-agent** - Test-Driven Development (Red-Green-Refactor)
-- **@gemini-dev** - Use Gemini for performance & large codebases
-- **@gemini-data** - Use Gemini for data analysis & logs
-- **@code-review-agent** - Code review and security checks
-
-[View Agents →](./docs/agents-overview.md)
-
-## Installation
+Structured workflow prompts and simple agents for software development with Claude, Gemini, and OpenAI Codex. 
 
 ### Prerequisites
 
@@ -51,7 +37,7 @@ The installer automatically detects which AI CLIs you have installed and configu
 **Detects and installs for:**
 - **Claude Code** → `~/.claude/agents/` (if Claude Code is installed)
 - **Gemini CLI** → `~/.gemini/GEMINI.md` (if Gemini CLI is installed)
-- **OpenAI Codex** → `~/.codex/instructions.md` (if Codex is installed)
+- **OpenAI Codex** → `~/.codex/agents/` (if Codex is installed)
 
 **No AI CLIs detected?** The installer will create `~/.aicraft/agents/` as a fallback.
 
@@ -86,8 +72,8 @@ cat ~/.gemini/GEMINI.md | head -10
 
 **For OpenAI Codex:**
 ```bash
-# Check instructions.md was created
-cat ~/.codex/instructions.md | head -10
+# List installed agents
+ls ~/.codex/agents/
 ```
 
 ### Windows (PowerShell)
@@ -111,7 +97,7 @@ The installer automatically detects which AI CLIs you have installed and configu
 **Detects and installs for:**
 - **Claude Code** → `%USERPROFILE%\.claude\agents\` (if Claude Code is installed)
 - **Gemini CLI** → `%USERPROFILE%\.gemini\GEMINI.md` (if Gemini CLI is installed)
-- **OpenAI Codex** → `%USERPROFILE%\.codex\instructions.md` (if Codex is installed)
+- **OpenAI Codex** → `%USERPROFILE%\.codex\agents\` (if Codex is installed)
 
 **No AI CLIs detected?** The installer will create `%USERPROFILE%\.aicraft\agents\` as a fallback.
 
@@ -150,59 +136,42 @@ Get-Content "$env:USERPROFILE\.gemini\GEMINI.md" | Select-Object -First 10
 
 **For OpenAI Codex:**
 ```powershell
-# Check instructions.md was created
-Get-Content "$env:USERPROFILE\.codex\instructions.md" | Select-Object -First 10
+# List installed agents
+Get-ChildItem "$env:USERPROFILE\.codex\agents\"
 ```
 
 ## Updating Agents
 
-### Linux / macOS
+When agents are updated in the repository, simply re-run the installation script:
 
-When agents are updated in the repository, use the smart update script:
+### Linux / macOS / WSL
 
 ```bash
-chmod +x update.sh
-./update.sh
+git pull
+./install.sh
 ```
-
-**Smart Features:**
-- ✓ Detects custom modifications you made to agents
-- ✓ Offers options: Overwrite, Keep, Diff, or Merge
-- ✓ Creates automatic backups before overwriting
-- ✓ Shows differences between versions
-- ✓ Opens diff viewer for manual merging
-
-**Update Options:**
-1. **Overwrite** - Replace with new version (backup created automatically)
-2. **Keep** - Keep your custom version
-3. **Diff** - View differences between versions
-4. **Merge** - Manual merge using your editor (VS Code, vim, nano)
-5. **Abort** - Cancel update
 
 ### Windows (PowerShell)
 
 ```powershell
-.\update.ps1
+git pull
+.\install.ps1
 ```
 
-Same smart features as Linux/macOS version!
+**Installation Behavior:**
+- Overwrites all existing agent files with latest versions
+- Creates automatic backups before overwriting (timestamped in `.backup.*` directories)
+- Safe to run multiple times
 
-**Update Options:**
-- Automatic backup creation
-- Diff viewing with VS Code or Notepad
-- Manual merge support
-- Safe rollback with backups
+### Customizing Agents
 
-### When to Update
+**Don't modify installed agents directly.** Instead:
 
-Run the update script when:
-- You pull latest changes from the repository
-- New agent features are released
-- Bug fixes or improvements are available
+1. **Fork the repository** and modify agents in your fork
+2. Install from your fork: `git clone https://github.com/YOUR_USERNAME/ai-craft.git`
+3. **Contribute improvements**: Open a pull request to share your enhancements with the community
 
-The update script will safely handle your custom modifications.
-
-**Note for WSL Users:** Use the Linux/macOS update script (`./update.sh`) instead of the PowerShell version.
+This approach keeps your customizations version-controlled and makes it easy to pull upstream updates.
 
 ## Usage
 
@@ -234,16 +203,17 @@ Instructions are automatically loaded:
 codex  # Agents guide all code generation
 ```
 
-## Claude + Gemini Together
+## Using Multiple AIs Together
 
 **Claude** is great for: Code writing, architecture, detailed reasoning
 **Gemini** is great for: Performance analysis, large files, data patterns
+**OpenAI Codex** is great for: Guided code generation, structured workflows
 
 Use them together:
 1. Claude analyzes and plans
 2. Gemini checks performance and data
-3. Claude implements the solution
-4. Both review from different angles
+3. Codex generates code following agent workflows
+4. All three review from different angles
 
 Simple and powerful!
 

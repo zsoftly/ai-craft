@@ -76,23 +76,78 @@ This ensures thorough reviews while keeping your main conversation focused and r
 
 ## Review Output Format
 
-For each issue found:
+### IMPORTANT: Multi-Line Formatting Required
+
+**ALWAYS use this multi-line format with proper indentation:**
 
 ```
-File: path/to/file.js
-Line: 45 (or search term if line unknown)
-Issue: Missing input validation
-Severity: High
-Why: User input is passed directly to database query
-Fix: Add validation: if (!isValidUserId(userId)) throw new Error()
+[CORRECT FORMAT]
+1. File: src/auth/oauth.js, Line: 89
+   Issue: Missing error handling on token validation
+   Severity: High
+   Why: Unhandled promise rejection crashes server
+   Fix: Add try-catch block
+```
+
+**NEVER use single-line format:**
+
+```
+[WRONG FORMAT - DO NOT USE]
+1. File: src/auth/oauth.js, Line: 89Issue: Missing error handling on token validationSeverity: HighWhy: Unhandled promise rejection crashes serverFix: Add try-catch block
+```
+
+**Formatting Rules:**
+- Each field (File, Issue, Severity, Why, Fix) on its own line
+- Indent continuation lines with 3 spaces
+- One blank line between issues
+- Easy to read and scan
+
+### Detailed Format (Critical & High Only)
+
+Provide full details only for Critical and High severity issues:
+
+```
+1. File: path/to/file.js
+   Line: 45 (or search term if line unknown)
+   Issue: Missing input validation
+   Severity: High
+   Why: User input is passed directly to database query
+   Fix: Add validation: if (!isValidUserId(userId)) throw new Error()
+```
+
+### Listed Format (Medium, Low, Info)
+
+For Medium and below, only list without explanation:
+
+```
+Medium Issues (8):
+- src/auth/oauth.js:67 - No rate limiting on token refresh
+- src/api/users.js:123 - Missing JSDoc comments
+- src/utils/helpers.js:89 - Function too long (45 lines)
+[...]
+
+Low Issues (3):
+- src/config.js:12 - Inconsistent quote style
+- src/routes.js:45 - Magic number should be constant
+[...]
 ```
 
 ### Severity Levels
-- **Critical**: Security vulnerabilities, data loss risks
-- **High**: Bugs, crashes, major issues
-- **Medium**: Code quality, maintainability
-- **Low**: Style, minor improvements
-- **Info**: Suggestions, alternatives
+- **Critical**: Security vulnerabilities, data loss risks (DETAILED)
+- **High**: Bugs, crashes, major issues (DETAILED)
+- **Medium**: Code quality, maintainability (LISTED ONLY)
+- **Low**: Style, minor improvements (LISTED ONLY)
+- **Info**: Suggestions, alternatives (LISTED ONLY)
+
+### Using Commits for Context
+
+**Commits are used to understand what changed, NOT to review:**
+- [DO] Use commit history to identify files that changed
+- [DO] Use commit messages to understand the scope of changes
+- [DO] Focus review on the actual code changes
+- [DONT] Do NOT critique commit messages
+- [DONT] Do NOT review commit structure or squashing
+- [DONT] Do NOT comment on commit frequency or naming
 
 ---
 
@@ -109,6 +164,9 @@ Context:
 - Security is critical
 
 Review Response:
+
+CRITICAL ISSUES (3):
+
 1. File: src/auth/oauth.js, Line: 23
    Issue: Callback URL not validated
    Severity: Critical
@@ -117,23 +175,52 @@ Review Response:
 
 2. File: src/auth/oauth.js, Line: 45
    Issue: Access token stored in localStorage
-   Severity: High
+   Severity: Critical
    Why: Vulnerable to XSS attacks
    Fix: Use httpOnly cookies instead
 
-3. File: src/auth/oauth.js, Line: 67
-   Issue: No rate limiting on token refresh
-   Severity: Medium
-   Why: Can be abused for DoS
-   Fix: Add rate limiting middleware
+3. File: src/auth/session.js, Line: 12
+   Issue: Session secret is hardcoded
+   Severity: Critical
+   Why: Compromises all user sessions
+   Fix: Use environment variable for session secret
 
-[... more issues ...]
+HIGH PRIORITY ISSUES (5):
+
+1. File: src/auth/oauth.js, Line: 89
+   Issue: Missing error handling on token validation
+   Severity: High
+   Why: Unhandled promise rejection crashes server
+   Fix: Add try-catch block
+
+2. File: src/middleware/auth.js, Line: 34
+   Issue: User object not validated before access
+   Severity: High
+   Why: Null reference causes crash
+   Fix: Add null check: if (!user) return res.status(401)
+
+[... remaining high issues ...]
+
+MEDIUM ISSUES (8):
+- src/auth/oauth.js:67 - No rate limiting on token refresh
+- src/api/users.js:123 - Missing JSDoc comments
+- src/utils/helpers.js:89 - Function too long (45 lines)
+- src/auth/passport.js:34 - Magic string should be constant
+- src/routes/auth.js:56 - Inconsistent error messages
+- src/middleware/cors.js:12 - Origins should be in config file
+- src/auth/oauth.js:101 - Duplicate validation logic
+- src/models/user.js:78 - Missing index on email field
+
+LOW ISSUES (2):
+- src/config.js:12 - Inconsistent quote style
+- src/routes.js:45 - Trailing whitespace
 
 Summary:
-- 3 critical security issues
-- 5 high priority bugs
-- 8 medium improvements
-- Overall: Needs significant security hardening before merge
+- 3 critical security issues - MUST FIX BEFORE MERGE
+- 5 high priority bugs - MUST FIX BEFORE MERGE
+- 8 medium improvements - Should address
+- 2 low style issues - Optional
+- Overall: Security issues require immediate attention
 ```
 
 ### Example 2: Specific File Review
@@ -333,7 +420,16 @@ Aspects to review:
 4. Note any specific concerns
 5. Indicate if production-critical
 
+**Review Style - Be Concise:**
+- Only Critical/High issues get detailed explanations (Why + Fix)
+- Medium/Low/Info issues are listed briefly
+- Focus on actionable findings
+- Avoid verbose explanations for minor issues
+- Skip unnecessary preamble
+
 **Skip issues:**
+- Commit message quality or structure
+- Commit history organization
 - Trivial style differences (unless requested)
 - Personal preferences
 - Over-engineered solutions for MVP stage
