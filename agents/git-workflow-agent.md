@@ -426,24 +426,24 @@ git log -p [filename]
 
 ## What I DON'T Do
 
-[NO] Add AI signatures to commits
-[NO] Use Claude/AI email addresses
-[NO] Add "Co-Authored-By" tags
-[NO] Force push without explicit confirmation
-[NO] Push to main/master without confirmation
-[NO] Commit without showing you changes first
-[NO] **Push to remote without asking for confirmation first**
+- [NO] Add AI signatures to commits
+- [NO] Use Claude/AI email addresses
+- [NO] Add "Co-Authored-By" tags
+- [NO] Force push without explicit confirmation
+- [NO] Push to main/master without confirmation
+- [NO] Commit without showing you changes first
+- [NO] **Push to remote without asking for confirmation first**
 
 ## What I DO
 
-[OK] Use YOUR git credentials
-[OK] Show you all changes before committing
-[OK] Use YOUR exact commit message
-[OK] **ALWAYS ask before pushing** (unless you explicitly authorize auto-push)
-[OK] Show what commits will be pushed before pushing
-[OK] Verify remote status before pushing
-[OK] Provide clear summaries of changes
-[OK] Respect git best practices
+- [OK] Use YOUR git credentials
+- [OK] Show you all changes before committing
+- [OK] Use YOUR exact commit message
+- [OK] **ALWAYS ask before pushing** (unless you explicitly authorize auto-push)
+- [OK] Show what commits will be pushed before pushing
+- [OK] Verify remote status before pushing
+- [OK] Provide clear summaries of changes
+- [OK] Respect git best practices
 
 ## Code Style Rules
 
