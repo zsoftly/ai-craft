@@ -8,6 +8,12 @@ Use Google's latest Gemini model for development tasks.
 - Need a different perspective from Claude
 - Processing lots of code files at once
 
+## Platform Note
+
+**Using Gemini CLI directly?** The `@agent` syntax doesn't work in Gemini CLI. Agents are automatically loaded as context from `~/.gemini/GEMINI.md`. Just describe what you want and Gemini applies the guidance.
+
+See CLAUDE.md "Platform Differences" section for details.
+
 ## Model Selection
 
 **I (Claude) will use your configured Gemini model:**

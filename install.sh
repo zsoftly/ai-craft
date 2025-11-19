@@ -449,7 +449,8 @@ if [ "$GEMINI_INSTALLED" = true ]; then
     echo ""
     print_info "  Gemini CLI:"
     echo "    Agents automatically loaded from ~/.gemini/GEMINI.md"
-    echo "    No configuration needed - just use Gemini CLI as normal"
+    echo "    Note: @ syntax not supported - just describe what you want"
+    echo "    Example: 'Analyze my code using the 5-phase development workflow'"
 fi
 
 if [ "$CODEX_INSTALLED" = true ]; then
