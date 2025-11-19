@@ -16,6 +16,7 @@ This repository contains simple markdown agents for multiple AI platforms:
   - `gemini-dev.md` - Gemini development agent
   - `gemini-data.md` - Gemini data analysis agent
   - `code-review-agent.md` - Code Review agent
+  - `content-review-agent.md` - Content humanization agent
   - `git-workflow-agent.md` - Git workflow agent
   - `inter-ai-communication.md` - Inter-AI communication patterns
   - `README.md` - Agent usage guide
@@ -133,6 +134,37 @@ Simple markdown files you reference with `@`:
    - Security and quality checks
    - File: `agents/code-review-agent.md`
 
+6. **Content Review Agent** (`@content-review-agent`)
+   - Review and humanize AI-generated content
+   - Remove AI writing patterns and banned phrases
+   - File: `agents/content-review-agent.md`
+
+### Platform Differences
+
+**Important:** Each platform handles agents differently.
+
+| Platform | Agent Syntax | How It Works |
+|----------|-------------|--------------|
+| Claude Code | `@agent-name` | Reference agents directly in prompts |
+| Gemini CLI | No `@` syntax | Agents auto-loaded as context from GEMINI.md |
+| OpenAI Codex | `@agent-name` | Reference agents directly in prompts |
+
+**Gemini CLI Usage:**
+
+Gemini doesn't support `@agent` references. Instead, agents are automatically loaded as context. Just describe what you want:
+
+```
+# Instead of "@dev-agent Phase 1: Analyze my code"
+# Just say:
+"Analyze my authentication code using the 5-phase development workflow"
+
+# Instead of "@content-review-agent Review this post"
+# Just say:
+"Review this LinkedIn post for AI patterns and humanize it"
+```
+
+Gemini reads the context from `~/.gemini/GEMINI.md` and applies the relevant agent guidance automatically.
+
 ### Multi-Platform Installation
 
 One command installs for all AI platforms:
@@ -239,6 +271,7 @@ Then reference it: `@my-agent Do something`
 - `agents/gemini-dev.md` - Gemini development agent (performance & large codebases)
 - `agents/gemini-data.md` - Gemini data analysis agent (logs & patterns)
 - `agents/code-review-agent.md` - Code review agent (security & quality)
+- `agents/content-review-agent.md` - Content review agent (humanize AI writing)
 - `agents/git-workflow-agent.md` - Git workflow agent (review, commit, push)
 - `agents/inter-ai-communication.md` - Inter-AI communication patterns
 - `agents/README.md` - Overview and examples

@@ -9,6 +9,12 @@ Use Gemini for data analysis, log processing, and pattern recognition.
 - CSV/JSON analysis
 - Performance metrics analysis
 
+## Platform Note
+
+**Using Gemini CLI directly?** The `@agent` syntax doesn't work in Gemini CLI. Agents are automatically loaded as context from `~/.gemini/GEMINI.md`. Just describe what you want and Gemini applies the guidance.
+
+See CLAUDE.md "Platform Differences" section for details.
+
 ## Model Selection
 
 **I (Claude) will use your configured Gemini model:**
