@@ -126,8 +126,9 @@ The MCP Registry will be a simple, robust, and scalable system composed of three
 
 2.  **Database:**
 
-    - **Description:** A persistent storage layer for all agent manifests and their versions. It needs to support structured data, indexing for fast lookups, and full-text search capabilities for the `GET /search` endpoint.
-    - **Recommendation:** **PostgreSQL**. Its robustness, support for JSONB data types, and powerful indexing features make it a perfect fit. Using a managed cloud service (like AWS RDS) is highly recommended.
+    - **Description:** A persistent storage layer for all agent **metadata**. While initially proposed to store the full `openapi_spec` in the database, a more scalable and robust approach is to offload large objects to a dedicated object store. The database will continue to support structured data, indexing for fast lookups, and full-text search capabilities for the `GET /search` endpoint.
+    - **Recommendation:** **PostgreSQL**. Its robustness, support for JSONB data types for metadata, and powerful indexing features make it a perfect fit. Using a managed cloud service (like AWS RDS) is highly recommended.
+    - **OpenAPI Spec Storage:** To improve auditability and reduce database load, OpenAPI specifications will be stored in **Amazon S3**. The database will store a reference to the S3 object, including a checksum, to ensure integrity. This approach also enables version immutability, as a new version of an agent will point to a new, immutable S3 object.
 
 3.  **Validation Logic:**
     - **Description:** Before any data is written to the database, incoming `agent.json` manifests must be validated. This includes checking for required fields, correct data types, and ensuring the embedded OpenAPI contract is syntactically valid.
@@ -146,11 +147,37 @@ A primary `agents` table will store the core metadata.
   - `endpoint`
   - `environment` (Indexed)
   - `tags` (Indexed, using GIN index on a JSONB field)
-  - `openapi_spec` (JSONB)
+  - `openapi_spec_s3_uri` (string)
+  - `openapi_spec_checksum` (string)
   - `created_at`
   - `is_deleted` (for soft deletes)
 
 A unique constraint will be placed on `(name, version)` to enforce uniqueness.
+
+### 4.3 Environment Isolation Strategy
+
+The initial plan proposed a single registry instance for all environments, relying on an `environment` field for logical separation. However, a production-grade implementation requires stronger isolation to prevent environment bleed-through and simplify security management.
+
+**Strong Recommendation: One Registry per Environment**
+
+To achieve robust isolation, we will deploy a separate, independent registry instance for each environment:
+
+-   `mcp-registry-dev`
+-   `mcp-registry-stage`
+-   `mcp-registry-prod`
+
+This approach provides several key advantages:
+
+-   **Data Isolation:** Each environment has its own dedicated database, preventing accidental access to or modification of production agent metadata from lower environments.
+-   **Simplified IAM:** AWS IAM policies can be scoped directly to the resources of a single environment, simplifying access control and reducing the risk of misconfiguration.
+-   **Incident Containment:** An issue in the `dev` or `stage` registry will not impact the `prod` registry, limiting the blast radius of any incidents.
+-   **Clear API Scoping:** Consumers of the registry will use a different endpoint for each environment, making it explicit which set of agents they are interacting with.
+
+If, for operational reasons, a single instance must be retained, the following controls would be mandatory:
+
+-   **Environment-Scoped API Keys:** API keys would be generated with a specific environment scope, and the API would enforce that a `dev` key cannot be used to publish to the `prod` environment.
+-   **Environment-Based Authorization:** Middleware would be required to enforce authorization based on the environment, ensuring that a user's role and the environment of the resource being accessed are both validated.
+
 
 ## 5. Hosting and Deployment
 
@@ -163,8 +190,17 @@ This approach offers the best balance of performance, scalability, and ease of m
   - **Compute:** **AWS Fargate**.
     - The FastAPI application will be packaged into a **Docker container**.
     - These platforms automatically manage scaling (including scaling to zero), patching, and server infrastructure.
+    - **Best Practices:**
+        - Enable autoscaling based on request count or CPU utilization to handle fluctuating loads.
+        - Run at least two tasks per service for high availability.
+        - Implement graceful shutdown hooks in FastAPI to ensure that in-flight requests are not dropped during deployments.
   - **Database:** **AWS RDS for PostgreSQL**.
     - A managed database service handles backups, failover, and maintenance.
+    - **Best Practices:**
+        - Enable Multi-AZ for high availability and automated failover.
+        - Configure automated backups and Point-In-Time-Recovery (PITR) to protect against data loss.
+        - Enable encryption at rest using AWS KMS to protect sensitive data.
+        - Implement connection pooling using PgBouncer or by tuning the SQLAlchemy pool settings to efficiently manage database connections.
   - **CI/CD:** The process of publishing the registry itself (and agents to it) should be automated. A GitHub Actions or GitLab CI pipeline would build the Docker image, push it to a container registry (e.g., ECR), and trigger a deployment in Fargate.
 
 ### 5.2 Alternative: Serverless Functions
@@ -176,35 +212,82 @@ For potentially lower-traffic scenarios or as a cost-saving measure, a purely se
   - **Gateway:** **Amazon API Gateway** would be used to manage the public-facing API routes and trigger the appropriate functions.
   - **Database:** **AWS Aurora Serverless** or **DynamoDB**.
 
-**Conclusion:** The **Serverless Container** approach is the recommended path as it offers a more cohesive development experience and simpler application structure compared to managing numerous individual functions.
+### 5.3 Infrastructure as Code
+
+The entire infrastructure for the MCP Registry will be managed using Infrastructure as Code (IaC) to ensure consistency, repeatability, and version control.
+
+-   **Technology:** We will use **Terraform** or **OpenTofu** to define and manage all cloud resources, including:
+    -   VPC, subnets, and networking rules
+    -   ECS cluster and Fargate services
+    -   RDS database
+    -   IAM roles and policies
+    -   Secrets in AWS Secrets Manager
+-   **Structure:** The IaC code will be organized into versioned modules, with separate state files for each environment (`dev`, `stage`, `prod`). This will allow for safe and predictable deployments to each environment.
+
+### 5.4 Conclusion
 
 ## 6. Security and Access Control
 
 Security is a critical component of the registry, ensuring that only authorized users and services can publish or access agent information.
 
-### 6.1 Authentication: API Keys
+### 6.1 Authentication: From API Keys to IAM and OIDC
 
-All requests to the registry API must be authenticated. The proposed method is via **API Keys**.
+The initial plan proposed API keys for authentication. While simple to implement, API keys are not sufficient for a production-grade internal platform due to the risks of key leakage, lack of identity context, and difficult rotation.
 
-  - **Mechanism:** Clients will pass their key in the `Authorization: Bearer <API_KEY>` HTTP header.
-  - **Management:**
-    - API keys will be generated and associated with a specific role (`Reader`, `Publisher`, or `Admin`).
-    - Keys will be stored securely in the database using a strong hashing algorithm (e.g., SHA-256). They will not be retrievable in plaintext.
-    - An internal administrative interface or CLI command will be created for managing keys.
+For production, we will adopt a more secure, identity-based authentication model.
+
+**Recommended Authentication Model (Best Practice)**
+
+-   **Primary Method: IAM + SigV4 Authentication**
+    -   The registry will be deployed behind an Application Load Balancer (ALB) or API Gateway, and access will be controlled via AWS IAM.
+    -   Human users and service accounts (e.g., CI/CD pipelines, other agents) will be granted specific IAM roles that allow them to assume a role to access the registry.
+    -   All requests to the registry API must be signed with AWS Signature Version 4 (SigV4), which provides strong authentication and identity context.
+    -   This model eliminates the need for static secrets like API keys, as authentication is based on short-lived credentials obtained by assuming an IAM role.
+
+-   **Alternative (if IAM is not feasible): OAuth2 / OIDC**
+    -   If a pure IAM-based approach is not feasible, an alternative is to use an OpenID Connect (OIDC) provider, such as GitHub Actions OIDC or an internal Identity Provider (IdP).
+    -   Clients would authenticate with the IdP to obtain a short-lived JSON Web Token (JWT), which would then be passed to the registry API.
+    -   The API would validate the JWT and extract the user's identity and permissions.
+
+-   **API Keys (Limited Use)**
+    -   API keys will be deprecated for production use.
+    -   They may be retained for limited use cases, such as:
+        -   **Local development:** To provide a simple way for developers to interact with the `dev` registry.
+        -   **Transitional usage:** To support legacy clients during a migration period.
+        -   **CLI bootstrap:** To perform initial setup or administrative tasks.
+    -   If used, API keys must have a clear owner, an expiration date, and be stored securely in AWS Secrets Manager.
 
 ### 6.2 Authorization: Role-Based Access Control (RBAC)
 
-Once authenticated, the registry will authorize actions based on pre-defined roles.
+Once a user or service is authenticated, the registry will authorize actions based on pre-defined roles. While the initial plan defined roles at the endpoint level, a production-grade system requires more granular, resource-level authorization.
 
   - **Roles:**
 
     1.  **Reader:** Can perform read-only operations (`GET` endpoints for discovery and search). This role is intended for agent consumers (applications, other agents).
-    2.  **Publisher:** Has `Reader` permissions plus the ability to create, update, and delete agent registrations (`POST`, `DELETE`). This role is intended for developers and CI/CD pipelines responsible for publishing agents.
-    3.  **Admin:** Has full permissions, including the ability to manage API keys.
+    2.  **Publisher:** Has `Reader` permissions plus the ability to create and update agent registrations (`POST`).
+    3.  **Admin:** Has full permissions, including the ability to manage API keys and perform administrative actions.
 
-  - **Enforcement:** This will be implemented as a middleware within the API service. The middleware will inspect the role associated with the authenticated API key and verify it against the required role for the requested endpoint.
+  - **Resource-Level Authorization:**
+    -   A key improvement is to enforce ownership-based permissions. A `Publisher` should only be able to publish or update agents they own. The `owner` field in the `agent.json` manifest will be used to enforce this.
+    -   Admin actions, such as deleting an agent version or modifying a user's role, must be fully audited.
 
-### 6.3 Multi-Environment Support
+  - **Enforcement:** This will be implemented as a middleware within the API service. The middleware will inspect the user's identity and roles, and then verify them against the requested action and the resource being accessed.
+
+  - **Immutability Rules:**
+    -   To ensure auditability and prevent accidental overwrites, the registry will enforce version immutability.
+    -   It will be forbidden to `POST` an agent with the same `name` and `version` as an existing agent.
+    -   To update an agent, a new version must be published. This forces a clear version history and simplifies rollbacks.
+
+### 6.3 Secrets Management
+
+A robust secrets management strategy is critical to the security of the registry. The following principles will be applied:
+
+-   **Secrets Storage:** All secrets, including API keys, database credentials, and any other sensitive information, will be stored in **AWS Secrets Manager**.
+-   **No Hardcoded Secrets:** Secrets will never be hardcoded in the application code, configuration files, or environment variables.
+-   **IAM Integration:** The application will be granted IAM permissions to retrieve secrets from Secrets Manager at runtime. This avoids the need to manage secrets within the application itself.
+-   **Database Credentials:** If IAM authentication is used for the database, no credentials need to be managed. If username/password authentication is used, the credentials will be stored in Secrets Manager and rotated regularly.
+
+### 6.4 Multi-Environment Support
 
 The registry will support multiple environments (`dev`, `stage`, `prod`) within a single deployed instance.
 
@@ -214,10 +297,16 @@ The registry will support multiple environments (`dev`, `stage`, `prod`) within 
     - Clients (agent consumers) are responsible for requesting the correct environment. For example, a service running in production should be configured to only fetch agents from the `prod` environment.
     - This approach provides flexibility. A future enhancement could be to create environment-specific API keys (e.g., `prod-reader`) to enforce stricter isolation if needed.
 
-### 6.4 Network Security
+### 6.5 Network Security
 
-  - **VPC:** The entire registry service (API, database) should be deployed within a secure Virtual Private Cloud (VPC).
-  - **Access:** By default, the registry API endpoint should only be accessible from within the VPC. If access from outside the VPC is required (e.g., for developers), it should be managed through a secure API Gateway with appropriate controls.
+The registry will be deployed with a defense-in-depth network security strategy.
+
+  - **VPC:** The entire registry service (API, database) will be deployed within a secure Virtual Private Cloud (VPC).
+  - **Private ALB:** The API will be fronted by a private Application Load Balancer (ALB), ensuring that it is not directly exposed to the public internet.
+  - **Security Groups:** Security groups will be used to enforce the principle of least privilege. For example, the ALB security group will only allow inbound traffic on the required port from specific sources, and the Fargate service security group will only allow inbound traffic from the ALB.
+  - **NACLs:** Network Access Control Lists (NACLs) will be used as a stateless firewall to provide an additional layer of security at the subnet level.
+  - **WAF:** If public access is ever required, AWS WAF will be used to protect the API from common web exploits.
+  - **Access:** By default, the registry API endpoint will only be accessible from within the VPC. If access from outside the VPC is required (e.g., for developers), it will be managed through a secure API Gateway with appropriate controls.
 
 ## 7. Tooling and Dependencies
 
@@ -256,7 +345,90 @@ This section summarizes the recommended technologies and tools required to build
     - **Formatter:** Black
     - **Testing Framework:** Pytest
 
-## 8. Implementation Roadmap
+## 8. CI/CD & Supply Chain Security
+
+A secure and reliable CI/CD pipeline is critical for both the registry itself and the agents that are published to it.
+
+### 8.1 Registry Deployment Pipeline
+
+The pipeline that builds and deploys the MCP Registry will include the following security gates:
+
+-   **SAST (Static Application Security Testing):** Tools like `Bandit` and `Semgrep` will be used to scan the Python code for security vulnerabilities.
+-   **Dependency Scanning:** The pipeline will scan all third-party dependencies for known vulnerabilities.
+-   **Container Image Scanning:** The Docker image will be scanned for vulnerabilities using tools like `Trivy` or `Grype`.
+-   **Signed Images:** All container images will be signed using `cosign` to ensure their integrity and authenticity.
+
+### 8.2 Agent Publishing Pipeline
+
+The pipeline that publishes new agents to the registry is a critical control point. To prevent the publishing of malicious or non-compliant agents, the following controls will be implemented:
+
+-   **Schema Validation:** The pipeline will validate the `agent.json` manifest against a strict schema.
+-   **Version Immutability:** The pipeline will enforce the version immutability rule, failing any attempt to overwrite an existing version.
+-   **Approval Gates for Production:** Any deployment to the `prod` registry will require a manual approval step from a designated approver.
+-   **OIDC-Based Identity:** The CI/CD pipeline will use an OIDC-based identity to authenticate with the registry, eliminating the need for static API keys.
+
+## 9. Observability & Operations
+
+A comprehensive observability strategy is essential for maintaining the health and performance of the MCP Registry.
+
+### 9.1 Metrics
+
+The following key metrics will be collected and monitored:
+
+-   **Request Count:** The number of requests to each API endpoint.
+-   **Error Rate:** The percentage of requests that result in an error.
+-   **Publish Frequency:** The number of new agents published over time.
+-   **Search Latency:** The latency of the search API.
+
+### 9.2 Logs
+
+-   **Structured JSON Logs:** All logs will be in a structured JSON format to facilitate searching and analysis.
+-   **Key Events:** The application will log key events, including:
+    -   Agent publish/delete events
+    -   Authentication failures
+    -   Authorization failures
+
+### 9.3 Tracing
+
+-   **OpenTelemetry Support:** The application will include optional support for OpenTelemetry to enable distributed tracing.
+
+### 9.4 Alerting
+
+Alerts will be configured for the following conditions:
+
+-   **Registry Unavailable:** The registry is not responding to requests.
+-   **DB Connectivity Failure:** The application cannot connect to the database.
+-   **Unauthorized Publish Attempts:** A user or service attempts to publish an agent without the required permissions.
+
+## 10. Data Governance & Compliance
+
+A clear data governance and compliance strategy is essential for ensuring the integrity and auditability of the MCP Registry.
+
+### 10.1 Audit Log
+
+-   **Audit Log Table:** A dedicated audit log table will be created in the database to record all significant events, including:
+    -   Who published an agent
+    -   When the agent was published
+    -   The source IP address of the publish request
+    -   What changed in the agent manifest
+-   **Read-Only Historical View:** A read-only view of the audit log will be provided for compliance and debugging purposes.
+
+### 10.2 Data Retention
+
+-   **Retention Policy:** A retention policy will be enforced for soft-deleted agents. After a defined period, soft-deleted agents will be hard-deleted from the database.
+-   **Legal Holds:** The system will provide a mechanism to place a legal hold on an agent, preventing it from being hard-deleted.
+
+## 11. MCP-Specific Design Considerations
+
+### 11.1 Registry Semantics
+
+The registry's primary responsibility is discovery, not model hosting. The following enhancements will be made to the registry's semantics:
+
+-   **Capability-Based Search:** In addition to free-text search, the registry will support capability-based search. This will allow clients to search for agents that support a specific tool or function, as defined in their OpenAPI spec.
+-   **Deprecation Metadata:** The `agent.json` manifest will be extended to include deprecation metadata, such as `deprecated: true` and `sunset_date`. This will allow clients to gracefully migrate away from deprecated agents.
+-   **Health Metadata:** The registry will optionally store health metadata for each agent, such as the last time the agent was seen alive. This will allow clients to avoid routing requests to unhealthy agents.
+
+## 12. Implementation Roadmap
 
 This roadmap outlines a phased approach to delivering the MCP Registry.
 
