@@ -1,0 +1,12 @@
+{
+  "name": "ai-craft",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "fmt": "prettier --write \"**/*.md\"",
+    "fmt:check": "prettier --check \"**/*.md\""
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2"
+  }
+}

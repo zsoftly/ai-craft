@@ -5,35 +5,49 @@ Simple agents for working with Claude and Gemini together.
 ## Available Agents
 
 ### 1. Development Agent (`@dev-agent`)
+
 5-phase development workflow for building features
+
 - Analysis → Planning → Implementation → Review → Pull Request
 - **File:** `dev-agent.md`
 
 ### 2. TDD Agent (`@tdd-agent`)
+
 Test-Driven Development with Red-Green-Refactor
+
 - Write test first → Implement → Refactor
 - **File:** `tdd-agent.md`
 
 ### 3. Gemini Development (`@gemini-dev`)
+
 Use latest Gemini for development (performance, large codebases)
+
 - **File:** `gemini-dev.md`
 
 ### 4. Gemini Data Analysis (`@gemini-data`)
+
 Use latest Gemini for data analysis (logs, CSV, patterns)
+
 - **File:** `gemini-data.md`
 
 ### 5. Code Review Agent (`@code-review-agent`)
+
 Review code for bugs, security, and quality
+
 - **File:** `code-review-agent.md`
 
 ### 6. Inter-AI Communication (`@inter-ai-communication`)
+
 Guide for bidirectional Claude ↔ Gemini communication
+
 - Real CLI commands for AI-to-AI calls
 - Working examples and patterns
 - **File:** `inter-ai-communication.md`
 
 ### 7. Git Workflow Agent (`@git-workflow-agent`)
+
 Review changes, commit, and push using YOUR git credentials
+
 - Shows uncommitted changes and unpushed commits
 - Never uses AI attribution in commits
 - Always uses your configured git identity
@@ -50,6 +64,7 @@ chmod +x install.sh
 ```
 
 The installer detects your AI CLIs and installs to the correct location:
+
 - **Claude Code** → `~/.claude/agents/`
 - **Gemini CLI** → `~/.gemini/GEMINI.md`
 - **OpenAI Codex** → `~/.codex/instructions.md`
@@ -73,12 +88,14 @@ Reference agents with `@`:
 ## Working with Gemini
 
 Gemini (Google's model) is great for:
+
 - **Large files** - Massive context window (entire codebases!)
 - **Performance analysis** - Optimization specialist
 - **Data processing** - Logs, CSVs, metrics
 - **Fast responses** - Quick analysis
 
 **Gemini CLI Tools:**
+
 - `read_file` - Read files
 - `search_file_content` - Search patterns
 - `web_fetch` - Fetch web content
@@ -100,6 +117,7 @@ Claude: [Helps you fix them]
 ## Common Workflows
 
 ### Workflow 1: Development with Both AIs
+
 ```
 @dev-agent Phase 1: Analyze the codebase
 [Claude analyzes architecture]
@@ -112,6 +130,7 @@ Ask Gemini to check for performance issues
 ```
 
 ### Workflow 2: Data-Driven Development
+
 ```
 @gemini-data Analyze user behavior logs
 [Gemini finds patterns]
@@ -124,6 +143,7 @@ Ask Gemini to check for performance issues
 ```
 
 ### Workflow 3: TDD with Performance Check
+
 ```
 @tdd-agent Let's build a search feature with TDD
 [Write tests, implement, refactor]
@@ -138,6 +158,7 @@ Ask Gemini to check for performance issues
 ## Examples
 
 ### Example 1: Bug Investigation
+
 ```
 You: My app is slow, can you help?
 
@@ -151,6 +172,7 @@ You: How do I fix it?
 ```
 
 ### Example 2: Feature Development
+
 ```
 @dev-agent Phase 1: Analyze payment system for adding Stripe
 
@@ -166,6 +188,7 @@ Gemini: [Suggests async processing, webhooks]
 ```
 
 ### Example 3: Code Review
+
 ```
 @code-review-agent Review my authentication code
 
@@ -181,6 +204,7 @@ Together: Fix security issues (Claude) + performance (Gemini)
 ## When to Use Which
 
 ### Use Claude (@dev-agent, @tdd-agent, @code-review-agent) for:
+
 - Writing code
 - Architecture decisions
 - Step-by-step workflows
@@ -188,6 +212,7 @@ Together: Fix security issues (Claude) + performance (Gemini)
 - Implementation details
 
 ### Use Gemini (@gemini-dev, @gemini-data) for:
+
 - Large codebases (100+ files)
 - Performance analysis
 - Log analysis
@@ -195,6 +220,7 @@ Together: Fix security issues (Claude) + performance (Gemini)
 - Quick optimization checks
 
 ### Use Both for:
+
 - Complete features (Claude builds, Gemini optimizes)
 - Data-driven decisions (Gemini analyzes, Claude implements)
 - Performance-critical code (Both review different aspects)
@@ -251,6 +277,7 @@ Done! ✓
 ## Learn More
 
 Read the individual agent files:
+
 - `dev-agent.md` - Full development workflow
 - `tdd-agent.md` - Test-driven development
 - `gemini-dev.md` - Using Gemini for development
@@ -262,6 +289,7 @@ Read the individual agent files:
 ## Inter-AI Communication
 
 The inter-ai-communication agent includes working examples of:
+
 1. **Claude → Gemini**: Performance analysis with real CLI commands
 2. **Claude implements**: Based on Gemini's suggestions
 3. **Claude → Gemini**: Validation loop

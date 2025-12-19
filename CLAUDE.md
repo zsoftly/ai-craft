@@ -30,6 +30,7 @@ All agents follow structured workflows designed to enforce separation between an
 ### Agent Philosophy
 
 Each agent provides:
+
 - **Purpose** - Clear use case definition
 - **When to use** - Context for when this agent applies
 - **Instructions** - Specific directives formatted as structured workflows
@@ -43,20 +44,26 @@ Each agent provides:
 ## Common Patterns Across Agents
 
 ### Quality Gates
+
 Implementation phases consistently enforce:
+
 - Lint and compile after every code block
 - Write tests for each code block
 - Run tests before proceeding to next block
 
 ### Anti-Over-Engineering
+
 Final phases include checks for:
+
 - Unnecessary complexity for pre-customer stage
 - Excessive abstraction or interfaces
 - Unnecessary fallbacks, versioning, or testing overkill
 - Backwards compatibility (only add when explicitly requested)
 
 ### Code Review Format
+
 When reviewing code, use this specific format:
+
 - File name
 - Line number (or search words if line numbers unavailable)
 - Issue description (short)
@@ -64,7 +71,9 @@ When reviewing code, use this specific format:
 - Recommended fix (only if simple)
 
 ### Context Optimization
+
 For large codebases or complex analysis, agents use Claude's Task tool to spawn `general-purpose` sub-agents to:
+
 - Search through entire codebase efficiently
 - Analyze multiple files and dependencies
 - Return comprehensive findings
@@ -75,6 +84,7 @@ For large codebases or complex analysis, agents use Claude's Task tool to spawn 
 ### Making Changes to Agents
 
 When modifying agent documents:
+
 1. Maintain the structured workflow formatting
 2. Keep instructions as concise bullet points
 3. Preserve the "When to use" and "Purpose" sections
@@ -85,6 +95,7 @@ When modifying agent documents:
 ### Creating New Agents
 
 New agents should:
+
 1. Follow structured workflow patterns
 2. Include separation between analysis and implementation phases
 3. Add quality gates in implementation phases
@@ -143,11 +154,11 @@ Simple markdown files you reference with `@`:
 
 **Important:** Each platform handles agents differently.
 
-| Platform | Agent Syntax | How It Works |
-|----------|-------------|--------------|
-| Claude Code | `@agent-name` | Reference agents directly in prompts |
-| Gemini CLI | No `@` syntax | Agents auto-loaded as context from GEMINI.md |
-| OpenAI Codex | `@agent-name` | Reference agents directly in prompts |
+| Platform     | Agent Syntax  | How It Works                                 |
+| ------------ | ------------- | -------------------------------------------- |
+| Claude Code  | `@agent-name` | Reference agents directly in prompts         |
+| Gemini CLI   | No `@` syntax | Agents auto-loaded as context from GEMINI.md |
+| OpenAI Codex | `@agent-name` | Reference agents directly in prompts         |
 
 **Gemini CLI Usage:**
 
@@ -175,17 +186,20 @@ One command installs for all AI platforms:
 ```
 
 **Installation Paths (Auto-detected):**
+
 - **Claude Code**: `~/.claude/agents/*.md` (for @ references)
 - **Gemini CLI**: `~/.gemini/GEMINI.md` (automatically loaded context file)
 - **OpenAI Codex**: `~/.codex/agents/*.md` (individual agent files)
 
 **How It Works:**
+
 - Script detects which AI CLIs are installed
 - Copies agents to appropriate location for each platform
 - Formats correctly for each platform's requirements
 - Falls back to `~/.aicraft/agents/` if no CLIs detected
 
 **Installation Behavior:**
+
 - Running `install.sh` overwrites existing agent files
 - Automatic backups created before overwriting (timestamped)
 - Safe to run multiple times
@@ -257,6 +271,7 @@ nano ~/.codex/agents/my-agent.md
 ```
 
 Structure it like the existing agents:
+
 - Purpose section
 - When to use
 - How to use
@@ -283,6 +298,7 @@ Then reference it: `@my-agent Do something`
 ### Claude Code (Primary)
 
 **Agent-Based (Recommended):**
+
 - Reference with `@` in Claude Code
 - No setup required - just run `./install.sh` or `./install.ps1`
 - Works with Claude, Gemini, and OpenAI Codex
@@ -292,6 +308,7 @@ Then reference it: `@my-agent Do something`
 ### Gemini CLI
 
 **Context Files (GEMINI.md):**
+
 - Agents consolidated into `~/.gemini/GEMINI.md`
 - Automatically loaded - no environment variables needed
 - Available in all Gemini CLI conversations
@@ -300,6 +317,7 @@ Then reference it: `@my-agent Do something`
 ### OpenAI Codex
 
 **Agent Directory:**
+
 - Individual agent files in `~/.codex/agents/*.md`
 - Automatically discovered and loaded by Codex
 - Guides Codex to follow structured workflows
@@ -344,4 +362,5 @@ nano agents/dev-agent.md
 
 # Changes take effect immediately
 ```
+
 - update the memory

@@ -1,15 +1,17 @@
 # AI Craft
 
-Structured workflow prompts and simple agents for software development with Claude, Gemini, and OpenAI Codex. 
+Structured workflow prompts and simple agents for software development with Claude, Gemini, and OpenAI Codex.
 
 ### Prerequisites
 
 **System Requirements:**
+
 - **Shell**: Bash 3.0+ or Zsh
 - **Operating Systems**: Linux, macOS, WSL2, Git Bash (Windows)
 - **Note**: This installer uses bashisms and is not POSIX sh compatible
 
 **Optional:**
+
 - Claude Code CLI (for `@` agent references)
 - Gemini CLI (for automatic agent context loading)
 - OpenAI Codex CLI (for global instructions)
@@ -35,6 +37,7 @@ chmod +x install.sh
 The installer automatically detects which AI CLIs you have installed and configures them:
 
 **Detects and installs for:**
+
 - **Claude Code** → `~/.claude/agents/` (if Claude Code is installed)
 - **Gemini CLI** → `~/.gemini/GEMINI.md` (if Gemini CLI is installed)
 - **OpenAI Codex** → `~/.codex/agents/` (if Codex is installed)
@@ -42,6 +45,7 @@ The installer automatically detects which AI CLIs you have installed and configu
 **No AI CLIs detected?** The installer will create `~/.aicraft/agents/` as a fallback.
 
 **Installation Behavior:**
+
 - Running `install.sh` **overwrites** existing agent files
 - **Automatic backups** are created before overwriting (timestamped)
 - Safe to run multiple times - your previous installation is always backed up
@@ -50,27 +54,34 @@ The installer automatically detects which AI CLIs you have installed and configu
 #### Step 3: Verify Installation
 
 **For Claude Code:**
+
 ```bash
 # List installed agents
 ls ~/.claude/agents/
 
 # You should see:
 # code-review-agent.md
+# content-review-agent.md
 # dev-agent.md
 # gemini-data.md
 # gemini-dev.md
 # git-workflow-agent.md
 # inter-ai-communication.md
 # tdd-agent.md
+# sniff.md
+# dig.md
+# wag.md
 ```
 
 **For Gemini CLI:**
+
 ```bash
 # Check GEMINI.md was created
 cat ~/.gemini/GEMINI.md | head -10
 ```
 
 **For OpenAI Codex:**
+
 ```bash
 # List installed agents
 ls ~/.codex/agents/
@@ -95,6 +106,7 @@ cd ai-craft
 The installer automatically detects which AI CLIs you have installed and configures them:
 
 **Detects and installs for:**
+
 - **Claude Code** → `%USERPROFILE%\.claude\agents\` (if Claude Code is installed)
 - **Gemini CLI** → `%USERPROFILE%\.gemini\GEMINI.md` (if Gemini CLI is installed)
 - **OpenAI Codex** → `%USERPROFILE%\.codex\agents\` (if Codex is installed)
@@ -114,27 +126,34 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 #### Step 3: Verify Installation
 
 **For Claude Code:**
+
 ```powershell
 # List installed agents
 Get-ChildItem "$env:USERPROFILE\.claude\agents\"
 
 # You should see:
 # code-review-agent.md
+# content-review-agent.md
 # dev-agent.md
 # gemini-data.md
 # gemini-dev.md
 # git-workflow-agent.md
 # inter-ai-communication.md
 # tdd-agent.md
+# sniff.md
+# dig.md
+# wag.md
 ```
 
 **For Gemini CLI:**
+
 ```powershell
 # Check GEMINI.md was created
 Get-Content "$env:USERPROFILE\.gemini\GEMINI.md" | Select-Object -First 10
 ```
 
 **For OpenAI Codex:**
+
 ```powershell
 # List installed agents
 Get-ChildItem "$env:USERPROFILE\.codex\agents\"
@@ -159,6 +178,7 @@ git pull
 ```
 
 **Installation Behavior:**
+
 - Overwrites all existing agent files with latest versions
 - Creates automatic backups before overwriting (timestamped in `.backup.*` directories)
 - Safe to run multiple times
@@ -168,7 +188,8 @@ git pull
 **Don't modify installed agents directly.** Instead:
 
 1. **Fork the repository** and modify agents in your fork
-2. Install from your fork: `git clone https://github.com/YOUR_USERNAME/ai-craft.git`
+2. Install from your fork:
+   `git clone https://github.com/YOUR_USERNAME/ai-craft.git`
 3. **Contribute improvements**: Open a pull request to share your enhancements with the community
 
 This approach keeps your customizations version-controlled and makes it easy to pull upstream updates.
@@ -185,6 +206,8 @@ Use agents with the `@` symbol:
 @gemini-dev Ask Gemini to check performance of src/api/
 @code-review-agent Review my code
 @git-workflow-agent What changes do I have that haven't been pushed?
+@sniff [paste job posting]
+@wag [paste job posting]
 ```
 
 ### Gemini CLI
@@ -210,6 +233,7 @@ codex  # Agents guide all code generation
 **OpenAI Codex** is great for: Guided code generation, structured workflows
 
 Use them together:
+
 1. Claude analyzes and plans
 2. Gemini checks performance and data
 3. Codex generates code following agent workflows
@@ -220,8 +244,25 @@ Simple and powerful!
 ## Multi-Platform Support
 
 AI Craft agents work across all major AI CLIs:
+
 - ✓ Claude Code (via @ references)
 - ✓ Gemini CLI (via system instructions)
 - ✓ OpenAI Codex (via global instructions)
 
 One install command works for all!
+
+## Agent Reference
+
+| Agent                    | Purpose                                      |
+| ------------------------ | -------------------------------------------- |
+| `dev-agent`              | 5-phase development workflow                 |
+| `tdd-agent`              | Test-driven development (RED/GREEN/REFACTOR) |
+| `code-review-agent`      | Code review with actionable feedback         |
+| `content-review-agent`   | Documentation and content review             |
+| `git-workflow-agent`     | Git operations and branch management         |
+| `inter-ai-communication` | Multi-AI collaboration protocols             |
+| `gemini-dev`             | Delegate tasks to Gemini                     |
+| `gemini-data`            | Delegate data analysis to Gemini             |
+| `sniff`                  | Quick Upwork job BID/SKIP decision           |
+| `dig`                    | Deep Upwork job analysis                     |
+| `wag`                    | Write Upwork proposals                       |

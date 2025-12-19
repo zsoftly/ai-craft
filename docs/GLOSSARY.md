@@ -9,6 +9,7 @@ Different agents use different phase models appropriate for their workflows:
 ### Development Agent (dev-agent.md)
 
 **5-Phase Workflow:**
+
 1. **Phase 1: Initial Analysis & Preparation** - Code analysis and architecture understanding
 2. **Phase 2: Plan Review & Architecture Feedback** - Review technical plans
 3. **Phase 3: Implementation & Development** - Code implementation with quality gates
@@ -20,6 +21,7 @@ Different agents use different phase models appropriate for their workflows:
 ### TDD Agent (tdd-agent.md)
 
 **Red-Green-Refactor Cycle:**
+
 - **RED** - Write a failing test first
 - **GREEN** - Implement minimum code to make test pass
 - **REFACTOR** - Improve code while keeping tests green
@@ -29,6 +31,7 @@ Different agents use different phase models appropriate for their workflows:
 ### Code Review Agent (code-review-agent.md)
 
 **Single-Phase Review:**
+
 - Focused on reviewing existing code
 - Security and quality checks
 - Git-based workflow
@@ -38,6 +41,7 @@ Different agents use different phase models appropriate for their workflows:
 ### Gemini Agents (gemini-dev.md, gemini-data.md)
 
 **Delegation Model:**
+
 - Claude orchestrates workflow
 - Gemini handles analysis/data tasks
 - Results returned to Claude for implementation
@@ -46,30 +50,36 @@ Different agents use different phase models appropriate for their workflows:
 
 ## Cross-Reference
 
-| If you're familiar with... | Try this agent... |
-|----------------------------|-------------------|
-| Waterfall methodology | dev-agent (5 phases) |
-| Agile/TDD | tdd-agent (Red-Green-Refactor) |
-| Code review process | code-review-agent |
-| Data analysis | gemini-data |
-| Performance optimization | gemini-dev |
+| If you're familiar with... | Try this agent...              |
+| -------------------------- | ------------------------------ |
+| Waterfall methodology      | dev-agent (5 phases)           |
+| Agile/TDD                  | tdd-agent (Red-Green-Refactor) |
+| Code review process        | code-review-agent              |
+| Data analysis              | gemini-data                    |
+| Performance optimization   | gemini-dev                     |
 
 ## Terminology Alignment
 
 ### Quality Gates
+
 All agents enforce quality gates during implementation:
+
 - Lint and compile after code blocks
 - Tests must pass before proceeding
 - Security checks included
 
 ### Anti-Over-Engineering
+
 Final phases include checks for:
+
 - Unnecessary complexity
 - Premature optimization
 - Backwards compatibility (only when requested)
 
 ### Context Optimization
+
 Agents use Task tool to spawn sub-agents for:
+
 - Large codebase analysis
 - Security reviews
 - Data processing
@@ -78,24 +88,28 @@ Agents use Task tool to spawn sub-agents for:
 ## Choosing the Right Phase Model
 
 **Use 5-Phase (dev-agent) when:**
+
 - Building complete features
 - Need structured progression
 - Want separation of analysis and implementation
 - Working on larger changes
 
 **Use Red-Green-Refactor (tdd-agent) when:**
+
 - Writing new code with tests
 - Practicing TDD methodology
 - Iterative development
 - Testing is the primary concern
 
 **Use Review Model (code-review-agent) when:**
+
 - Code already exists
 - Need quality assurance
 - Security audit required
 - Pre-deployment checks
 
-**Use Delegation Model (gemini-*) when:**
+**Use Delegation Model (gemini-\*) when:**
+
 - Large datasets to analyze
 - Performance-critical analysis
 - Need alternative perspective
@@ -115,6 +129,7 @@ A: Jump to specific phases! For example, use dev-agent Phase 4 for just the revi
 ## Consistent Principles Across All Agents
 
 Regardless of phase model, all agents share:
+
 - **Code Style**: No emojis in application source code (only in user-facing tools)
 - **Quality**: Tests, linting, compilation checks
 - **Security**: Built-in security considerations

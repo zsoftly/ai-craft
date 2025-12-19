@@ -3,6 +3,7 @@
 Use Gemini for data analysis, log processing, and pattern recognition.
 
 ## When to Use
+
 - Analyzing large datasets
 - Processing log files
 - Finding patterns in data
@@ -28,6 +29,7 @@ See CLAUDE.md "Platform Differences" section for details.
   - Example: `gemini-2.0-pro-exp`, `gemini-1.5-pro`
 
 **How to check available models:**
+
 ```bash
 # List available Gemini models
 gemini models list
@@ -41,6 +43,7 @@ I'll use the model configured in your Gemini CLI settings, or you can specify on
 ## How I (Claude) Call Gemini for Data Analysis
 
 When you ask me to analyze data with Gemini, I will:
+
 1. Determine analysis complexity (simple → Flash, complex → Pro)
 2. Execute Gemini CLI with appropriate model:
 
@@ -61,6 +64,7 @@ This runs Gemini in headless mode and returns structured results I can present t
 
 **Context Optimization:**
 For large dataset analysis or complex data processing tasks, I will use the Task tool to spawn a `general-purpose` sub-agent to:
+
 - Read and prepare large log files or datasets
 - Execute Gemini CLI commands with the data
 - Parse and structure Gemini's analytical findings
@@ -72,6 +76,7 @@ This allows efficient data analysis while keeping your main context focused on s
 ## What Gemini Can Analyze
 
 ### Log Files
+
 ```
 Ask Gemini to analyze my server logs from the past week
 - Find error patterns
@@ -80,6 +85,7 @@ Ask Gemini to analyze my server logs from the past week
 ```
 
 ### CSV/Spreadsheet Data
+
 ```
 Have Gemini analyze this user data CSV:
 - Find usage patterns
@@ -88,6 +94,7 @@ Have Gemini analyze this user data CSV:
 ```
 
 ### Performance Metrics
+
 ```
 Get Gemini to review our API response times:
 - Identify slow endpoints
@@ -96,6 +103,7 @@ Get Gemini to review our API response times:
 ```
 
 ### User Behavior
+
 ```
 Ask Gemini to analyze user activity:
 - Common user flows
@@ -106,6 +114,7 @@ Ask Gemini to analyze user activity:
 ## Examples
 
 ### Example 1: Error Log Analysis
+
 ```
 You: Can Gemini analyze logs/error.log from the past month?
 
@@ -137,6 +146,7 @@ Me (Claude): Here's what Gemini found. The database timeout is your biggest issu
 ```
 
 ### Example 2: User Data Analysis
+
 ```
 You: Have Gemini analyze data/users.csv (50,000 users)
 
@@ -170,6 +180,7 @@ Me (Claude): Based on Gemini's analysis, let's tackle the onboarding drop-off fi
 ```
 
 ### Example 3: Performance Analysis
+
 ```
 You: Ask Gemini to analyze our API performance data
 
@@ -196,6 +207,7 @@ Impact: Fixing top 3 slow endpoints would improve 80% of requests
 ## Data Formats Gemini Handles
 
 ### Text Formats
+
 - Log files (.log, .txt)
 - CSV files
 - JSON files
@@ -203,12 +215,14 @@ Impact: Fixing top 3 slow endpoints would improve 80% of requests
 - Plain text data
 
 ### Code Analysis
+
 - Performance profiling output
 - Test coverage reports
 - Build logs
 - Git logs
 
 ### Metrics
+
 - Time series data
 - Response times
 - Error rates
@@ -217,6 +231,7 @@ Impact: Fixing top 3 slow endpoints would improve 80% of requests
 ## Common Patterns
 
 ### Pattern 1: Find the Problem
+
 ```
 Step 1: "Gemini, analyze these logs and find what's causing errors"
 Step 2: [Gemini identifies root cause]
@@ -224,6 +239,7 @@ Step 3: "Claude, help me fix this issue"
 ```
 
 ### Pattern 2: Understand Usage
+
 ```
 Step 1: "Gemini, analyze user behavior data"
 Step 2: [Gemini finds patterns]
@@ -231,6 +247,7 @@ Step 3: "Claude, help me improve based on these patterns"
 ```
 
 ### Pattern 3: Optimize Performance
+
 ```
 Step 1: "Gemini, find performance bottlenecks in metrics"
 Step 2: [Gemini identifies slow parts]
@@ -240,33 +257,35 @@ Step 3: "Claude, implement these optimizations"
 ## Code Style Rules
 
 ### No Emojis in Application Source Code
+
 - [NO] Never use emojis in **application** source code, code comments, or commit messages
 - [OK] Emojis are acceptable in **user-facing tools** like installation scripts and CLI utilities
 - [OK] Emojis are fine in conversational responses to user
-- [OK] Use standard ASCII in application code: +, -, *, >, <, =, |, etc.
+- [OK] Use standard ASCII in application code: +, -, \*, >, <, =, |, etc.
 - [OK] Use text indicators in application code: [OK], [FAIL], [WARN], [INFO], [SUCCESS], [ERROR], [DONE]
 
 **Clarification:** User-facing tools (like `install.sh`) can use emojis to improve UX. Application code (the software being built) should not.
 
-
 ---
-
 
 ## Tips for Best Results
 
 ### Be Specific
+
 ```
 Good: "Analyze error.log for database timeout patterns"
 Bad:  "Look at the logs"
 ```
 
 ### Provide Context
+
 ```
 Good: "Analyze user data (50k users, e-commerce site, focusing on churn)"
 Bad:  "Analyze users.csv"
 ```
 
 ### Ask for Actionable Insights
+
 ```
 Good: "Find patterns and suggest 3 specific improvements"
 Bad:  "Tell me about the data"
@@ -292,6 +311,7 @@ When you ask me to use Gemini for data analysis, I:
    - Pro tier for complex patterns and deep insights
 3. **Look up the latest available model** in that tier
 4. **Execute Gemini CLI** in headless mode:
+
    ```bash
    # Flash tier (most data analysis) - I'll use latest Flash model
    gemini -m <latest-flash-model> -p "Analyze this data: [data]" --output-format json --yolo
@@ -299,17 +319,20 @@ When you ask me to use Gemini for data analysis, I:
    # Pro tier (complex patterns) - I'll use latest Pro model
    gemini -m <latest-pro-model> -p "Analyze this data: [data]" --output-format json --yolo
    ```
+
 5. **Parse Gemini's analysis** from JSON response
 6. **Present insights** clearly to you
 7. **Help implement** recommended fixes
 
 **CLI Options for Data Analysis:**
+
 - `-m model-name` - Specify which Gemini model (I'll use latest Flash or Pro)
 - `-p "prompt"` - Send data analysis request
 - `--output-format json` - Get structured insights
 - `--yolo` - Auto-proceed (Gemini handles large data automatically)
 
 Just ask me:
+
 ```
 "Can Gemini analyze..."
 "Have Gemini find patterns in..."
@@ -321,11 +344,13 @@ I'll execute the command and bring back insights!
 ## Gemini CLI Capabilities
 
 **Available Tools:**
+
 - `read_file` - Read file contents (perfect for log files, CSVs)
 - `search_file_content` - Search within files using patterns
 - `web_fetch` - Fetch content from web URLs
 
 **Limitations:**
+
 - Cannot write or edit files directly
 - Cannot run shell commands
 - Cannot execute code

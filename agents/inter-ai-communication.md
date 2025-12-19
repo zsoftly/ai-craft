@@ -13,16 +13,19 @@ This agent enables Claude and Gemini to call each other using headless CLI comma
 **When to use**: Need performance analysis, large data processing, or quick factual lookups
 
 **Claude executes**:
+
 ```bash
 gemini -p "Your request to Gemini" --output-format json
 ```
 
 **Example**:
+
 ```bash
 gemini -p "Analyze this code for performance issues: [code here]" --output-format json
 ```
 
 **Response format**:
+
 ```json
 {
   "response": "Gemini's analysis and recommendations...",
@@ -35,16 +38,19 @@ gemini -p "Analyze this code for performance issues: [code here]" --output-forma
 **When to use**: Need code implementation, detailed reasoning, or file manipulation
 
 **Gemini would execute** (when shell access enabled):
+
 ```bash
 claude -p "Your request to Claude" --output-format json
 ```
 
 **Example**:
+
 ```bash
 claude -p "Implement the memoization pattern suggested in this analysis: [analysis]" --output-format json
 ```
 
 **Response format**:
+
 ```json
 {
   "response": "Claude's implementation and explanation...",
@@ -68,11 +74,13 @@ claude -p "Implement the memoization pattern suggested in this analysis: [analys
 **User request**: "Can you ask Gemini to analyze this fibonacci code?"
 
 **Claude executes**:
+
 ```bash
 gemini -p "Analyze this Python code for performance issues: def fibonacci(n): return n if n <= 1 else fibonacci(n-1) + fibonacci(n-2). Suggest optimizations." --output-format json
 ```
 
 **Gemini responds**:
+
 ```json
 {
   "response": "This recursive implementation has O(2^n) complexity. Recommendations:
@@ -97,6 +105,7 @@ gemini -p "Analyze this Python code for performance issues: def fibonacci(n): re
 ### Test 2: Claude implementing Gemini's suggestions
 
 **Claude implements**:
+
 ```python
 # Optimized Fibonacci with memoization
 memo = {}
@@ -123,6 +132,7 @@ print(fibonacci_memo(50))  # Fast! No exponential recursion
 ### For Claude (me)
 
 [OK] **Already configured** - I can call Gemini directly:
+
 ```bash
 gemini -p "prompt" --output-format json
 ```
@@ -130,11 +140,13 @@ gemini -p "prompt" --output-format json
 ### For Gemini
 
 **Current Gemini CLI Capabilities:**
+
 - `read_file` - Read file contents
 - `search_file_content` - Search within files
 - `web_fetch` - Fetch web content
 
 **Gemini CLI Limitations:**
+
 - Cannot run shell commands (no `run_shell_command` tool)
 - Cannot write or edit files
 - Cannot execute code directly
@@ -142,6 +154,7 @@ gemini -p "prompt" --output-format json
 **Therefore:** Gemini cannot directly call Claude CLI. Use manual bridging pattern instead.
 
 #### Recommended Pattern: Manual Bridging
+
 Instead of Gemini directly calling Claude, use this pattern:
 
 ```
@@ -164,6 +177,7 @@ This is the **recommended and only currently supported pattern** since Gemini CL
 - Validate input before passing to CLI tools
 
 **Examples:**
+
 ```bash
 # [NO] Dangerous - unescaped user input
 user_code="$1"
@@ -240,6 +254,7 @@ Claude: Let me fix these issues one by one...
 ## CLI Command Reference
 
 ### Claude CLI (claude)
+
 ```bash
 # Non-interactive mode with JSON output
 claude -p "Your prompt" --output-format json
@@ -252,6 +267,7 @@ claude -p "Your prompt" --continue --output-format json
 ```
 
 ### Gemini CLI (gemini)
+
 ```bash
 # Non-interactive mode with JSON output
 gemini -p "Your prompt" --output-format json
@@ -266,6 +282,7 @@ gemini -p "Your prompt" --output-format json --yolo
 ## Best Practices
 
 ### When Claude calls Gemini
+
 - [OK] Performance analysis
 - [OK] Large data processing (logs, CSVs)
 - [OK] Pattern recognition
@@ -273,6 +290,7 @@ gemini -p "Your prompt" --output-format json --yolo
 - [OK] Massive codebase analysis
 
 ### When Gemini would call Claude
+
 - [OK] Code implementation
 - [OK] File editing
 - [OK] Detailed step-by-step reasoning
@@ -280,7 +298,9 @@ gemini -p "Your prompt" --output-format json --yolo
 - [OK] Writing documentation
 
 ### Current Recommended Pattern
+
 **Claude as orchestrator**:
+
 1. Claude receives user request
 2. Claude calls Gemini for analysis (when needed)
 3. Claude receives Gemini's response
@@ -292,24 +312,26 @@ This avoids complex bidirectional tool permissions while maintaining collaborati
 ## Code Style Rules
 
 ### No Emojis in Application Source Code
+
 - [NO] Never use emojis in **application** source code, code comments, or commit messages
 - [OK] Emojis are acceptable in **user-facing tools** like installation scripts and CLI utilities
 - [OK] Emojis are fine in conversational responses to user
-- [OK] Use standard ASCII in application code: +, -, *, >, <, =, |, etc.
+- [OK] Use standard ASCII in application code: +, -, \*, >, <, =, |, etc.
 - [OK] Use text indicators in application code: [OK], [FAIL], [WARN], [INFO], [SUCCESS], [ERROR], [DONE]
 
 **Clarification:** User-facing tools (like `install.sh`) can use emojis to improve UX. Application code (the software being built) should not.
 
-
 ## Testing
 
 ### Test Claude → Gemini
+
 ```bash
 # From Claude
 gemini -p "Test: What is 2+2?" --output-format json
 ```
 
 Expected response:
+
 ```json
 {
   "response": "4",
@@ -318,12 +340,14 @@ Expected response:
 ```
 
 ### Test Gemini → Claude (requires shell access)
+
 ```bash
 # From Gemini (if shell tool enabled)
 claude -p "Test: Write hello world in Python" --output-format json
 ```
 
 Expected response:
+
 ```json
 {
   "response": "print('Hello, World!')",
@@ -334,20 +358,24 @@ Expected response:
 ## Troubleshooting
 
 ### "Tool not found" error from Gemini
+
 - Gemini doesn't have shell tool access enabled
 - Use the manual bridging pattern instead (Claude orchestrates)
 
 ### JSON parsing errors
+
 - Ensure `--output-format json` flag is present
 - Check that prompts don't contain unescaped quotes
 
 ### Timeout errors
+
 - Use longer timeout for large data: `--timeout 60000`
 - Consider breaking large requests into smaller chunks
 
 ## Future Enhancements
 
 Potential improvements:
+
 - Direct tool-to-tool communication protocol
 - Shared context/memory between AIs
 - Automatic routing based on task type
