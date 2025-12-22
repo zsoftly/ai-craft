@@ -82,11 +82,11 @@ The registry will expose the following core endpoints:
 
 ### 3.3 Versioning Strategy
 
-- The registry will use **Semantic Versioning (SemVer)** as specified in the `agent.json` (`major.minor.patch`).
-- A combination of `name` and `version` uniquely identifies an agent manifest.
-- Clients should be encouraged to request a specific major version (e.g., `1.x`) or use the `latest` tag with caution in development environments. The registry can resolve `1.x` to the latest non-breaking version.
-- The `latest` tag will always point to the most recently published version, regardless of whether it's a breaking change.
-
+    - The registry will use **Semantic Versioning (SemVer)** as specified in the `agent.json` (`major.minor.patch`).
+    - A combination of `name` and `version` uniquely identifies an agent manifest.
+    - Clients should be encouraged to request a specific major version (e.g., `1.x`) or use the `latest` tag with caution.
+      - **Version Range Resolution (`1.x`):** When a client requests a major version like `1.x`, the registry will resolve this to the **highest available patch version of the highest available minor version within that major version**. (e.g., for `1.x`, if `1.2.0` and `1.3.5` exist, it resolves to `1.3.5`). This ensures the most up-to-date non-breaking version is provided.
+      - **`latest` Tag:** The `latest` tag will always point to the most recently published version, **regardless of whether it introduces breaking changes**. Consumers are advised to use `latest` with extreme caution in production environments, as it offers no guarantee of backward compatibility.
 ## 4. Proposed Architecture
 
 The MCP Registry will be a simple, robust, and scalable system composed of three core components. The architecture prioritizes statelessness and cloud-native principles.
@@ -249,13 +249,19 @@ For production, we will adopt a more secure, identity-based authentication model
     -   Clients would authenticate with the IdP to obtain a short-lived JSON Web Token (JWT), which would then be passed to the registry API.
     -   The API would validate the JWT and extract the user's identity and permissions.
 
--   **API Keys (Limited Use)**
-    -   API keys will be deprecated for production use.
-    -   They may be retained for limited use cases, such as:
-        -   **Local development:** To provide a simple way for developers to interact with the `dev` registry.
-        -   **Transitional usage:** To support legacy clients during a migration period.
-        -   **CLI bootstrap:** To perform initial setup or administrative tasks.
-    -   If used, API keys must have a clear owner, an expiration date, and be stored securely in AWS Secrets Manager.
+- **API Keys (Limited Use)**
+
+            - API keys will be deprecated for production use and are considered a **transitional mechanism for Phase 1 MVP and development environments only**.
+
+            - They may be retained for limited, temporary use cases, such as:
+
+                - **Local development:** To provide a simple way for developers to interact with the `dev` registry.
+
+                - **CLI bootstrap:** To perform initial setup or administrative tasks in development.
+
+            - **Strict Policy:** All production environments and CI/CD pipelines (even for development environments) MUST utilize IAM + SigV4 or OIDC-based authentication. A clear migration path from API keys to IAM/OIDC will be established as part of Phase 2.
+
+            - If used, API keys must have a clear owner, an expiration date, and be stored securely in AWS Secrets Manager.
 
 ### 6.2 Authorization: Role-Based Access Control (RBAC)
 
@@ -289,14 +295,10 @@ A robust secrets management strategy is critical to the security of the registry
 
 ### 6.4 Multi-Environment Support
 
-The registry will support multiple environments (`dev`, `stage`, `prod`) within a single deployed instance.
+    The plan mandates a **"One Registry per Environment"** strategy (as detailed in Section 4.3). This means each environment (`dev`, `stage`, `prod`) will have its own entirely separate and independent registry instance.
 
-  - **Mechanism:** The `environment` field in the `agent.json` manifest is the primary mechanism for distinguishing agents.
-  - **Access Strategy:**
-    - Discovery endpoints (`/agents`, `/search`) will be enhanced with an optional `environment` query parameter (e.g., `GET /agents?environment=prod`).
-    - Clients (agent consumers) are responsible for requesting the correct environment. For example, a service running in production should be configured to only fetch agents from the `prod` environment.
-    - This approach provides flexibility. A future enhancement could be to create environment-specific API keys (e.g., `prod-reader`) to enforce stricter isolation if needed.
-
+      - **Mechanism:** The `environment` field in the `agent.json` manifest will be used as metadata within its dedicated registry instance to denote the agent's target environment (e.g., an agent deployed to the `prod` AWS account would have `"environment": "prod"` in its manifest, and would be published only to the `mcp-registry-prod` instance).
+      - **Access Strategy:** Clients (agent consumers) must be configured to interact with the correct environment-specific registry endpoint. For example, a service running in the `prod` AWS account will query `mcp-registry-prod` exclusively. This physically isolates environments, simplifying security and preventing cross-environment data contamination.
 ### 6.5 Network Security
 
 The registry will be deployed with a defense-in-depth network security strategy.
