@@ -285,7 +285,7 @@ Individual agent files are stored in: ~/.gemini/aicraft-agents/
             fi
 
             # Remove inline @ references to prevent Gemini CLI import errors
-            agent_summary=$(echo "$agent_summary" | sed 's/@[a-z-][a-z-]*//g')
+            agent_summary=$(echo "$agent_summary" | sed 's/@[a-z-]\+//g')
             MANAGED_CONTENT+="$agent_summary"$'\n\n'
         fi
     done
@@ -304,9 +304,9 @@ Individual agent files are stored in: ~/.gemini/aicraft-agents/
             print_info "   [BACKUP] Created: $BACKUP_FILE"
 
             # Extract content before our markers
-            before_content=$(awk '/<!-- AI-CRAFT-AGENTS-START/,0 {exit} {print}' "$GEMINI_DIR/GEMINI.md")
+            before_content=$(awk '/<!-- AI-CRAFT-AGENTS-START/ {exit} {print}' "$GEMINI_DIR/GEMINI.md")
             # Extract content after our markers
-            after_content=$(awk '/<!-- AI-CRAFT-AGENTS-END -->/,0 {if (found) print; if (/<!-- AI-CRAFT-AGENTS-END -->/) found=1}' "$GEMINI_DIR/GEMINI.md")
+            after_content=$(awk '/<!-- AI-CRAFT-AGENTS-END -->/ {found=1; next} found {print}' "$GEMINI_DIR/GEMINI.md")
 
             # Combine: user content before + our managed content + user content after
             {
@@ -352,55 +352,111 @@ if [ "$CODEX_INSTALLED" = true ]; then
 
     print_info "[Installing for OpenAI Codex CLI...]"
 
-    # Create backup if directory already exists
-    if [ -d "$CODEX_DIR/agents" ] && [ "$(ls -A "$CODEX_DIR/agents" 2>/dev/null)" ]; then
-        BACKUP_DIR="$CODEX_DIR/agents.backup.$(date +%Y%m%d_%H%M%S)"
-        mkdir -p "$BACKUP_DIR"
-        if cp -r "$CODEX_DIR/agents"/* "$BACKUP_DIR/" 2>/dev/null; then
-            print_info "   [BACKUP] Previous installation backed up to: $BACKUP_DIR"
+    # Create directory if it doesn't exist
+    mkdir -p "$CODEX_DIR"
+
+    # Migration: Clean up old incorrect agents/ directory structure
+    if [ -d "$CODEX_DIR/agents" ]; then
+        print_warning "   [MIGRATION] Found old ~/.codex/agents/ directory (incorrect structure)"
+        print_info "   [MIGRATION] Codex uses ~/.codex/AGENTS.md, not individual files"
+
+        # Backup old directory
+        OLD_BACKUP_DIR="$CODEX_DIR/agents.old.$(date +%Y%m%d_%H%M%S)"
+        if mv "$CODEX_DIR/agents" "$OLD_BACKUP_DIR" 2>/dev/null; then
+            print_info "   [MIGRATION] Old directory moved to: $OLD_BACKUP_DIR"
+            print_info "   [MIGRATION] You can safely delete it after verifying the new setup works"
         else
-            print_warning "   [WARN] Backup failed, but continuing installation"
+            print_warning "   [WARN] Could not move old directory, please remove manually: $CODEX_DIR/agents"
         fi
     fi
 
-    mkdir -p "$CODEX_DIR/agents"
+    # Smart AGENTS.md update: preserve user content, only manage our section
+    print_info "   [Updating AGENTS.md...]"
 
-    # Copy agent files with error handling (exclude README and GLOSSARY - they're just docs)
+    # Build our managed content section
+    CODEX_MANAGED_CONTENT="<!-- AI-CRAFT-AGENTS-START - Do not edit between these markers, content will be updated automatically -->
+
+# AI Craft Agents
+
+Structured workflow agents for software development tasks. Apply the relevant agent's guidance when working on matching tasks.
+
+"
+
+    # Append full agent content
     for agent in agents/*.md; do
         if [ -f "$agent" ]; then
-            agent_name=$(basename "$agent")
+            agent_basename=$(basename "$agent")
             # Skip documentation files
-            if [ "$agent_name" = "README.md" ] || [ "$agent_name" = "GLOSSARY.md" ]; then
+            if [ "$agent_basename" = "README.md" ] || [ "$agent_basename" = "GLOSSARY.md" ]; then
                 continue
             fi
-            if ! cp "$agent" "$CODEX_DIR/agents/" 2>/dev/null; then
-                print_error "   [ERROR] Failed to copy $agent to $CODEX_DIR/agents"
-                exit 1
+            agent_name=$(basename "$agent" .md)
+            CODEX_MANAGED_CONTENT+="---"$'\n\n'
+
+            # Read full agent content, remove @ references that don't work in Codex
+            agent_content=$(sed 's/@[a-z-]\+//g' "$agent" 2>/dev/null)
+
+            if [ -z "$agent_content" ]; then
+                agent_content="# $agent_name"$'\n\n'"Agent documentation - see source repository for details"
             fi
+
+            CODEX_MANAGED_CONTENT+="$agent_content"$'\n\n'
         fi
     done
 
-    # Create .codexignore to prevent Codex from scanning unwanted files (saves API credits)
-    cat > "$CODEX_DIR/agents/.codexignore" << 'EOF'
-# Ignore backup files
-*.backup.*
+    CODEX_MANAGED_CONTENT+="<!-- AI-CRAFT-AGENTS-END -->"
 
-# Ignore non-agent files (keep only .md agents)
-*.json
-*.yaml
-*.yml
-*.txt
-*.log
-.DS_Store
+    # Check if AGENTS.md exists and has our markers
+    if [ -f "$CODEX_DIR/AGENTS.md" ]; then
+        if grep -q "<!-- AI-CRAFT-AGENTS-START" "$CODEX_DIR/AGENTS.md" 2>/dev/null; then
+            # Markers exist - replace content between markers, preserve user content
+            print_info "   [Updating AI Craft section in existing AGENTS.md...]"
 
-# Common directories to exclude
-node_modules/
-dist/
-build/
-.git/
-EOF
+            # Create backup before modifying
+            BACKUP_FILE="$CODEX_DIR/AGENTS.md.backup.$(date +%Y%m%d_%H%M%S)"
+            cp "$CODEX_DIR/AGENTS.md" "$BACKUP_FILE"
+            print_info "   [BACKUP] Created: $BACKUP_FILE"
 
-    print_success "   [OK] Installed to: $CODEX_DIR/agents"
+            # Extract content before our markers
+            before_content=$(awk '/<!-- AI-CRAFT-AGENTS-START/ {exit} {print}' "$CODEX_DIR/AGENTS.md")
+            # Extract content after our markers
+            after_content=$(awk '/<!-- AI-CRAFT-AGENTS-END -->/ {found=1; next} found {print}' "$CODEX_DIR/AGENTS.md")
+
+            # Combine: user content before + our managed content + user content after
+            {
+                echo "$before_content"
+                echo "$CODEX_MANAGED_CONTENT"
+                echo "$after_content"
+            } > "$CODEX_DIR/AGENTS.md"
+
+            print_success "   [OK] Updated AI Craft section, preserved user content"
+        else
+            # No markers - append our section to preserve existing user content
+            print_info "   [Appending AI Craft section to existing AGENTS.md...]"
+
+            # Create backup
+            BACKUP_FILE="$CODEX_DIR/AGENTS.md.backup.$(date +%Y%m%d_%H%M%S)"
+            cp "$CODEX_DIR/AGENTS.md" "$BACKUP_FILE"
+            print_info "   [BACKUP] Created: $BACKUP_FILE"
+
+            # Append our managed section
+            {
+                cat "$CODEX_DIR/AGENTS.md"
+                echo ""
+                echo ""
+                echo "$CODEX_MANAGED_CONTENT"
+            } > "$CODEX_DIR/AGENTS.md.tmp" && mv "$CODEX_DIR/AGENTS.md.tmp" "$CODEX_DIR/AGENTS.md"
+
+            print_success "   [OK] Appended AI Craft section, preserved existing content"
+        fi
+    else
+        # No AGENTS.md - create new file with just our content
+        print_info "   [Creating new AGENTS.md...]"
+        echo "$CODEX_MANAGED_CONTENT" > "$CODEX_DIR/AGENTS.md"
+        print_success "   [OK] Created new AGENTS.md"
+    fi
+
+    print_success "   [OK] Codex CLI installation complete"
 fi
 
 echo ""
@@ -411,7 +467,7 @@ echo ""
 print_header "[Installed agents for:]"
 [ "$CLAUDE_INSTALLED" = true ] && echo "   - Claude Code: $CLAUDE_DIR"
 [ "$GEMINI_INSTALLED" = true ] && echo "   - Gemini CLI: $GEMINI_DIR/GEMINI.md"
-[ "$CODEX_INSTALLED" = true ] && echo "   - OpenAI Codex: $CODEX_DIR/agents"
+[ "$CODEX_INSTALLED" = true ] && echo "   - OpenAI Codex: $CODEX_DIR/AGENTS.md"
 
 if [ "$CLAUDE_INSTALLED" = false ] && [ "$GEMINI_INSTALLED" = false ] && [ "$CODEX_INSTALLED" = false ]; then
     print_warning "   [WARN] No AI CLIs detected"
@@ -456,8 +512,9 @@ fi
 if [ "$CODEX_INSTALLED" = true ]; then
     echo ""
     print_info "  OpenAI Codex:"
-    echo "    @dev-agent Phase 1: Analyze my code"
-    echo "    @tdd-agent Implement with test-driven approach"
+    echo "    Agents automatically loaded from ~/.codex/AGENTS.md"
+    echo "    Note: @ syntax not supported - just describe what you want"
+    echo "    Example: 'Analyze my code using the 5-phase development workflow'"
 fi
 
 echo ""

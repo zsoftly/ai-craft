@@ -158,7 +158,7 @@ Simple markdown files you reference with `@`:
 | ------------ | ------------- | -------------------------------------------- |
 | Claude Code  | `@agent-name` | Reference agents directly in prompts         |
 | Gemini CLI   | No `@` syntax | Agents auto-loaded as context from GEMINI.md |
-| OpenAI Codex | `@agent-name` | Reference agents directly in prompts         |
+| OpenAI Codex | No `@` syntax | Agents auto-loaded as context from AGENTS.md |
 
 **Gemini CLI Usage:**
 
@@ -189,7 +189,7 @@ One command installs for all AI platforms:
 
 - **Claude Code**: `~/.claude/agents/*.md` (for @ references)
 - **Gemini CLI**: `~/.gemini/GEMINI.md` (automatically loaded context file)
-- **OpenAI Codex**: `~/.codex/agents/*.md` (individual agent files)
+- **OpenAI Codex**: `~/.codex/AGENTS.md` (automatically loaded context file)
 
 **How It Works:**
 
@@ -250,7 +250,9 @@ gemini
 
 ```bash
 codex
-# Global instructions automatically applied to all generations
+# Agents automatically loaded from ~/.codex/AGENTS.md - no configuration needed
+# Note: @ syntax not supported - just describe what you want
+# Example: "Analyze my code using the 5-phase development workflow"
 ```
 
 ### Working with Agents
@@ -267,7 +269,7 @@ nano ~/.claude/agents/my-agent.md
 # Add to ~/.gemini/GEMINI.md
 
 # For OpenAI Codex
-nano ~/.codex/agents/my-agent.md
+# Add to ~/.codex/AGENTS.md
 ```
 
 Structure it like the existing agents:
@@ -277,7 +279,8 @@ Structure it like the existing agents:
 - How to use
 - Examples
 
-Then reference it: `@my-agent Do something`
+Then reference it in Claude Code: `@my-agent Do something`
+(Note: Gemini CLI and Codex don't support @ syntax - just describe what you want)
 
 ### Key Files
 
@@ -316,12 +319,13 @@ Then reference it: `@my-agent Do something`
 
 ### OpenAI Codex
 
-**Agent Directory:**
+**Context Files (AGENTS.md):**
 
-- Individual agent files in `~/.codex/agents/*.md`
-- Automatically discovered and loaded by Codex
-- Guides Codex to follow structured workflows
-- Same structure as Claude Code (individual files)
+- Agents consolidated into `~/.codex/AGENTS.md`
+- Automatically loaded - no environment variables needed
+- Available in all Codex CLI conversations
+- Automatically applied as context
+- Note: @ syntax not supported - describe what you want naturally
 
 ### Cross-Platform Benefits
 
@@ -348,7 +352,7 @@ ls ~/.claude/agents/
 cat ~/.gemini/GEMINI.md
 
 # Verify OpenAI Codex installation
-ls ~/.codex/agents/
+cat ~/.codex/AGENTS.md
 ```
 
 ### Making Changes

@@ -40,7 +40,7 @@ The installer automatically detects which AI CLIs you have installed and configu
 
 - **Claude Code** → `~/.claude/agents/` (if Claude Code is installed)
 - **Gemini CLI** → `~/.gemini/GEMINI.md` (if Gemini CLI is installed)
-- **OpenAI Codex** → `~/.codex/agents/` (if Codex is installed)
+- **OpenAI Codex** → `~/.codex/AGENTS.md` (if Codex is installed)
 
 **No AI CLIs detected?** The installer will create `~/.aicraft/agents/` as a fallback.
 
@@ -83,8 +83,8 @@ cat ~/.gemini/GEMINI.md | head -10
 **For OpenAI Codex:**
 
 ```bash
-# List installed agents
-ls ~/.codex/agents/
+# View installed agent instructions
+cat ~/.codex/AGENTS.md | head -20
 ```
 
 ### Windows (PowerShell)
@@ -109,7 +109,7 @@ The installer automatically detects which AI CLIs you have installed and configu
 
 - **Claude Code** → `%USERPROFILE%\.claude\agents\` (if Claude Code is installed)
 - **Gemini CLI** → `%USERPROFILE%\.gemini\GEMINI.md` (if Gemini CLI is installed)
-- **OpenAI Codex** → `%USERPROFILE%\.codex\agents\` (if Codex is installed)
+- **OpenAI Codex** → `%USERPROFILE%\.codex\AGENTS.md` (if Codex is installed)
 
 **No AI CLIs detected?** The installer will create `%USERPROFILE%\.aicraft\agents\` as a fallback.
 
@@ -155,8 +155,8 @@ Get-Content "$env:USERPROFILE\.gemini\GEMINI.md" | Select-Object -First 10
 **For OpenAI Codex:**
 
 ```powershell
-# List installed agents
-Get-ChildItem "$env:USERPROFILE\.codex\agents\"
+# View installed agent instructions
+Get-Content "$env:USERPROFILE\.codex\AGENTS.md" | Select-Object -First 20
 ```
 
 ## Updating Agents
@@ -179,7 +179,7 @@ git pull
 
 **Installation Behavior:**
 
-- Overwrites all existing agent files with latest versions
+- Overwrites existing agent files for Claude; updates only the managed section for Gemini and Codex
 - Creates automatic backups before overwriting (timestamped in `.backup.*` directories)
 - Safe to run multiple times
 

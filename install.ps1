@@ -212,8 +212,10 @@ Individual agent files are stored in: ~/.gemini/aicraft-agents/
             $beforeContent = ($existingContent -split '<!-- AI-CRAFT-AGENTS-START')[0]
 
             # Extract content after markers (if exists)
-            $afterMatch = $existingContent -match '<!-- AI-CRAFT-AGENTS-END -->([\s\S]*?)$'
-            $afterContent = if ($afterMatch) { $Matches[1] } else { "" }
+            $afterContent = ""
+            if ($existingContent -match '<!-- AI-CRAFT-AGENTS-END -->([\s\S]*)$') {
+                $afterContent = $Matches[1]
+            }
 
             # Combine: user content before + our managed content + user content after
             $newContent = $beforeContent + $managedContent + $afterContent
@@ -251,59 +253,121 @@ Individual agent files are stored in: ~/.gemini/aicraft-agents/
 if ($CODEX_INSTALLED) {
     Write-Color "[Installing for OpenAI Codex CLI...]" "Blue"
 
-    $CODEX_AGENTS_DIR = Join-Path $CODEX_DIR "agents"
+    # Create directory if it doesn't exist
+    New-Item -ItemType Directory -Force -Path $CODEX_DIR | Out-Null
 
-    # Create backup if directory already exists
-    if ((Test-Path $CODEX_AGENTS_DIR) -and ((Get-ChildItem $CODEX_AGENTS_DIR -ErrorAction SilentlyContinue).Count -gt 0)) {
+    # Migration: Clean up old incorrect agents/ directory structure
+    $oldAgentsDir = Join-Path $CODEX_DIR "agents"
+    if (Test-Path $oldAgentsDir) {
+        Write-Color "   [MIGRATION] Found old ~/.codex/agents/ directory (incorrect structure)" "Yellow"
+        Write-Color "   [MIGRATION] Codex uses ~/.codex/AGENTS.md, not individual files" "Blue"
+
+        # Backup old directory
         $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-        $BACKUP_DIR = "$CODEX_AGENTS_DIR.backup.$timestamp"
-        New-Item -ItemType Directory -Force -Path $BACKUP_DIR | Out-Null
+        $oldBackupDir = "$oldAgentsDir.old.$timestamp"
         try {
-            Copy-Item -Path "$CODEX_AGENTS_DIR\*" -Destination $BACKUP_DIR -Force
-            Write-Color "   [BACKUP] Previous installation backed up to: $BACKUP_DIR" "Blue"
+            Rename-Item -Path $oldAgentsDir -NewName "agents.old.$timestamp"
+            Write-Color "   [MIGRATION] Old directory moved to: $oldBackupDir" "Blue"
+            Write-Color "   [MIGRATION] You can safely delete it after verifying the new setup works" "Blue"
         }
         catch {
-            Write-Color "   [WARN] Backup failed, but continuing installation" "Yellow"
+            Write-Color "   [WARN] Could not move old directory, please remove manually: $oldAgentsDir" "Yellow"
         }
     }
 
-    New-Item -ItemType Directory -Force -Path $CODEX_AGENTS_DIR | Out-Null
+    # Smart AGENTS.md update: preserve user content, only manage our section
+    Write-Color "   [Updating AGENTS.md...]" "Blue"
+    $agentsMdPath = Join-Path $CODEX_DIR "AGENTS.md"
 
-    try {
-        # Copy only actual agents (exclude GLOSSARY and README - they're just docs)
-        Get-ChildItem "agents\*.md" | Where-Object {
-            $_.Name -ne "GLOSSARY.md" -and $_.Name -ne "README.md"
-        } | Copy-Item -Destination $CODEX_AGENTS_DIR -Force
+    # Build our managed content section
+    $codexManagedContent = @"
+<!-- AI-CRAFT-AGENTS-START - Do not edit between these markers, content will be updated automatically -->
 
-        # Create .codexignore to prevent Codex from scanning unwanted files (saves API credits)
-        $codexignorePath = Join-Path $CODEX_AGENTS_DIR ".codexignore"
-        $codexignoreContent = @"
-# Ignore backup files
-*.backup.*
+# AI Craft Agents
 
-# Ignore non-agent files (keep only .md agents)
-*.json
-*.yaml
-*.yml
-*.txt
-*.log
-.DS_Store
+Structured workflow agents for software development tasks. Apply the relevant agent's guidance when working on matching tasks.
 
-# Common directories to exclude
-node_modules/
-dist/
-build/
-.git/
 "@
-        Set-Content -Path $codexignorePath -Value $codexignoreContent
 
-        Write-Color "   [OK] Installed to: $CODEX_AGENTS_DIR" "Green"
+    # Append full agent content (exclude GLOSSARY and README)
+    foreach ($agent in (Get-ChildItem "agents\*.md" | Where-Object {
+        $_.Name -ne "GLOSSARY.md" -and $_.Name -ne "README.md"
+    })) {
+        $agentName = $agent.BaseName
+        $codexManagedContent += "---`n`n"
+
+        try {
+            # Read full agent content
+            $agentContent = Get-Content $agent.FullName -Raw
+
+            # Remove @ references that don't work in Codex
+            $agentContent = $agentContent -replace '@[a-z-]+', ''
+
+            if ([string]::IsNullOrWhiteSpace($agentContent)) {
+                $agentContent = "# $agentName`n`nAgent documentation - see source repository for details"
+            }
+
+            $codexManagedContent += "$agentContent`n`n"
+        }
+        catch {
+            $codexManagedContent += "# $agentName`n`nAgent documentation - see source repository for details`n`n"
+        }
     }
-    catch {
-        Write-Color "   [ERROR] Failed to copy files to $CODEX_AGENTS_DIR" "Red"
-        Write-Host $_.Exception.Message
-        exit 1
+
+    $codexManagedContent += "<!-- AI-CRAFT-AGENTS-END -->"
+
+    # Check if AGENTS.md exists and has our markers
+    if (Test-Path $agentsMdPath) {
+        $existingContent = Get-Content $agentsMdPath -Raw -ErrorAction SilentlyContinue
+
+        if ($existingContent -match "<!-- AI-CRAFT-AGENTS-START") {
+            # Markers exist - replace content between markers, preserve user content
+            Write-Color "   [Updating AI Craft section in existing AGENTS.md...]" "Blue"
+
+            # Create backup
+            $backupPath = "$agentsMdPath.backup.$((Get-Date).ToString('yyyyMMdd_HHmmss'))"
+            Copy-Item $agentsMdPath $backupPath
+            Write-Color "   [BACKUP] Created: $backupPath" "Blue"
+
+            # Extract content before markers
+            $beforeContent = ($existingContent -split '<!-- AI-CRAFT-AGENTS-START')[0]
+
+            # Extract content after markers (if exists)
+            $afterContent = ""
+            if ($existingContent -match '<!-- AI-CRAFT-AGENTS-END -->([\s\S]*)$') {
+                $afterContent = $Matches[1]
+            }
+
+            # Combine: user content before + our managed content + user content after
+            $newContent = $beforeContent + $codexManagedContent + $afterContent
+            Set-Content -Path $agentsMdPath -Value $newContent
+
+            Write-Color "   [OK] Updated AI Craft section, preserved user content" "Green"
+        }
+        else {
+            # No markers - append our section to preserve existing user content
+            Write-Color "   [Appending AI Craft section to existing AGENTS.md...]" "Blue"
+
+            # Create backup
+            $backupPath = "$agentsMdPath.backup.$((Get-Date).ToString('yyyyMMdd_HHmmss'))"
+            Copy-Item $agentsMdPath $backupPath
+            Write-Color "   [BACKUP] Created: $backupPath" "Blue"
+
+            # Append our managed section
+            $newContent = $existingContent + "`n`n" + $codexManagedContent
+            Set-Content -Path $agentsMdPath -Value $newContent
+
+            Write-Color "   [OK] Appended AI Craft section, preserved existing content" "Green"
+        }
     }
+    else {
+        # No AGENTS.md - create new file with just our content
+        Write-Color "   [Creating new AGENTS.md...]" "Blue"
+        Set-Content -Path $agentsMdPath -Value $codexManagedContent
+        Write-Color "   [OK] Created new AGENTS.md" "Green"
+    }
+
+    Write-Color "   [OK] Codex CLI installation complete" "Green"
 }
 
 Write-Host ""
@@ -314,7 +378,7 @@ Write-Host ""
 Write-Color "[Installed agents for:]" "Cyan"
 if ($CLAUDE_INSTALLED) { Write-Host "   - Claude Code: $CLAUDE_DIR" }
 if ($GEMINI_INSTALLED) { Write-Host "   - Gemini CLI: $GEMINI_DIR\GEMINI.md" }
-if ($CODEX_INSTALLED) { Write-Host "   - OpenAI Codex: $CODEX_DIR\agents" }
+if ($CODEX_INSTALLED) { Write-Host "   - OpenAI Codex: $CODEX_DIR\AGENTS.md" }
 
 if (-not $CLAUDE_INSTALLED -and -not $GEMINI_INSTALLED -and -not $CODEX_INSTALLED) {
     Write-Color "   [WARN] No AI CLIs detected" "Yellow"
@@ -357,8 +421,9 @@ if ($GEMINI_INSTALLED) {
 if ($CODEX_INSTALLED) {
     Write-Host ""
     Write-Color "  OpenAI Codex:" "Blue"
-    Write-Host "    @dev-agent Phase 1: Analyze my code"
-    Write-Host "    @tdd-agent Implement with test-driven approach"
+    Write-Host "    Agents automatically loaded from $env:USERPROFILE\.codex\AGENTS.md"
+    Write-Host "    Note: @ syntax not supported - just describe what you want"
+    Write-Host "    Example: 'Analyze my code using the 5-phase development workflow'"
 }
 
 Write-Host ""

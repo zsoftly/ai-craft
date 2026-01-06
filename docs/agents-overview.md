@@ -67,7 +67,7 @@ The installer detects your AI CLIs and installs to the correct location:
 
 - **Claude Code** → `~/.claude/agents/`
 - **Gemini CLI** → `~/.gemini/GEMINI.md`
-- **OpenAI Codex** → `~/.codex/instructions.md`
+- **OpenAI Codex** → `~/.codex/AGENTS.md`
 
 ## Usage
 
