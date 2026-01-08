@@ -40,7 +40,6 @@ variable "private_subnet_cidrs" {
 variable "db_username" {
   description = "The username for the database."
   type        = string
-  default     = "mcpadmin"
   sensitive   = true
 }
 
