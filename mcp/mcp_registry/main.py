@@ -5,20 +5,12 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 
 from . import crud, models, schemas
-from .database import SessionLocal, engine, create_db_and_tables
+from .database import engine, create_db_and_tables, get_db
 
-models.Base.metadata.create_all(bind=engine)
+
 
 app = FastAPI()
 
-
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @app.on_event("startup")

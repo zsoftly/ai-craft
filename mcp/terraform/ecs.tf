@@ -30,15 +30,13 @@ resource "aws_ecs_task_definition" "main" {
           hostPort      = 80
         }
       ]
-      environment = [
-        {
-          name  = "DATABASE_URL"
-          value = "secretsmanager:${aws_secretsmanager_secret.db_credentials.name}"
-        }
-      ]
       secrets = [
         {
           name      = "DB_CREDENTIALS"
+          valueFrom = aws_secretsmanager_secret.db_credentials.arn
+        },
+        {
+          name      = "DATABASE_URL"
           valueFrom = aws_secretsmanager_secret.db_credentials.arn
         }
       ]

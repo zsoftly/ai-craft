@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 class CapabilityBase(BaseModel):
     name: str
@@ -8,9 +8,8 @@ class CapabilityBase(BaseModel):
 class CapabilityCreate(CapabilityBase):
     pass
 
-class Capability(CapabilityBase):
+class CapabilitySimple(CapabilityBase):
     id: int
-    agents: List["Agent"] = []
 
     class Config:
         orm_mode = True
@@ -28,12 +27,25 @@ class AgentBase(BaseModel):
     openapi_spec_s3_uri: Optional[str] = None
     openapi_spec_checksum: Optional[str] = None
 
+class AgentSimple(AgentBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
 class AgentCreate(AgentBase):
     capabilities: List[CapabilityCreate] = []
 
 class Agent(AgentBase):
     id: int
-    capabilities: List[Capability] = []
+    capabilities: List[CapabilitySimple] = Field(default_factory=list)
+
+    class Config:
+        orm_mode = True
+
+class Capability(CapabilityBase):
+    id: int
+    agents: List[AgentSimple] = Field(default_factory=list)
 
     class Config:
         orm_mode = True

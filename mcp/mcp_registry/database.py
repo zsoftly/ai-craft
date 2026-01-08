@@ -10,7 +10,9 @@ from datetime import datetime
 load_dotenv() # Load environment variables from .env file
 
 # Database connection string from environment variable
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@localhost/mcp_registry")
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL environment variable not set")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -19,8 +21,8 @@ Base = declarative_base()
 agent_capability_association = Table(
     'agent_capability_association',
     Base.metadata,
-    Column('agent_id', Integer, ForeignKey('agents.id')),
-    Column('capability_id', Integer, ForeignKey('capabilities.id'))
+    Column('agent_id', Integer, ForeignKey('agents.id'), primary_key=True),
+    Column('capability_id', Integer, ForeignKey('capabilities.id'), primary_key=True)
 )
 
 class Agent(Base):

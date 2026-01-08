@@ -2,10 +2,10 @@ from sqlalchemy.orm import Session
 from . import models, schemas
 
 def get_agent(db: Session, agent_id: int):
-    return db.query(models.Agent).filter(models.Agent.id == agent_id).first()
+    return db.query(models.Agent).filter(models.Agent.id == agent_id, models.Agent.is_deleted == False).first()
 
 def get_agents(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Agent).offset(skip).limit(limit).all()
+    return db.query(models.Agent).filter(models.Agent.is_deleted == False).offset(skip).limit(limit).all()
 
 def create_agent(db: Session, agent: schemas.AgentCreate):
     db_agent = models.Agent(
@@ -44,9 +44,7 @@ def get_capabilities(db: Session, skip: int = 0, limit: int = 100):
 def create_capability(db: Session, capability: schemas.CapabilityCreate):
     db_capability = models.Capability(**capability.dict())
     db.add(db_capability)
-    db.commit()
-    db.refresh(db_capability)
     return db_capability
 
 def get_agents_by_capability(db: Session, capability_name: str):
-    return db.query(models.Agent).join(models.Agent.capabilities).filter(models.Capability.name == capability_name).all()
+    return db.query(models.Agent).join(models.Agent.capabilities).filter(models.Capability.name == capability_name, models.Agent.is_deleted == False).all()
