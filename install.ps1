@@ -408,6 +408,7 @@ if ($CLAUDE_INSTALLED) {
     Write-Host ""
     Write-Color "  Claude Code:" "Blue"
     Write-Host "    @dev-agent Phase 1: Analyze my code"
+    Write-Host "    @sniff [paste opportunity]"
     Write-Host "    @gemini-dev Ask Gemini to check performance"
 }
 
@@ -426,5 +427,7 @@ if ($CODEX_INSTALLED) {
     Write-Host "    Example: 'Analyze my code using the 5-phase development workflow'"
 }
 
+Write-Host ""
+Write-Color "  After updating agents, start a new AI CLI session/window to load the latest instructions." "Blue"
 Write-Host ""
 Write-Color "Happy coding!" "Green"

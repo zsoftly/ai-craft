@@ -498,6 +498,7 @@ if [ "$CLAUDE_INSTALLED" = true ]; then
     echo ""
     print_info "  Claude Code:"
     echo "    @dev-agent Phase 1: Analyze my code"
+    echo "    @sniff [paste opportunity]"
     echo "    @gemini-dev Ask Gemini to check performance"
 fi
 
@@ -517,5 +518,7 @@ if [ "$CODEX_INSTALLED" = true ]; then
     echo "    Example: 'Analyze my code using the 5-phase development workflow'"
 fi
 
+echo ""
+print_info "  After updating agents, start a new AI CLI session/window to load the latest instructions."
 echo ""
 print_success "Happy coding!"

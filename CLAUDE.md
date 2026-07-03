@@ -160,6 +160,11 @@ Simple markdown files you reference with `@`:
 | Gemini CLI   | No `@` syntax | Agents auto-loaded as context from GEMINI.md |
 | OpenAI Codex | No `@` syntax | Agents auto-loaded as context from AGENTS.md |
 
+Agents are loaded at AI CLI session startup. After running `./install.sh` or
+`.\install.ps1`, open a new Claude/Gemini/Codex window or session before
+expecting the updated instructions to apply. Existing windows can keep old
+context.
+
 **Gemini CLI Usage:**
 
 Gemini doesn't support `@agent` references. Instead, agents are automatically loaded as context. Just describe what you want:
@@ -197,6 +202,8 @@ One command installs for all AI platforms:
 - Copies agents to appropriate location for each platform
 - Formats correctly for each platform's requirements
 - Falls back to `~/.aicraft/agents/` if no CLIs detected
+- Updates only the AI Craft managed sections for Gemini and Codex, preserving
+  user content outside the markers.
 
 **Installation Behavior:**
 

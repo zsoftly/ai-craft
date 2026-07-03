@@ -50,6 +50,8 @@ The installer automatically detects which AI CLIs you have installed and configu
 - **Automatic backups** are created before overwriting (timestamped)
 - Safe to run multiple times - your previous installation is always backed up
 - Backups are stored in the same directory with `.backup.<timestamp>` suffix
+- Already-open Claude, Gemini, or Codex windows may keep their old context.
+  Start a new AI CLI session after reinstalling to load updated agents.
 
 #### Step 3: Verify Installation
 
@@ -182,6 +184,8 @@ git pull
 - Overwrites existing agent files for Claude; updates only the managed section for Gemini and Codex
 - Creates automatic backups before overwriting (timestamped in `.backup.*` directories)
 - Safe to run multiple times
+- Start a new Claude, Gemini, or Codex session after reinstalling. Current
+  windows usually do not reload global agent files mid-session.
 
 ### Customizing Agents
 
@@ -210,6 +214,10 @@ Use agents with the `@` symbol:
 @wag [paste job posting]
 ```
 
+Claude Code loads markdown agents from `~/.claude/agents/` when the session
+starts. If you run `./install.sh` while Claude is already open, start a new
+Claude window/session before relying on updated agent instructions.
+
 ### Gemini CLI
 
 Agents are automatically loaded from `~/.gemini/GEMINI.md`:
@@ -218,6 +226,9 @@ Agents are automatically loaded from `~/.gemini/GEMINI.md`:
 gemini  # Agents loaded automatically - no configuration needed
 ```
 
+Gemini reads `~/.gemini/GEMINI.md` at startup. Re-run `gemini` after installing
+or updating agents.
+
 ### OpenAI Codex
 
 Instructions are automatically loaded:
@@ -225,6 +236,9 @@ Instructions are automatically loaded:
 ```bash
 codex  # Agents guide all code generation
 ```
+
+Codex reads `~/.codex/AGENTS.md` when a new session starts. Re-run `codex` or
+open a new Codex window after installing updates.
 
 ## Using Multiple AIs Together
 
@@ -260,9 +274,9 @@ One install command works for all!
 | `code-review-agent`      | Code review with actionable feedback         |
 | `content-review-agent`   | Documentation and content review             |
 | `git-workflow-agent`     | Git operations and branch management         |
+| `sniff`                  | Fast ZSoftly ICP opportunity screening       |
+| `dig`                    | Deep bid/no-bid and partner-fit analysis     |
+| `wag`                    | ZSoftly-aligned proposal/message drafting    |
 | `inter-ai-communication` | Multi-AI collaboration protocols             |
 | `gemini-dev`             | Delegate tasks to Gemini                     |
 | `gemini-data`            | Delegate data analysis to Gemini             |
-| `sniff`                  | Quick Upwork job BID/SKIP decision           |
-| `dig`                    | Deep Upwork job analysis                     |
-| `wag`                    | Write Upwork proposals                       |

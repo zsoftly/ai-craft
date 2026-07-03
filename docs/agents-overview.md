@@ -53,6 +53,30 @@ Review changes, commit, and push using YOUR git credentials
 - Always uses your configured git identity
 - **File:** `git-workflow-agent.md`
 
+### 8. Sniff (`@sniff`)
+
+Fast opportunity screening against ZSoftly's current ICP
+
+- Flags BID, NO BID, PARTNER, or MORE INFO
+- Checks ICP fit, deadline risk, buyer quality, and feasibility
+- **File:** `sniff.md`
+
+### 9. Dig (`@dig`)
+
+Deep bid/no-bid and partner-fit analysis
+
+- Reviews RFPs, supplier lists, public tenders, Upwork jobs, and partner opportunities
+- Separates eligibility gates from capability fit
+- **File:** `dig.md`
+
+### 10. Wag (`@wag`)
+
+ZSoftly-aligned proposal and message drafting
+
+- Writes proposal drafts after `sniff` or `dig`
+- Supports RFP sections, Upwork proposals, intent emails, and partner outreach
+- **File:** `wag.md`
+
 ## Installation
 
 ```bash
@@ -68,6 +92,9 @@ The installer detects your AI CLIs and installs to the correct location:
 - **Claude Code** → `~/.claude/agents/`
 - **Gemini CLI** → `~/.gemini/GEMINI.md`
 - **OpenAI Codex** → `~/.codex/AGENTS.md`
+
+Open a new Claude, Gemini, or Codex session after reinstalling. Current windows
+usually keep the context they loaded at startup.
 
 ## Usage
 
