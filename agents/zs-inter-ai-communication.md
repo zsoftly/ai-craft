@@ -1,3 +1,10 @@
+---
+name: zs-inter-ai-communication
+description: Patterns for calling Gemini and other AI CLIs from a Claude session and passing results back. Use when you need two model families to cross check each other on the same problem.
+tools: Bash, Read, Grep, Glob
+color: cyan
+---
+
 # Inter-AI Communication Agent
 
 Guide for bidirectional communication between Claude and Gemini.

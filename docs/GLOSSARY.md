@@ -6,7 +6,7 @@ This glossary explains the different phase models and terminology used across AI
 
 Different agents use different phase models appropriate for their workflows:
 
-### Development Agent (dev-agent.md)
+### Development Agent (zs-dev-agent.md)
 
 **5-Phase Workflow:**
 
@@ -18,7 +18,7 @@ Different agents use different phase models appropriate for their workflows:
 
 **When to use:** Complete feature development from analysis to pull request
 
-### TDD Agent (tdd-agent.md)
+### TDD Agent (zs-tdd-agent.md)
 
 **Red-Green-Refactor Cycle:**
 
@@ -28,7 +28,7 @@ Different agents use different phase models appropriate for their workflows:
 
 **When to use:** Test-driven development workflows
 
-### Code Review Agent (code-review-agent.md)
+### Code Review Agent (zs-code-review-agent.md)
 
 **Single-Phase Review:**
 
@@ -38,7 +38,7 @@ Different agents use different phase models appropriate for their workflows:
 
 **When to use:** Code review and quality assurance
 
-### Gemini Agents (gemini-dev.md, gemini-data.md)
+### Gemini Agents (zs-gemini-dev.md, zs-gemini-data.md)
 
 **Delegation Model:**
 

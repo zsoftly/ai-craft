@@ -1,3 +1,11 @@
+---
+name: zs-content-review-agent
+description: Reviews content for AI writing patterns and humanizes it. Use after any content update (marketing copy, page text, MDX or blog content, docs, README) and before handing work back. Detects em dashes, banned and hyperbolic words, "not just X but Y" constructions, filler adjectives and adverbs, passive voice, overlong sentences, and flowery marketing language, then fixes the offending sentences while leaving code, tables, and frontmatter intact.
+tools: Read, Edit, Grep, Glob, Bash
+model: sonnet
+color: purple
+---
+
 # Content Review Agent
 
 A structured 3-phase agent for reviewing and humanizing content, articles, and posts.
@@ -160,19 +168,19 @@ I will:
 ### Example 1: Blog Post Review
 
 ```
-@content-review-agent Phase 1: Review this content for AI patterns:
+@agent-zs-content-review-agent Phase 1: Review this content for AI patterns:
 
 [Paste your blog post here]
 
-@content-review-agent Phase 2: Provide humanization feedback
+@agent-zs-content-review-agent Phase 2: Provide humanization feedback
 
-@content-review-agent Phase 3: Final review and polish
+@agent-zs-content-review-agent Phase 3: Final review and polish
 ```
 
 ### Example 2: Quick Social Media Check
 
 ```
-@content-review-agent Review this LinkedIn post for AI patterns and give me a cleaner version:
+@agent-zs-content-review-agent Review this LinkedIn post for AI patterns and give me a cleaner version:
 
 [Paste post]
 ```
@@ -180,9 +188,9 @@ I will:
 ### Example 3: Technical Article
 
 ```
-@content-review-agent Phase 1: Review this technical article for AI patterns
+@agent-zs-content-review-agent Phase 1: Review this technical article for AI patterns
 
-@content-review-agent Phase 2: Make it more accessible while keeping technical accuracy
+@agent-zs-content-review-agent Phase 2: Make it more accessible while keeping technical accuracy
 ```
 
 ---
@@ -313,18 +321,18 @@ Adjust tone for:
 
 ## Integration with Other Agents
 
-Use with **@dev-agent** when writing technical documentation:
+Use with **@agent-zs-dev-agent** when writing technical documentation:
 
 ```
-@dev-agent Phase 3: Write the API documentation
+@agent-zs-dev-agent Phase 3: Write the API documentation
 
-@content-review-agent Phase 1: Review the docs for AI patterns
+@agent-zs-content-review-agent Phase 1: Review the docs for AI patterns
 ```
 
-Use with **@tdd-agent** for README files:
+Use with **@agent-zs-tdd-agent** for README files:
 
 ```
-@tdd-agent Complete the feature
+@agent-zs-tdd-agent Complete the feature
 
-@content-review-agent Review the README updates for clarity
+@agent-zs-content-review-agent Review the README updates for clarity
 ```

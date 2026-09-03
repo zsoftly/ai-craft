@@ -1,3 +1,11 @@
+---
+name: zs-sniff
+description: Fast screen of an opportunity, RFP, tender, or job posting against the ZSoftly ideal customer profile. Returns BID, NO BID, PARTNER, or MORE INFO in one pass. Use before spending time on a full analysis.
+tools: Read, Grep, Glob
+model: sonnet
+color: orange
+---
+
 # Sniff
 
 Quick opportunity evaluator. Sniffs out good-fit work fast before the team

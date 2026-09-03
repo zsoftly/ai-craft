@@ -1,377 +1,117 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code when working in this repository.
 
-## Repository Overview
+## What this repository is
 
-AI Craft provides structured workflow prompts and simple markdown agents for software development. Work with Claude for code implementation, Gemini for performance analysis and large data processing, and OpenAI Codex for guided code generation.
+AI Craft is ZSoftly's engineering workflow for AI assisted development, packaged for Claude Code, Gemini CLI, and OpenAI Codex. It ships subagents, skills, and the installer and plugin manifests that put them on an engineer's machine.
 
-## Repository Structure
+It contains no application code. Everything here is markdown that other tools load, plus two installer scripts.
 
-This repository contains simple markdown agents for multiple AI platforms:
-
-- `agents/` - **Simple markdown agents** for multiple AI platforms
-  - `dev-agent.md` - Application Development agent
-  - `tdd-agent.md` - Test-Driven Development agent
-  - `gemini-dev.md` - Gemini development agent
-  - `gemini-data.md` - Gemini data analysis agent
-  - `code-review-agent.md` - Code Review agent
-  - `content-review-agent.md` - Content humanization agent
-  - `git-workflow-agent.md` - Git workflow agent
-  - `inter-ai-communication.md` - Inter-AI communication patterns
-  - `README.md` - Agent usage guide
-- `install.sh` / `install.ps1` - Multi-platform installation scripts (Linux/macOS/Windows)
-- `lib/colors.sh` - Shared color library for bash scripts
-
-## Core Architecture: Agent-Based Workflows
-
-All agents follow structured workflows designed to enforce separation between analysis, planning, implementation, validation, and deployment:
-
-### Agent Philosophy
-
-Each agent provides:
-
-- **Purpose** - Clear use case definition
-- **When to use** - Context for when this agent applies
-- **Instructions** - Specific directives formatted as structured workflows
-- **Key principles**:
-  - Analysis phases explicitly separate thinking from coding
-  - Implementation phases enforce quality gates (lint, compile, test after each block)
-  - Review phases prevent over-engineering for pre-customer stage
-  - Final phases handle deployment and team handoff
-  - Sub-agent delegation for heavy analysis work (context optimization)
-
-## Common Patterns Across Agents
-
-### Quality Gates
-
-Implementation phases consistently enforce:
-
-- Lint and compile after every code block
-- Write tests for each code block
-- Run tests before proceeding to next block
-
-### Anti-Over-Engineering
-
-Final phases include checks for:
-
-- Unnecessary complexity for pre-customer stage
-- Excessive abstraction or interfaces
-- Unnecessary fallbacks, versioning, or testing overkill
-- Backwards compatibility (only add when explicitly requested)
-
-### Code Review Format
-
-When reviewing code, use this specific format:
-
-- File name
-- Line number (or search words if line numbers unavailable)
-- Issue description (short)
-- Why it's likely incorrect
-- Recommended fix (only if simple)
-
-### Context Optimization
-
-For large codebases or complex analysis, agents use Claude's Task tool to spawn `general-purpose` sub-agents to:
-
-- Search through entire codebase efficiently
-- Analyze multiple files and dependencies
-- Return comprehensive findings
-- Save main conversation context for implementation
-
-## Working with This Repository
-
-### Making Changes to Agents
-
-When modifying agent documents:
-
-1. Maintain the structured workflow formatting
-2. Keep instructions as concise bullet points
-3. Preserve the "When to use" and "Purpose" sections
-4. Ensure consistency with other agents
-5. Include anti-over-engineering guidance in final phases
-6. Add context optimization for analysis-heavy phases
-
-### Creating New Agents
-
-New agents should:
-
-1. Follow structured workflow patterns
-2. Include separation between analysis and implementation phases
-3. Add quality gates in implementation phases
-4. Include anti-over-engineering checks in final phases
-5. Use consistent formatting with existing agents
-6. Include sub-agent delegation where beneficial
-
-### Documentation Standards
-
-- Use markdown format with clear headers
-- Include code blocks with triple backticks for multi-line instructions
-- Keep bullet points concise and actionable
-- Use bold for phase names and key terms
-- Maintain consistent terminology across agents
-- Never use emojis in generated code (only in conversational responses)
-
-## Simple Markdown Agents
-
-AI Craft includes simple markdown-based agents that can be referenced with `@` in Claude Code. No complex setup - just markdown files.
-
-### Available Agents
-
-Simple markdown files you reference with `@`:
-
-1. **Development Agent** (`@dev-agent`)
-   - 5-phase workflow: Analysis → Plan Review → Implementation → Code Review → PR
-   - Built-in quality gates and over-engineering checks
-   - File: `agents/dev-agent.md`
-
-2. **TDD Agent** (`@tdd-agent`)
-   - Red-Green-Refactor cycle
-   - Test-first development guidance
-   - File: `agents/tdd-agent.md`
-
-3. **Gemini Dev Agent** (`@gemini-dev`)
-   - Use latest Gemini model for performance analysis
-   - Handle large codebases (massive context window)
-   - File: `agents/gemini-dev.md`
-
-4. **Gemini Data Agent** (`@gemini-data`)
-   - Use latest Gemini for log analysis, data patterns
-   - Process large datasets and CSV files
-   - File: `agents/gemini-data.md`
-
-5. **Code Review Agent** (`@code-review-agent`)
-   - Git-based code review
-   - Security and quality checks
-   - File: `agents/code-review-agent.md`
-
-6. **Content Review Agent** (`@content-review-agent`)
-   - Review and humanize AI-generated content
-   - Remove AI writing patterns and banned phrases
-   - File: `agents/content-review-agent.md`
-
-### Platform Differences
-
-**Important:** Each platform handles agents differently.
-
-| Platform     | Agent Syntax  | How It Works                                 |
-| ------------ | ------------- | -------------------------------------------- |
-| Claude Code  | `@agent-name` | Reference agents directly in prompts         |
-| Gemini CLI   | No `@` syntax | Agents auto-loaded as context from GEMINI.md |
-| OpenAI Codex | No `@` syntax | Agents auto-loaded as context from AGENTS.md |
-
-Agents are loaded at AI CLI session startup. After running `./install.sh` or
-`.\install.ps1`, open a new Claude/Gemini/Codex window or session before
-expecting the updated instructions to apply. Existing windows can keep old
-context.
-
-**Gemini CLI Usage:**
-
-Gemini doesn't support `@agent` references. Instead, agents are automatically loaded as context. Just describe what you want:
+## Layout
 
 ```
-# Instead of "@dev-agent Phase 1: Analyze my code"
-# Just say:
-"Analyze my authentication code using the 5-phase development workflow"
-
-# Instead of "@content-review-agent Review this post"
-# Just say:
-"Review this LinkedIn post for AI patterns and humanize it"
+agents/                       subagent definitions, one file per agent
+skills/<name>/SKILL.md        skills, invoked with /<name>
+.claude-plugin/plugin.json    plugin manifest, the repo root is the plugin root
+.claude-plugin/marketplace.json  marketplace manifest, source is "./"
+install.sh, install.ps1       installers for Claude, Gemini, and Codex
+lib/colors.sh                 shared bash colour helpers
+docs/                         workflow and reference documentation
 ```
 
-Gemini reads the context from `~/.gemini/GEMINI.md` and applies the relevant agent guidance automatically.
+## The workflow this repository defines
 
-### Multi-Platform Installation
+Four roles. The orchestrator runs in the main session and delegates the rest.
 
-One command installs for all AI platforms:
+| Role           | Runs as                            | Claude and Gemini                   | Codex                                       |
+| :------------- | :--------------------------------- | :---------------------------------- | :------------------------------------------ |
+| Orchestrator   | `/zs-orchestrate` skill            | `skills/zs-orchestrate/SKILL.md`    | same file, installed to `~/.agents/skills/` |
+| Implementation | `zs-code-agent` subagent           | `agents/zs-code-agent.md`           | `codex/agents/zs-code-agent.toml`           |
+| Code review    | `zs-code-review-agent` subagent    | `agents/zs-code-review-agent.md`    | `codex/agents/zs-code-review-agent.toml`    |
+| Context review | `zs-context-review-agent` subagent | `agents/zs-context-review-agent.md` | `codex/agents/zs-context-review-agent.toml` |
+
+`/zs-self-review` runs the two reviewers over the engineer's own diff before a push. `/zs-verify-references` checks every external reference a change introduces.
+
+Full description in `docs/workflow.md`. The distinction between agents and skills, and how the three CLIs each spell it, is in `docs/agents-and-skills.md`.
+
+## Rules for changing this repository
+
+### Every agent file needs frontmatter
+
+Claude Code registers a file in an `agents/` directory as a subagent only when it opens with YAML frontmatter carrying `name` and `description`. A file without it is inert. This was the single biggest defect in the previous revision of this repository.
+
+```yaml
+---
+name: agent-name
+description: What it does and when to delegate to it. This text is the only thing the main model sees when deciding whether to use the agent.
+tools: Read, Grep, Glob, Bash
+model: opus
+color: red
+---
+```
+
+- `description` decides delegation. Write it as "does X, use it when Y", not as a title.
+- Omit `Edit` and `Write` from `tools` for any agent that must not change code. Every review agent depends on this.
+- Set `model` only when there is a reason: `opus` for review and deep analysis, `sonnet` for fast implementation and pattern work, otherwise leave it out and inherit the session model.
+- Avoid `: ` inside an unquoted description. It breaks the YAML parse.
+
+### Everything is prefixed zs-
+
+Agent `name` fields, agent filenames, skill directory names, and the `name` key in the Codex TOML all start with `zs-`. This keeps the repository clear of bundled skills, which take generic names and grow over time, and it makes the bare `/zs-orchestrate` form work identically whether the plugin or the installer put it there.
+
+Agent names accept lowercase letters and hyphens only, so the prefix is `zs-` and not `zs_`.
+
+When you add anything, prefix it. When you rename anything, add the old name to `LEGACY_AGENT_FILES` in both installers, and only add a directory to the retire list if a released installer actually wrote to it. Retiring into a sibling folder matters, because Claude Code scans `~/.claude/agents` recursively.
+
+### Codex agents mirror the markdown agents
+
+`codex/agents/*.toml` carries the same instructions as the matching `agents/zs-*.md`, in a `developer_instructions` key rather than the file body. A change to one needs the same change to the other. This is the only duplication in the repository, and it exists because Codex takes TOML while Claude and Gemini take markdown frontmatter.
+
+Verified Codex keys: `name`, `description`, and `developer_instructions` are required. `model`, `model_reasoning_effort`, and `sandbox_mode` are optional. Use `sandbox_mode = "read-only"` for every review agent, which is the Codex equivalent of leaving `Edit` and `Write` out of a Claude agent's `tools`. Do not add a key you have not confirmed in the Codex documentation.
+
+Model slugs: `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`.
+
+### Every skill needs a directory
+
+A skill is `skills/<name>/SKILL.md`. The directory name becomes the command. Set `disable-model-invocation: true` on skills that should only run when a person types them, which is the right default for workflows that spend real tokens.
+
+### Keep frontmatter portable
+
+Gemini and Codex do not understand Claude's `tools` and `model` values, and Codex validates frontmatter keys strictly. The installers write a copy carrying only `name` and `description` for those CLIs. Do not add a field that the installer would have to special case unless it earns its place.
+
+### Validate before shipping
 
 ```bash
-# Auto-detects Claude Code, Gemini CLI, OpenAI Codex
-./install.sh
+python3 -c "import tomllib,glob;[tomllib.load(open(f,'rb')) for f in glob.glob('codex/agents/*.toml')]"
+claude plugin validate .              # plugin and marketplace manifests
+claude --plugin-dir . --model haiku -p "list the agent types available to you"
+bash -n install.sh                    # installer syntax
+HOME=/tmp/aicraft-test ./install.sh   # installer against a throwaway home
+npm run fmt:check                     # prettier
 ```
 
-**Installation Paths (Auto-detected):**
+Never test the installer against your real home directory. It writes into `~/.claude`, `~/.gemini`, `~/.codex`, and `~/.agents`.
 
-- **Claude Code**: `~/.claude/agents/*.md` (for @ references)
-- **Gemini CLI**: `~/.gemini/GEMINI.md` (automatically loaded context file)
-- **OpenAI Codex**: `~/.codex/AGENTS.md` (automatically loaded context file)
+### Writing style
 
-**How It Works:**
+- No em dashes. No semicolons in prose. The `zs-content-review-agent` in this repository enforces this and the repository should pass its own check.
+- No emojis in generated code or in agent bodies. Emojis in installer console output are already there and are controlled by `--no-emoji`.
+- Short sentences. Say what the thing does, then when to use it.
+- No hyperbole, no marketing adjectives, no "not just X but Y".
 
-- Script detects which AI CLIs are installed
-- Copies agents to appropriate location for each platform
-- Formats correctly for each platform's requirements
-- Falls back to `~/.aicraft/agents/` if no CLIs detected
-- Updates only the AI Craft managed sections for Gemini and Codex, preserving
-  user content outside the markers.
+### External references
 
-**Installation Behavior:**
+Every URL in this repository was verified when it was added. The date of the check is recorded next to the reference list in `docs/agents-and-skills.md`. If you add a link, fetch it first and confirm it says what you claim it says. This repository teaches that discipline, so it has to hold itself to it.
 
-- Running `install.sh` overwrites existing agent files
-- Automatic backups created before overwriting (timestamped)
-- Safe to run multiple times
-- Previous installations backed up to `.backup.<timestamp>` directories
+### Record the change
 
-No dependencies, no Docker, no npm. Just markdown files.
+Every user visible change goes in `CHANGELOG.md` under the version being prepared, using the Keep a Changelog headings: Added, Changed, Deprecated, Removed, Fixed, Security. A rename or a behaviour change that breaks an existing install also needs a row in the migration table and, if it changes a filename, an entry in `LEGACY_AGENT_FILES` in both installers.
 
-### Usage Examples
+Version numbers follow Semantic Versioning. Keep `package.json` and `.claude-plugin/plugin.json` on the same version, because the plugin manifest version is what decides whether installed copies receive an update.
 
-#### In Claude Code (You!)
+## Constraints
 
-```
-@dev-agent Phase 1: Analyze my authentication system
-
-[Claude analyzes the code]
-
-@dev-agent Phase 3: Implement OAuth with Google
-```
-
-#### Using Gemini for Performance
-
-```
-@gemini-dev Ask Gemini to analyze performance of src/api/
-
-[Gemini analyzes with massive context]
-
-@dev-agent Implement Gemini's optimization suggestions
-```
-
-#### Combined Workflow
-
-```
-@dev-agent Phase 1: Analyze payment system
-
-Can you ask Gemini to check for performance issues?
-
-@dev-agent Phase 3: Implement with performance fixes
-```
-
-#### In Gemini CLI
-
-```bash
-gemini
-# Agents automatically loaded from ~/.gemini/GEMINI.md - no configuration needed
-```
-
-#### In OpenAI Codex
-
-```bash
-codex
-# Agents automatically loaded from ~/.codex/AGENTS.md - no configuration needed
-# Note: @ syntax not supported - just describe what you want
-# Example: "Analyze my code using the 5-phase development workflow"
-```
-
-### Working with Agents
-
-#### Creating Custom Agents
-
-Just create a markdown file:
-
-```bash
-# For Claude Code
-nano ~/.claude/agents/my-agent.md
-
-# For Gemini CLI
-# Add to ~/.gemini/GEMINI.md
-
-# For OpenAI Codex
-# Add to ~/.codex/AGENTS.md
-```
-
-Structure it like the existing agents:
-
-- Purpose section
-- When to use
-- How to use
-- Examples
-
-Then reference it in Claude Code: `@my-agent Do something`
-(Note: Gemini CLI and Codex don't support @ syntax - just describe what you want)
-
-### Key Files
-
-- `agents/dev-agent.md` - Development workflow agent (5-phase)
-- `agents/tdd-agent.md` - TDD workflow agent (Red-Green-Refactor)
-- `agents/gemini-dev.md` - Gemini development agent (performance & large codebases)
-- `agents/gemini-data.md` - Gemini data analysis agent (logs & patterns)
-- `agents/code-review-agent.md` - Code review agent (security & quality)
-- `agents/content-review-agent.md` - Content review agent (humanize AI writing)
-- `agents/git-workflow-agent.md` - Git workflow agent (review, commit, push)
-- `agents/inter-ai-communication.md` - Inter-AI communication patterns
-- `agents/README.md` - Overview and examples
-- `install.sh` / `install.ps1` - Multi-platform installation scripts
-- `lib/colors.sh` - Shared color library
-
-## Integration with AI Platforms
-
-### Claude Code (Primary)
-
-**Agent-Based (Recommended):**
-
-- Reference with `@` in Claude Code
-- No setup required - just run `./install.sh` or `./install.ps1`
-- Works with Claude, Gemini, and OpenAI Codex
-- Simple, non-technical approach
-- Easy to customize and extend (fork the repo for custom changes)
-
-### Gemini CLI
-
-**Context Files (GEMINI.md):**
-
-- Agents consolidated into `~/.gemini/GEMINI.md`
-- Automatically loaded - no environment variables needed
-- Available in all Gemini CLI conversations
-- Automatically applied as context
-
-### OpenAI Codex
-
-**Context Files (AGENTS.md):**
-
-- Agents consolidated into `~/.codex/AGENTS.md`
-- Automatically loaded - no environment variables needed
-- Available in all Codex CLI conversations
-- Automatically applied as context
-- Note: @ syntax not supported - describe what you want naturally
-
-### Cross-Platform Benefits
-
-✅ One installation works for all platforms
-✅ Consistent workflows across different AIs
-✅ Each platform gets appropriately formatted content
-✅ Simple markdown files - easy to version control
-✅ No complex dependencies or setup
-
-## Development Commands
-
-No build commands needed - just markdown files!
-
-### Testing Installation
-
-```bash
-# Run installer
-./install.sh
-
-# Verify Claude Code installation
-ls ~/.claude/agents/
-
-# Verify Gemini CLI installation
-cat ~/.gemini/GEMINI.md
-
-# Verify OpenAI Codex installation
-cat ~/.codex/AGENTS.md
-```
-
-### Making Changes
-
-```bash
-# Edit an agent
-nano agents/dev-agent.md
-
-# Reinstall to update
-./install.sh
-
-# Changes take effect immediately
-```
-
-- update the memory
+- Never run `git add`, `git commit`, or `git push` on the user's behalf. Hand over the commands.
+- Do not remove an agent or a skill people are using. Add, deprecate in the docs, and remove in a later change.
+- The installer overwrites files in the home directory. Keep the backup behaviour that is already there.

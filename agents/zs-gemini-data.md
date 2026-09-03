@@ -1,3 +1,10 @@
+---
+name: zs-gemini-data
+description: Delegates log analysis, CSV and JSON processing, and pattern finding over large datasets to the Gemini CLI. Use for data files that are too large to read into the main context.
+tools: Bash, Read, Grep, Glob
+color: cyan
+---
+
 # Gemini Data Agent
 
 Use Gemini for data analysis, log processing, and pattern recognition.

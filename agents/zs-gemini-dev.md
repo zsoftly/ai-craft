@@ -1,3 +1,10 @@
+---
+name: zs-gemini-dev
+description: Delegates development and performance analysis to the Gemini CLI for very large codebases or for a second opinion from a different model family. Use when the context is too large for one Claude pass or when you want an independent read on performance.
+tools: Bash, Read, Grep, Glob
+color: cyan
+---
+
 # Gemini Development Agent
 
 Use Google's latest Gemini model for development tasks.

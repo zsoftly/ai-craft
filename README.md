@@ -1,6 +1,53 @@
 # AI Craft
 
-Structured workflow prompts and simple agents for software development with Claude, Gemini, and OpenAI Codex.
+The ZSoftly engineering workflow for AI assisted development. Agents and skills for Claude Code, Gemini CLI, and OpenAI Codex.
+
+## What this gives you
+
+An engineering loop, not a prompt box. One orchestrator plans and delegates, an implementation agent writes the code, and two review agents check it in parallel from different angles. Findings go back through implementation until the change stands up.
+
+```
+/zs-orchestrate add rate limiting to the login endpoint
+/zs-self-review                 # before every push, on every change
+/zs-verify-references           # every link, package, and endpoint the change introduced
+```
+
+Read [docs/workflow.md](docs/workflow.md) for how the loop runs and what is expected of you inside it. Read [docs/agents-and-skills.md](docs/agents-and-skills.md) if you are unclear on what an agent is versus a skill.
+
+## Install
+
+### Claude Code, using the plugin
+
+Versioned, namespaced, and updated with one command. This is the recommended path.
+
+```
+/plugin marketplace add zsoftly/ai-craft
+/plugin install ai-craft@zsoftly
+```
+
+Skills arrive as `/ai-craft:zs-orchestrate` and `/ai-craft:zs-self-review`. Agents arrive as `ai-craft:zs-code-review-agent` and so on. Update with `/plugin update ai-craft@zsoftly`.
+
+To put it on every engineer's machine automatically, commit this to a repository's `.claude/settings.json`. Claude Code applies it once the engineer trusts the folder.
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "zsoftly": {
+      "source": {
+        "source": "github",
+        "repo": "zsoftly/ai-craft"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "ai-craft@zsoftly": true
+  }
+}
+```
+
+### Gemini CLI and OpenAI Codex, using the installer
+
+The installer also covers Claude Code for anyone who prefers files in `~/.claude` over the plugin. Do not use both for Claude Code on the same machine, or you get two copies of every agent. Pass `--skip-claude` when the plugin is already installed.
 
 ### Prerequisites
 
@@ -38,9 +85,10 @@ The installer automatically detects which AI CLIs you have installed and configu
 
 **Detects and installs for:**
 
-- **Claude Code** → `~/.claude/agents/` (if Claude Code is installed)
-- **Gemini CLI** → `~/.gemini/GEMINI.md` (if Gemini CLI is installed)
-- **OpenAI Codex** → `~/.codex/AGENTS.md` (if Codex is installed)
+- **Claude Code** → `~/.claude/agents/` and `~/.claude/skills/`
+- **Gemini CLI** → `~/.gemini/agents/` and `~/.gemini/GEMINI.md`
+- **OpenAI Codex** → `~/.codex/agents/` and `~/.codex/AGENTS.md`
+- **Gemini CLI and Codex, shared** → `~/.agents/skills/`, the Agent Skills standard location
 
 **No AI CLIs detected?** The installer will create `~/.aicraft/agents/` as a fallback.
 
@@ -62,17 +110,25 @@ The installer automatically detects which AI CLIs you have installed and configu
 ls ~/.claude/agents/
 
 # You should see:
-# code-review-agent.md
-# content-review-agent.md
-# dev-agent.md
-# gemini-data.md
-# gemini-dev.md
-# git-workflow-agent.md
-# inter-ai-communication.md
-# tdd-agent.md
-# sniff.md
-# dig.md
-# wag.md
+# zs-code-agent.md
+# zs-code-review-agent.md
+# zs-content-review-agent.md
+# zs-context-review-agent.md
+# zs-dev-agent.md
+# zs-dig.md
+# zs-gemini-data.md
+# zs-gemini-dev.md
+# zs-git-workflow-agent.md
+# zs-inter-ai-communication.md
+# zs-sniff.md
+# zs-tdd-agent.md
+# zs-wag.md
+
+# And the skills:
+ls ~/.claude/skills/
+# zs-orchestrate
+# zs-self-review
+# zs-verify-references
 ```
 
 **For Gemini CLI:**
@@ -85,7 +141,17 @@ cat ~/.gemini/GEMINI.md | head -10
 **For OpenAI Codex:**
 
 ```bash
-# View installed agent instructions
+# List installed subagents
+ls ~/.codex/agents/
+# zs-code-agent.toml
+# zs-code-review-agent.toml
+# zs-content-review-agent.toml
+# zs-context-review-agent.toml
+
+# List installed skills
+ls ~/.agents/skills/
+
+# View the always on guidance
 cat ~/.codex/AGENTS.md | head -20
 ```
 
@@ -109,9 +175,10 @@ The installer automatically detects which AI CLIs you have installed and configu
 
 **Detects and installs for:**
 
-- **Claude Code** → `%USERPROFILE%\.claude\agents\` (if Claude Code is installed)
-- **Gemini CLI** → `%USERPROFILE%\.gemini\GEMINI.md` (if Gemini CLI is installed)
-- **OpenAI Codex** → `%USERPROFILE%\.codex\AGENTS.md` (if Codex is installed)
+- **Claude Code** → `%USERPROFILE%\.claude\agents\` and `%USERPROFILE%\.claude\skills\`
+- **Gemini CLI** → `%USERPROFILE%\.gemini\agents\` and `%USERPROFILE%\.gemini\GEMINI.md`
+- **OpenAI Codex** → `%USERPROFILE%\.codex\agents\` and `%USERPROFILE%\.codex\AGENTS.md`
+- **Gemini CLI and Codex, shared** → `%USERPROFILE%\.agents\skills\`
 
 **No AI CLIs detected?** The installer will create `%USERPROFILE%\.aicraft\agents\` as a fallback.
 
@@ -134,17 +201,22 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 Get-ChildItem "$env:USERPROFILE\.claude\agents\"
 
 # You should see:
-# code-review-agent.md
-# content-review-agent.md
-# dev-agent.md
-# gemini-data.md
-# gemini-dev.md
-# git-workflow-agent.md
-# inter-ai-communication.md
-# tdd-agent.md
-# sniff.md
-# dig.md
-# wag.md
+# zs-code-agent.md
+# zs-code-review-agent.md
+# zs-content-review-agent.md
+# zs-context-review-agent.md
+# zs-dev-agent.md
+# zs-dig.md
+# zs-gemini-data.md
+# zs-gemini-dev.md
+# zs-git-workflow-agent.md
+# zs-inter-ai-communication.md
+# zs-sniff.md
+# zs-tdd-agent.md
+# zs-wag.md
+
+# And the skills:
+Get-ChildItem "$env:USERPROFILE\.claude\skills\"
 ```
 
 **For Gemini CLI:**
@@ -157,7 +229,11 @@ Get-Content "$env:USERPROFILE\.gemini\GEMINI.md" | Select-Object -First 10
 **For OpenAI Codex:**
 
 ```powershell
-# View installed agent instructions
+# List installed subagents and skills
+Get-ChildItem "$env:USERPROFILE\.codex\agents\"
+Get-ChildItem "$env:USERPROFILE\.agents\skills\"
+
+# View the always on guidance
 Get-Content "$env:USERPROFILE\.codex\AGENTS.md" | Select-Object -First 20
 ```
 
@@ -202,81 +278,114 @@ This approach keeps your customizations version-controlled and makes it easy to 
 
 ### Claude Code
 
-Use agents with the `@` symbol:
+Skills are invoked with `/`, agents with `@agent-`. With the plugin installed both carry the `ai-craft:` prefix.
 
 ```
-@dev-agent Phase 1: Analyze my authentication system
-@tdd-agent RED: Write a failing test for login
-@gemini-dev Ask Gemini to check performance of src/api/
-@code-review-agent Review my code
-@git-workflow-agent What changes do I have that haven't been pushed?
-@sniff [paste job posting]
-@wag [paste job posting]
+/zs-orchestrate add rate limiting to the login endpoint
+/zs-self-review
+/zs-verify-references
+
+@agent-zs-code-review-agent review the changes on this branch
+@agent-zs-context-review-agent check this change against the ticket description
+@agent-zs-content-review-agent review the README changes
+@agent-zs-tdd-agent write a failing test for login
+@agent-zs-sniff [paste job posting]
 ```
 
-Claude Code loads markdown agents from `~/.claude/agents/` when the session
-starts. If you run `./install.sh` while Claude is already open, start a new
-Claude window/session before relying on updated agent instructions.
+Claude Code loads agents and skills when the session starts. If you install while Claude is already open, start a new session before relying on the updated files.
 
 ### Gemini CLI
 
-Agents are automatically loaded from `~/.gemini/GEMINI.md`:
+Subagents install to `~/.gemini/agents/` and are directed with `@<name>`. Skills install to `~/.agents/skills/`, and `~/.gemini/GEMINI.md` carries the always on context.
 
 ```bash
-gemini  # Agents loaded automatically - no configuration needed
+gemini
+# @zs-code-review-agent review the changes on this branch
+# /skills list
 ```
-
-Gemini reads `~/.gemini/GEMINI.md` at startup. Re-run `gemini` after installing
-or updating agents.
 
 ### OpenAI Codex
 
-Instructions are automatically loaded:
+Codex has all three pieces. Subagents are TOML files in `~/.codex/agents/`, skills live in `~/.agents/skills/` and are invoked with `$<name>`, and `~/.codex/AGENTS.md` carries the always on guidance.
+
+Codex does not spawn subagents on its own, so delegation is explicit. Name the agent in the prompt.
 
 ```bash
-codex  # Agents guide all code generation
+codex
+# $zs-orchestrate add rate limiting to the login endpoint
+# $zs-self-review
+# Spawn zs-code-review-agent and zs-context-review-agent on this branch in parallel
+# /agent          inspect and switch between running threads
 ```
 
-Codex reads `~/.codex/AGENTS.md` when a new session starts. Re-run `codex` or
-open a new Codex window after installing updates.
+The four workflow agents ship with their models already set: `gpt-5.6-terra` for implementation, `gpt-5.6-sol` for both reviewers, `gpt-5.6-luna` for content review. The reviewers also set `sandbox_mode = "read-only"`, which is how they are prevented from editing what they review. Change any of it in `~/.codex/agents/*.toml`.
 
 ## Using Multiple AIs Together
 
-**Claude** is great for: Code writing, architecture, detailed reasoning
-**Gemini** is great for: Performance analysis, large files, data patterns
-**OpenAI Codex** is great for: Guided code generation, structured workflows
+Each CLI is stronger at different work.
 
-Use them together:
+- **Claude**: code writing, architecture, multi step reasoning, orchestration
+- **Gemini**: very large codebases, performance analysis, log and data patterns
+- **Codex**: parallel subagent fan out with per agent model and sandbox settings
 
-1. Claude analyzes and plans
-2. Gemini checks performance and data
-3. Codex generates code following agent workflows
-4. All three review from different angles
+The `zs-gemini-dev` and `zs-gemini-data` agents let a Claude session hand work to Gemini and read the result back, which is useful when the context is larger than one model should carry. `zs-inter-ai-communication` documents the patterns.
 
-Simple and powerful!
+Running the same change past two model families is a real second opinion, and worth it when the change is risky.
 
 ## Multi-Platform Support
 
-AI Craft agents work across all major AI CLIs:
+Agents and skills work across all three CLIs:
 
-- ✓ Claude Code (via @ references)
-- ✓ Gemini CLI (via system instructions)
-- ✓ OpenAI Codex (via global instructions)
+- Claude Code: subagents in `~/.claude/agents/`, skills in `~/.claude/skills/`, or the plugin
+- Gemini CLI: subagents in `~/.gemini/agents/`, skills in `~/.agents/skills/`
+- OpenAI Codex: subagents in `~/.codex/agents/`, skills in `~/.agents/skills/`, guidance in `~/.codex/AGENTS.md`
 
-One install command works for all!
+One install command covers all three. See [docs/agents-and-skills.md](docs/agents-and-skills.md) for what each location means.
+
+## Skill Reference
+
+Invoked with `/name`, or `/ai-craft:name` when installed as a plugin.
+
+| Skill                  | Purpose                                                                  |
+| ---------------------- | ------------------------------------------------------------------------ |
+| `zs-orchestrate`       | The four agent loop: plan, implement, review in parallel, iterate        |
+| `zs-self-review`       | Review your own diff before asking a colleague. Run before every push    |
+| `zs-verify-references` | Confirm every link, package, endpoint, and version the change introduced |
 
 ## Agent Reference
 
-| Agent                    | Purpose                                      |
-| ------------------------ | -------------------------------------------- |
-| `dev-agent`              | 5-phase development workflow                 |
-| `tdd-agent`              | Test-driven development (RED/GREEN/REFACTOR) |
-| `code-review-agent`      | Code review with actionable feedback         |
-| `content-review-agent`   | Documentation and content review             |
-| `git-workflow-agent`     | Git operations and branch management         |
-| `sniff`                  | Fast ZSoftly ICP opportunity screening       |
-| `dig`                    | Deep bid/no-bid and partner-fit analysis     |
-| `wag`                    | ZSoftly-aligned proposal/message drafting    |
-| `inter-ai-communication` | Multi-AI collaboration protocols             |
-| `gemini-dev`             | Delegate tasks to Gemini                     |
-| `gemini-data`            | Delegate data analysis to Gemini             |
+Invoked with `@agent-name`, or delegated to automatically.
+
+| Agent                       | Model   | Purpose                                                       |
+| --------------------------- | ------- | ------------------------------------------------------------- |
+| `zs-code-agent`             | sonnet  | Implements a scoped change and reports what it did            |
+| `zs-code-review-agent`      | opus    | Bugs, security, and correctness of the code itself            |
+| `zs-context-review-agent`   | opus    | Requirements coverage, completeness, docs, reference checking |
+| `zs-content-review-agent`   | sonnet  | Removes AI writing patterns from prose                        |
+| `zs-dev-agent`              | inherit | Five phase development workflow                               |
+| `zs-tdd-agent`              | inherit | Test driven development, red green refactor                   |
+| `zs-git-workflow-agent`     | inherit | Inspect changes, commit and push with your own git identity   |
+| `zs-gemini-dev`             | inherit | Delegate development and performance work to Gemini           |
+| `zs-gemini-data`            | inherit | Delegate log and dataset analysis to Gemini                   |
+| `zs-inter-ai-communication` | inherit | Patterns for calling other AI CLIs and reading results back   |
+| `zs-sniff`                  | sonnet  | Fast opportunity screen against the ZSoftly ICP               |
+| `zs-dig`                    | opus    | Deep bid or no bid and partner fit analysis                   |
+| `zs-wag`                    | inherit | Proposal and outreach drafting aligned to the ICP             |
+
+## Naming
+
+Everything this repository ships is prefixed `zs-`. That keeps it clear of the skills Claude Code, Gemini CLI, and Codex bundle themselves, which take generic names such as `/verify`, `/loop`, `/batch`, and `/code-review`. A skill that shares a name with a bundled one silently replaces it, and that is a bad surprise to hand an engineer.
+
+The prefix also means one name works everywhere. `/zs-orchestrate` is what you type whether the plugin installed it or the installer did, because a plugin skill is reachable by its bare name as long as nothing else has claimed it. `/ai-craft:zs-orchestrate` stays available as the collision proof form.
+
+Installing over a 1.0.0 install moves the eleven old filenames into a timestamped sibling folder rather than deleting them, and touches nothing else. The full name mapping is in [CHANGELOG.md](CHANGELOG.md#migrating-to-200).
+
+If you fork this for another org, change the prefix in the `agents/` filenames and `name:` fields, the `skills/` directory names, and the `name` field in `codex/agents/*.toml`.
+
+## Documentation
+
+- [docs/workflow.md](docs/workflow.md): the four agent loop, self review, and what ownership means
+- [docs/agents-and-skills.md](docs/agents-and-skills.md): agents, skills, commands, and plugins across the three CLIs
+- [docs/agents-overview.md](docs/agents-overview.md): what each agent does, with examples
+- [docs/GLOSSARY.md](docs/GLOSSARY.md): terms used across the agents
+- [CHANGELOG.md](CHANGELOG.md): what changed in each release, and how to migrate

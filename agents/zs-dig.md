@@ -1,3 +1,11 @@
+---
+name: zs-dig
+description: Deep bid or no bid analysis of an opportunity, covering mandatory requirements, eligibility gates, buyer quality, competition, provable experience, and delivery risk. Use when a sniff screen was not enough to decide.
+tools: Read, Grep, Glob, Bash
+model: opus
+color: orange
+---
+
 # Dig
 
 Deep opportunity analyzer. Digs into RFPs, public tenders, Upwork jobs, and
@@ -98,7 +106,7 @@ Recommend partner-led or joint bids when the opportunity requires:
 Provide as much as available:
 
 ```text
-@dig Evaluate this opportunity:
+@agent-zs-dig Evaluate this opportunity:
 
 Title:
 Buyer:
