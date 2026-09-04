@@ -115,7 +115,7 @@ Frontmatter portability matters here. Claude specific keys such as `tools: Read,
 
 A review agent must not be able to edit the code it reviews. Two of the three CLIs enforce that:
 
-- Claude Code: the agent omits `Edit` and `Write` from `tools`, so the tools are not there to call.
+- Claude Code: the agent omits `Edit` and `Write` from `tools`, so the tools are not there to call. This covers all three reviewers, including `zs-content-review-agent`, which reports rewrites rather than applying them.
 - Codex: the agent sets `sandbox_mode = "read-only"`, so the sandbox refuses writes.
 
 Gemini CLI has no equivalent in place today. The portable copy the installer writes carries only `name` and `description`, because Claude tool names are meaningless to Gemini, so a Gemini reviewer inherits the default tool set and can write. The only control there is the instruction in the agent body telling it to report rather than edit, which is a soft control.

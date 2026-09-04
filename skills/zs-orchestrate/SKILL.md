@@ -65,10 +65,13 @@ Read the report that comes back. Pay attention to its `ASSUMPTIONS`, `NOT DONE`,
 
 ## Phase 3: Review in parallel
 
-Once implementation reports back, launch both reviewers in the same message so they run concurrently:
+Once implementation reports back, launch every applicable reviewer in the same message so they run concurrently:
 
 - `zs-code-review-agent` with the diff to review and any focus areas.
 - `zs-context-review-agent` with the diff and the original request verbatim, so it can check requirements coverage.
+- `zs-content-review-agent` whenever the change touches prose a human reads: README, docs, changelogs, release notes, marketing copy, help text, error strings. Give it the prose paths only, not the whole diff, so it does not spend its context on code it will not comment on.
+
+All of them go in one message. Launching them one after another wastes the wall clock time the fan out exists to save.
 
 Give each reviewer the same context you gave the implementer, plus what actually changed. A reviewer that has to guess the requirement cannot check it.
 

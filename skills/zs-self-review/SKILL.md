@@ -18,13 +18,16 @@ This runs before a push and before a review request. Anything the reviewers here
 ## Step 1: Establish the diff
 
 ```bash
-git status
+git status --porcelain          # includes untracked files, marked ??
 git log --oneline origin/HEAD..HEAD
+git diff HEAD                   # working tree and staged, against the last commit
 git diff --stat origin/HEAD...HEAD
-git diff origin/HEAD...HEAD
+git diff origin/HEAD...HEAD     # commits on this branch
 ```
 
-Fall back to `git diff` and `git diff --staged` when the branch has no upstream. Use `gh pr diff <number>` when a pull request number was given.
+Your work is all of it: committed, staged, unstaged, and untracked. `git diff` shows none of the untracked files, so read every path `git status --porcelain` marks `??` in full and include them in what you send the reviewers. A file you just created is the one a colleague has never seen.
+
+Fall back to `git diff HEAD` alone when the branch has no upstream. Use `gh pr diff <number>` when a pull request number was given.
 
 If there is nothing to review, say so and stop. Do not review the whole repository by default.
 

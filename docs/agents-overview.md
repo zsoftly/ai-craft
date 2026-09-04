@@ -36,27 +36,27 @@ Pulls every URL, package, endpoint, version, flag, and identifier the change int
 Implements one scoped change in its own context. Reads the repository first, matches existing conventions, runs lint, build, and tests, then reports what it did, what it assumed, and what it could not verify.
 
 - Runs on a fast model
-- **File:** `zs-code-agent.md`
+- **File:** `agents/zs-code-agent.md`
 
 ### Code Review Agent (`@agent-zs-code-review-agent`)
 
 Bugs, security holes, and correctness of the code itself. Reports findings by file and line with severity. Has no write tools, so it cannot change what it reviews.
 
 - Runs on a strong review model
-- **File:** `zs-code-review-agent.md`
+- **File:** `agents/zs-code-review-agent.md`
 
 ### Context Review Agent (`@agent-zs-context-review-agent`)
 
 The second reviewer, running in parallel with the first. Checks requirements coverage, completeness across callers and docs and config, and whether every external reference the change introduced actually exists.
 
 - Runs on a strong review model
-- **File:** `zs-context-review-agent.md`
+- **File:** `agents/zs-context-review-agent.md`
 
 ### Content Review Agent (`@agent-zs-content-review-agent`)
 
-Removes AI writing patterns from prose. Em dashes, hyperbolic words, filler adjectives, passive voice, and marketing language. Joins the review round whenever a change touches text a human reads.
+Reports AI writing patterns in prose, with a suggested rewrite for each sentence it flags. Read only, like the other two reviewers. Em dashes, hyperbolic words, filler adjectives, passive voice, and marketing language. Joins the review round whenever a change touches text a human reads.
 
-- **File:** `zs-content-review-agent.md`
+- **File:** `agents/zs-content-review-agent.md`
 
 ## Available Agents
 
@@ -65,32 +65,32 @@ Removes AI writing patterns from prose. Em dashes, hyperbolic words, filler adje
 5-phase development workflow for building features
 
 - Analysis → Planning → Implementation → Review → Pull Request
-- **File:** `zs-dev-agent.md`
+- **File:** `agents/zs-dev-agent.md`
 
 ### 2. TDD Agent (`@agent-zs-tdd-agent`)
 
 Test-Driven Development with Red-Green-Refactor
 
 - Write test first → Implement → Refactor
-- **File:** `zs-tdd-agent.md`
+- **File:** `agents/zs-tdd-agent.md`
 
 ### 3. Gemini Development (`@agent-zs-gemini-dev`)
 
 Use latest Gemini for development (performance, large codebases)
 
-- **File:** `zs-gemini-dev.md`
+- **File:** `agents/zs-gemini-dev.md`
 
 ### 4. Gemini Data Analysis (`@agent-zs-gemini-data`)
 
 Use latest Gemini for data analysis (logs, CSV, patterns)
 
-- **File:** `zs-gemini-data.md`
+- **File:** `agents/zs-gemini-data.md`
 
 ### 5. Code Review Agent (`@agent-zs-code-review-agent`)
 
 Review code for bugs, security, and quality
 
-- **File:** `zs-code-review-agent.md`
+- **File:** `agents/zs-code-review-agent.md`
 
 ### 6. Inter-AI Communication (`@agent-zs-inter-ai-communication`)
 
@@ -98,7 +98,7 @@ Guide for bidirectional Claude ↔ Gemini communication
 
 - Real CLI commands for AI-to-AI calls
 - Working examples and patterns
-- **File:** `zs-inter-ai-communication.md`
+- **File:** `agents/zs-inter-ai-communication.md`
 
 ### 7. Git Workflow Agent (`@agent-zs-git-workflow-agent`)
 
@@ -107,7 +107,7 @@ Review changes, commit, and push using YOUR git credentials
 - Shows uncommitted changes and unpushed commits
 - Never uses AI attribution in commits
 - Always uses your configured git identity
-- **File:** `zs-git-workflow-agent.md`
+- **File:** `agents/zs-git-workflow-agent.md`
 
 ### 8. Sniff (`@agent-zs-sniff`)
 
@@ -115,7 +115,7 @@ Fast opportunity screening against ZSoftly's current ICP
 
 - Flags BID, NO BID, PARTNER, or MORE INFO
 - Checks ICP fit, deadline risk, buyer quality, and feasibility
-- **File:** `zs-sniff.md`
+- **File:** `agents/zs-sniff.md`
 
 ### 9. Dig (`@agent-zs-dig`)
 
@@ -123,7 +123,7 @@ Deep bid/no-bid and partner-fit analysis
 
 - Reviews RFPs, supplier lists, public tenders, Upwork jobs, and partner opportunities
 - Separates eligibility gates from capability fit
-- **File:** `zs-dig.md`
+- **File:** `agents/zs-dig.md`
 
 ### 10. Wag (`@agent-zs-wag`)
 
@@ -131,7 +131,7 @@ ZSoftly-aligned proposal and message drafting
 
 - Writes proposal drafts after `zs-sniff` or `zs-dig`
 - Supports RFP sections, Upwork proposals, intent emails, and partner outreach
-- **File:** `zs-wag.md`
+- **File:** `agents/zs-wag.md`
 
 ## Installation
 
@@ -361,22 +361,22 @@ Done! ✓
 
 Read the individual agent files:
 
-- `zs-code-agent.md` - Scoped implementation, reports back
-- `zs-code-review-agent.md` - Code review process
-- `zs-context-review-agent.md` - Requirements, completeness, reference checking
-- `zs-content-review-agent.md` - Removing AI writing patterns
-- `zs-dev-agent.md` - Full development workflow
-- `zs-tdd-agent.md` - Test-driven development
-- `zs-gemini-dev.md` - Using Gemini for development
-- `zs-gemini-data.md` - Using Gemini for data analysis
-- `zs-inter-ai-communication.md` - Claude and Gemini bidirectional communication
-- `zs-git-workflow-agent.md` - Git commit and push with your credentials
+- `agents/zs-code-agent.md` - Scoped implementation, reports back
+- `agents/zs-code-review-agent.md` - Code review process
+- `agents/zs-context-review-agent.md` - Requirements, completeness, reference checking
+- `agents/zs-content-review-agent.md` - Removing AI writing patterns
+- `agents/zs-dev-agent.md` - Full development workflow
+- `agents/zs-tdd-agent.md` - Test-driven development
+- `agents/zs-gemini-dev.md` - Using Gemini for development
+- `agents/zs-gemini-data.md` - Using Gemini for data analysis
+- `agents/zs-inter-ai-communication.md` - Claude and Gemini bidirectional communication
+- `agents/zs-git-workflow-agent.md` - Git commit and push with your credentials
 
 And the skills in `skills/`:
 
-- `orchestrate/SKILL.md` - The four agent loop
-- `self-review/SKILL.md` - Pre push review of your own work
-- `verify-references/SKILL.md` - Confirming external references
+- `skills/zs-orchestrate/SKILL.md` - The four agent loop
+- `skills/zs-self-review/SKILL.md` - Pre push review of your own work
+- `skills/zs-verify-references/SKILL.md` - Confirming external references
 
 ## Inter-AI Communication
 

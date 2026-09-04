@@ -361,7 +361,7 @@ Invoked with `@agent-name`, or delegated to automatically.
 | `zs-code-agent`             | sonnet  | Implements a scoped change and reports what it did            |
 | `zs-code-review-agent`      | opus    | Bugs, security, and correctness of the code itself            |
 | `zs-context-review-agent`   | opus    | Requirements coverage, completeness, docs, reference checking |
-| `zs-content-review-agent`   | sonnet  | Removes AI writing patterns from prose                        |
+| `zs-content-review-agent`   | sonnet  | Reports AI writing patterns in prose, with rewrites           |
 | `zs-dev-agent`              | inherit | Five phase development workflow                               |
 | `zs-tdd-agent`              | inherit | Test driven development, red green refactor                   |
 | `zs-git-workflow-agent`     | inherit | Inspect changes, commit and push with your own git identity   |

@@ -28,7 +28,10 @@ Two things happened. The agents in this repository were never registered as agen
 ### Changed
 
 - Every agent and skill is prefixed `zs-`. Bundled skills take generic names, and a same named personal or project skill silently replaces the bundled one. See [Migrating to 2.0.0](#migrating-to-200) for the full name mapping.
-- Every agent file now carries YAML frontmatter with `name` and `description`, which is what makes it register as a subagent. Review agents omit `Edit` and `Write` from `tools`, so they can no longer modify the code they review.
+- Every agent file now carries YAML frontmatter with `name` and `description`, which is what makes it register as a subagent. All three review agents omit `Edit` and `Write` from `tools`, so they can no longer modify what they review.
+- `zs-content-review-agent` reports rewrites instead of applying them. In 1.0.0 it edited prose directly. It now quotes each sentence it flags and gives the replacement, and the caller decides what to take. This matches the other two reviewers and the Codex definition, which was already read only.
+- Every reviewer now establishes the full change: committed, staged, unstaged, and untracked. The previous instructions used `git diff origin/HEAD...HEAD`, which shows no untracked files at all, so a newly added file could pass review without anyone reading it.
+- A reference the reviewer could not confirm is reported once, under `UNVERIFIED REFERENCES`, which blocks the change the same way `CRITICAL` does. It was previously told to file the same reference under both.
 - Models are set per agent. Review and deep analysis on `opus` and `gpt-5.6-sol`, implementation on `sonnet` and `gpt-5.6-terra`, content review on `sonnet` and `gpt-5.6-luna`. The orchestrator takes the session model.
 - `zs-code-review-agent` now establishes the diff itself with git before reviewing, reports findings without editing, and treats an unverified external reference as a Critical finding.
 - Invocation syntax in all documentation moved from the bare `@name` to `@agent-zs-name`, which is the form Claude Code actually accepts for a subagent.
