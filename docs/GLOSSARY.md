@@ -6,7 +6,7 @@ This glossary explains the different phase models and terminology used across AI
 
 Different agents use different phase models appropriate for their workflows:
 
-### Development Agent (dev-agent.md)
+### Development Agent (zs-dev-agent.md)
 
 **5-Phase Workflow:**
 
@@ -18,7 +18,7 @@ Different agents use different phase models appropriate for their workflows:
 
 **When to use:** Complete feature development from analysis to pull request
 
-### TDD Agent (tdd-agent.md)
+### TDD Agent (zs-tdd-agent.md)
 
 **Red-Green-Refactor Cycle:**
 
@@ -28,7 +28,7 @@ Different agents use different phase models appropriate for their workflows:
 
 **When to use:** Test-driven development workflows
 
-### Code Review Agent (code-review-agent.md)
+### Code Review Agent (zs-code-review-agent.md)
 
 **Single-Phase Review:**
 
@@ -38,7 +38,7 @@ Different agents use different phase models appropriate for their workflows:
 
 **When to use:** Code review and quality assurance
 
-### Gemini Agents (gemini-dev.md, gemini-data.md)
+### Gemini Agents (zs-gemini-dev.md, zs-gemini-data.md)
 
 **Delegation Model:**
 
@@ -50,13 +50,13 @@ Different agents use different phase models appropriate for their workflows:
 
 ## Cross-Reference
 
-| If you're familiar with... | Try this agent...              |
-| -------------------------- | ------------------------------ |
-| Waterfall methodology      | dev-agent (5 phases)           |
-| Agile/TDD                  | tdd-agent (Red-Green-Refactor) |
-| Code review process        | code-review-agent              |
-| Data analysis              | gemini-data                    |
-| Performance optimization   | gemini-dev                     |
+| If you're familiar with... | Try this agent...                 |
+| -------------------------- | --------------------------------- |
+| Waterfall methodology      | zs-dev-agent (5 phases)           |
+| Agile/TDD                  | zs-tdd-agent (Red-Green-Refactor) |
+| Code review process        | zs-code-review-agent              |
+| Data analysis              | zs-gemini-data                    |
+| Performance optimization   | zs-gemini-dev                     |
 
 ## Terminology Alignment
 
@@ -87,21 +87,21 @@ Agents use Task tool to spawn sub-agents for:
 
 ## Choosing the Right Phase Model
 
-**Use 5-Phase (dev-agent) when:**
+**Use 5-Phase (zs-dev-agent) when:**
 
 - Building complete features
 - Need structured progression
 - Want separation of analysis and implementation
 - Working on larger changes
 
-**Use Red-Green-Refactor (tdd-agent) when:**
+**Use Red-Green-Refactor (zs-tdd-agent) when:**
 
 - Writing new code with tests
 - Practicing TDD methodology
 - Iterative development
 - Testing is the primary concern
 
-**Use Review Model (code-review-agent) when:**
+**Use Review Model (zs-code-review-agent) when:**
 
 - Code already exists
 - Need quality assurance
@@ -118,13 +118,13 @@ Agents use Task tool to spawn sub-agents for:
 ## Common Questions
 
 **Q: Can I mix phase models?**
-A: Yes! Start with dev-agent Phase 1 (Analysis), then switch to tdd-agent for implementation, then back to dev-agent Phase 4 for review.
+A: Yes! Start with zs-dev-agent Phase 1 (Analysis), then switch to zs-tdd-agent for implementation, then back to zs-dev-agent Phase 4 for review.
 
 **Q: Why different models?**
 A: Each model fits different workflows. Structured phases work well for complete features, while TDD's cycle is perfect for test-first development.
 
 **Q: What if I only need part of a phase model?**
-A: Jump to specific phases! For example, use dev-agent Phase 4 for just the review, or gemini-data for just analysis.
+A: Jump to specific phases! For example, use zs-dev-agent Phase 4 for just the review, or zs-gemini-data for just analysis.
 
 ## Consistent Principles Across All Agents
 

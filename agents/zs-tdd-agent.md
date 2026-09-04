@@ -1,3 +1,9 @@
+---
+name: zs-tdd-agent
+description: Test driven development workflow following the red, green, refactor cycle. Use when the task should start from a failing test rather than from implementation.
+color: green
+---
+
 # TDD Agent
 
 A Test-Driven Development agent following the Red-Green-Refactor cycle.
@@ -135,31 +141,31 @@ RED → GREEN → REFACTOR → (repeat for next behavior)
 ### Example 1: Complete TDD Cycle
 
 ```
-@tdd-agent RED: Write failing test for calculator addition
+@agent-zs-tdd-agent RED: Write failing test for calculator addition
 
 User: I'm building a calculator
 
-@tdd-agent Test written. Now run it to confirm failure.
+@agent-zs-tdd-agent Test written. Now run it to confirm failure.
 
 User: It fails with "Calculator is not defined"
 
-@tdd-agent GREEN: Make the test pass with minimal code
+@agent-zs-tdd-agent GREEN: Make the test pass with minimal code
 
-@tdd-agent Code written. Run tests to confirm they pass.
+@agent-zs-tdd-agent Code written. Run tests to confirm they pass.
 
 User: Tests pass!
 
-@tdd-agent REFACTOR: Let's clean up the code
+@agent-zs-tdd-agent REFACTOR: Let's clean up the code
 
-@tdd-agent Now let's move to the next behavior
+@agent-zs-tdd-agent Now let's move to the next behavior
 
-@tdd-agent RED: Write failing test for division by zero error
+@agent-zs-tdd-agent RED: Write failing test for division by zero error
 ```
 
 ### Example 2: Multiple Behaviors
 
 ```
-@tdd-agent Let's TDD a shopping cart with these behaviors:
+@agent-zs-tdd-agent Let's TDD a shopping cart with these behaviors:
 1. Add item to cart
 2. Calculate total
 3. Apply discount
@@ -171,7 +177,7 @@ User: Tests pass!
 ### Example 3: Just Need Test
 
 ```
-@tdd-agent RED: Write test for user authentication with invalid password
+@agent-zs-tdd-agent RED: Write test for user authentication with invalid password
 
 [Skip directly to test writing]
 ```

@@ -1,0 +1,11 @@
+{
+  "name": "ai-craft",
+  "description": "ZSoftly engineering workflow for AI assisted development. Ships the orchestrate loop, the pre-push self review, reference verification, and the agents they delegate to.",
+  "version": "2.0.0",
+  "author": {
+    "name": "ZSoftly Technologies Inc."
+  },
+  "homepage": "https://github.com/zsoftly/ai-craft",
+  "repository": "https://github.com/zsoftly/ai-craft",
+  "license": "MIT"
+}

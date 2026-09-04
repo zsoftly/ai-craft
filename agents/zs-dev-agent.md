@@ -1,3 +1,9 @@
+---
+name: zs-dev-agent
+description: Five phase feature development workflow covering analysis, plan review, implementation, code review, and pull request. Use for structured feature work when you want explicit quality gates between phases.
+color: blue
+---
+
 # Development Agent
 
 A structured 5-phase agent for application development workflows.
@@ -139,27 +145,27 @@ I will:
 ### Example 1: Building a New Feature
 
 ```
-@dev-agent Phase 1: Analyze the codebase for user authentication feature
+@agent-zs-dev-agent Phase 1: Analyze the codebase for user authentication feature
 
 User: I need to add OAuth authentication to our Express app
 
-@dev-agent Phase 2: Review this plan:
+@agent-zs-dev-agent Phase 2: Review this plan:
 - Use Passport.js for OAuth
 - Support Google and GitHub providers
 - JWT tokens for session management
 - Store refresh tokens in Redis
 
-@dev-agent Phase 3: Implement OAuth authentication following the plan
+@agent-zs-dev-agent Phase 3: Implement OAuth authentication following the plan
 
-@dev-agent Phase 4: Review the authentication code we just wrote
+@agent-zs-dev-agent Phase 4: Review the authentication code we just wrote
 
-@dev-agent Phase 5: Create pull request for OAuth authentication
+@agent-zs-dev-agent Phase 5: Create pull request for OAuth authentication
 ```
 
 ### Example 2: Quick Feature
 
 ```
-@dev-agent I need to add rate limiting to our API. Let's go through all phases.
+@agent-zs-dev-agent I need to add rate limiting to our API. Let's go through all phases.
 
 [Agent will guide through each phase sequentially]
 ```
@@ -167,7 +173,7 @@ User: I need to add OAuth authentication to our Express app
 ### Example 3: Just Need Review
 
 ```
-@dev-agent Phase 4: Review my authentication implementation in src/auth/
+@agent-zs-dev-agent Phase 4: Review my authentication implementation in src/auth/
 
 [Skip directly to code review phase]
 ```

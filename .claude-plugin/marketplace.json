@@ -1,0 +1,15 @@
+{
+  "name": "zsoftly",
+  "owner": {
+    "name": "ZSoftly Technologies Inc.",
+    "url": "https://github.com/zsoftly"
+  },
+  "description": "ZSoftly's AI engineering workflow: the orchestrate loop, pre-push self review, and the agents behind them.",
+  "plugins": [
+    {
+      "name": "ai-craft",
+      "source": "./",
+      "description": "Orchestrator, implementation, code review, and context review agents plus the skills that drive them."
+    }
+  ]
+}
