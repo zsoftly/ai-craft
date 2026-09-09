@@ -4,6 +4,12 @@ All notable changes to this project are recorded here.
 
 The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/), and this project follows [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-09-09
+
+### Added
+
+- `/zs-ticket-updates` skill. Updates GitHub and NorthStar items with required metadata and evidence-based completion. It requires explicit engineer authorization before changing project state.
+
 ## [2.0.0] - 2026-09-03
 
 This release breaks every existing installation. Read [Migrating to 2.0.0](#migrating-to-200) before upgrading.

@@ -29,6 +29,18 @@ Pulls every URL, package, endpoint, version, flag, and identifier the change int
 - **File:** `skills/zs-verify-references/SKILL.md`
 - **Use it for:** anything an AI helped write
 
+### `/zs-ticket-updates`
+
+When installed through the Claude Code plugin, invoke it as
+`/ai-craft:zs-ticket-updates`.
+
+Creates or updates ZSoftly engineering tickets and NorthStar metadata. It
+preserves unspecified values and requires explicit engineer authorization before
+changing project state.
+
+- **File:** `skills/zs-ticket-updates/SKILL.md`
+- **Use it for:** an explicitly requested issue, project field, comment, or pull request update
+
 ## The workflow agents
 
 ### Code Agent (`@agent-zs-code-agent`)
@@ -377,6 +389,7 @@ And the skills in `skills/`:
 - `skills/zs-orchestrate/SKILL.md` - The four agent loop
 - `skills/zs-self-review/SKILL.md` - Pre push review of your own work
 - `skills/zs-verify-references/SKILL.md` - Confirming external references
+- `skills/zs-ticket-updates/SKILL.md` - Engineering ticket and NorthStar updates
 
 ## Inter-AI Communication
 

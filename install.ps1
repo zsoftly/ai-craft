@@ -235,7 +235,7 @@ if ($CLAUDE_INSTALLED) {
 
         Write-Color "   [OK] Installed to: $CLAUDE_DIR" "Green"
 
-        # Install skills, the invocable workflows behind /zs-orchestrate and /zs-self-review
+        # Install invocable skills, including /zs-orchestrate and /zs-ticket-updates.
         if (Test-Path "skills") {
             New-Item -ItemType Directory -Force -Path $CLAUDE_SKILLS_DIR | Out-Null
             foreach ($skill in (Get-ChildItem "skills" -Directory)) {
@@ -473,7 +473,7 @@ The sections below are reference documents, not agents you can spawn. Apply the 
 The subagents you can actually spawn are defined in ~/.codex/agents/*.toml:
 zs-code-agent, zs-code-review-agent, zs-context-review-agent, zs-content-review-agent.
 The skills you can invoke live in ~/.agents/skills/:
-zs-orchestrate, zs-self-review, zs-verify-references.
+zs-orchestrate, zs-self-review, zs-verify-references, zs-ticket-updates.
 
 "@
 
@@ -617,6 +617,7 @@ if ($CLAUDE_INSTALLED) {
     Write-Host "    /zs-orchestrate add rate limiting to the login endpoint"
     Write-Host "    /zs-self-review                   (run this before every push)"
     Write-Host "    /zs-verify-references"
+    Write-Host "    /zs-ticket-updates create an engineering Story in NorthStar"
     Write-Host "    @agent-zs-code-review-agent review the changes on this branch"
     Write-Host "    @agent-zs-sniff [paste opportunity]"
     Write-Host ""
@@ -636,7 +637,7 @@ if ($CODEX_INSTALLED) {
     Write-Host ""
     Write-Color "  OpenAI Codex:" "Blue"
     Write-Host "    Skills in $env:USERPROFILE\.agents\skills\, invoke one with `$<name>"
-    Write-Host "    Example: '`$zs-self-review' or '`$zs-orchestrate add rate limiting'"
+    Write-Host "    Example: '`$zs-self-review', '`$zs-orchestrate add rate limiting', or '`$zs-ticket-updates update issue #123'"
     Write-Host "    Subagents in $env:USERPROFILE\.codex\agents\, spawn one by name in your prompt"
     Write-Host "    Example: 'Spawn the zs-code-review-agent to review this branch'"
     Write-Host "    Inspect running threads with /agent"
