@@ -114,6 +114,7 @@ The installer automatically detects which AI CLIs you have installed and configu
 ls ~/.claude/agents/
 
 # You should see:
+# zs-cmp-deploy-agent.md
 # zs-code-agent.md
 # zs-code-review-agent.md
 # zs-content-review-agent.md

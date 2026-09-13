@@ -113,48 +113,47 @@ and pull request. Do not claim that this creates a Development relationship.
 
 ## Ticket body
 
-For a new engineering ticket, use this structure. Keep it factual and short.
+For a new engineering ticket, use this structure. Keep it short, factual, and
+focused on the acceptance criteria.
 
 ```markdown
 ## Summary
 
-<Customer or platform problem in one or two sentences.>
-
-## Scope
-
-- <Exact component, service, template, or repository area.>
+<Problem and intended outcome in one or two sentences.>
 
 ## Acceptance criteria
 
 - [ ] <Observable result.>
-
-## Deployment status
-
-- Staging: Not deployed
-- Production: Not deployed
-
-## Verification evidence
-
-- <Test, command result, PR, deployment result, or screenshot.>
-
-## Risks and follow-up
-
-- <Risk or follow-up item, or `None`.>
 ```
 
-Do not check acceptance criteria, claim a deployment, or change Status to `Done` without evidence.
+Do not duplicate technical values, configuration, test logs, deployment output,
+pull request content, or source details that GitHub or source control already
+maintains. Link to the authoritative pull request, check, deployment, or file
+instead of copying it into the ticket.
+
+For a research, discovery, or documentation ticket whose work is to collect
+facts, record those facts in a source-controlled file. Add only one line to the
+ticket: `Source of truth: https://github.com/zsoftly/<repo-name>/blob/main/<path> ($HOME/zsoftly/<repo-name>/<path>)`.
+When the file is on a feature branch, use its expected post-merge `main` URL.
+Do not repeat the file's contents, facts, or values in the ticket.
+
+Do not check acceptance criteria, claim a deployment, or change Status to
+`Done` without evidence. For `Done`, link to the authoritative GitHub pull
+request, check, deployment, or source-controlled file. Do not copy its values,
+logs, or output into the ticket.
 
 ## Ticket comment
 
-Use this format for a status update. Omit `Blocker` when there is none.
+Use this concise format for a status update. Omit `Blocker` when there is none.
+Do not repeat information already maintained in a pull request, check,
+deployment, or source-controlled file.
 
 ```markdown
 ## Update
 
 - Status: <Todo | In progress | Done>
 - Completed: <Verified work only.>
-- Evidence: <PR, test result, deployment result, or screenshot.>
-- Environment: <Staging | Production | Not deployed>
+- Evidence: <Link to the authoritative PR, check, deployment, or file.>
 - Next step: <One concrete action.>
 - Blocker: <What prevents the next step.>
 ```

@@ -145,6 +145,15 @@ ZSoftly-aligned proposal and message drafting
 - Supports RFP sections, Upwork proposals, intent emails, and partner outreach
 - **File:** `agents/zs-wag.md`
 
+### 11. CMP Deploy Agent (`@agent-zs-cmp-deploy-agent`)
+
+Deploy ZCP CMP to an instance through Argo CD and verify the result
+
+- Pins image digests, runs the sync, verifies the rollout against running pods
+- Checks whether the chart is behind the backend before rolling forward
+- Prepares Git changes for a human to publish and never commits or pushes
+- **File:** `agents/zs-cmp-deploy-agent.md`
+
 ## Installation
 
 ```bash
@@ -383,6 +392,7 @@ Read the individual agent files:
 - `agents/zs-gemini-data.md` - Using Gemini for data analysis
 - `agents/zs-inter-ai-communication.md` - Claude and Gemini bidirectional communication
 - `agents/zs-git-workflow-agent.md` - Git commit and push with your credentials
+- `agents/zs-cmp-deploy-agent.md` - ZCP CMP deploy and rollout verification
 
 And the skills in `skills/`:
 
