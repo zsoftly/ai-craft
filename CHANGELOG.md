@@ -4,6 +4,26 @@ All notable changes to this project are recorded here.
 
 The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/), and this project follows [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-09-12
+
+### Added
+
+- `zs-cmp-deploy-agent`. Deploys a platform release through a GitOps controller and verifies the rollout. It carries the end to end flow as ordered gates: establish the published commit and digests, check the contract between the API and its clients, check whether the deployment configuration is behind the application, check migration and rollback compatibility, pin digests, sync with the options passed explicitly, watch the migration hook, verify the rollout against running workload digests, confirm preserved configuration survived the sync, and verify end to end by response body rather than status code.
+- This agent definition is public, so it holds no environment specific information at all. No repository names, document paths, hostnames, cluster or namespace names, application identifiers, instance identifiers, Secret names, registry names, service inventory or incident narratives. Its first action is to locate and read the organisation's internal deploy runbook, which owns every concrete value, and it is told to ask rather than guess anything it cannot find there. A published agent definition is the wrong place for deploy topology, and a stale copy of an environment detail is worse than no copy.
+- The deploy agent has two modes. It defaults to preparing changes and handing them to the engineer with no Git write of any kind. Given an explicit autonomous grant that names the environments, the repositories and whether merging is included, it publishes through the GitHub API rather than local Git, so the engineer's index and working tree stay untouched either way. Autonomy covers publication only, every gate still has to pass, and self merging into a staging or production environment needs that environment named explicitly plus a passing required check suite.
+
+## [2.1.1] - 2026-09-12
+
+### Changed
+
+- `/zs-ticket-updates` keeps ticket bodies and status comments concise and acceptance-criteria-focused. It links to authoritative GitHub or source-controlled evidence instead of duplicating technical details.
+
+## [2.1.0] - 2026-09-09
+
+### Added
+
+- `/zs-ticket-updates` skill. Updates GitHub and NorthStar items with required metadata and evidence-based completion. It requires explicit engineer authorization before changing project state.
+
 ## [2.0.0] - 2026-09-03
 
 This release breaks every existing installation. Read [Migrating to 2.0.0](#migrating-to-200) before upgrading.

@@ -10,6 +10,7 @@ An engineering loop, not a prompt box. One orchestrator plans and delegates, an 
 /zs-orchestrate add rate limiting to the login endpoint
 /zs-self-review                 # before every push, on every change
 /zs-verify-references           # every link, package, and endpoint the change introduced
+/zs-ticket-updates              # create or update a ZSoftly engineering ticket
 ```
 
 Read [docs/workflow.md](docs/workflow.md) for how the loop runs and what is expected of you inside it. Read [docs/agents-and-skills.md](docs/agents-and-skills.md) if you are unclear on what an agent is versus a skill.
@@ -25,7 +26,10 @@ Versioned, namespaced, and updated with one command. This is the recommended pat
 /plugin install ai-craft@zsoftly
 ```
 
-Skills arrive as `/ai-craft:zs-orchestrate` and `/ai-craft:zs-self-review`. Agents arrive as `ai-craft:zs-code-review-agent` and so on. Update with `/plugin update ai-craft@zsoftly`.
+Skills arrive as `/ai-craft:zs-orchestrate`, `/ai-craft:zs-self-review`,
+`/ai-craft:zs-verify-references`, and `/ai-craft:zs-ticket-updates`. Agents
+arrive as `ai-craft:zs-code-review-agent` and so on. Update with
+`/plugin update ai-craft@zsoftly`.
 
 To put it on every engineer's machine automatically, commit this to a repository's `.claude/settings.json`. Claude Code applies it once the engineer trusts the folder.
 
@@ -110,6 +114,7 @@ The installer automatically detects which AI CLIs you have installed and configu
 ls ~/.claude/agents/
 
 # You should see:
+# zs-cmp-deploy-agent.md
 # zs-code-agent.md
 # zs-code-review-agent.md
 # zs-content-review-agent.md
@@ -129,6 +134,7 @@ ls ~/.claude/skills/
 # zs-orchestrate
 # zs-self-review
 # zs-verify-references
+# zs-ticket-updates
 ```
 
 **For Gemini CLI:**
@@ -284,6 +290,7 @@ Skills are invoked with `/`, agents with `@agent-`. With the plugin installed bo
 /zs-orchestrate add rate limiting to the login endpoint
 /zs-self-review
 /zs-verify-references
+/zs-ticket-updates create an engineering Story in NorthStar
 
 @agent-zs-code-review-agent review the changes on this branch
 @agent-zs-context-review-agent check this change against the ticket description
@@ -314,6 +321,7 @@ Codex does not spawn subagents on its own, so delegation is explicit. Name the a
 codex
 # $zs-orchestrate add rate limiting to the login endpoint
 # $zs-self-review
+# $zs-ticket-updates update issue #123 with verified deployment evidence
 # Spawn zs-code-review-agent and zs-context-review-agent on this branch in parallel
 # /agent          inspect and switch between running threads
 ```
@@ -351,6 +359,7 @@ Invoked with `/name`, or `/ai-craft:name` when installed as a plugin.
 | `zs-orchestrate`       | The four agent loop: plan, implement, review in parallel, iterate        |
 | `zs-self-review`       | Review your own diff before asking a colleague. Run before every push    |
 | `zs-verify-references` | Confirm every link, package, endpoint, and version the change introduced |
+| `zs-ticket-updates`    | Create or update ZSoftly engineering tickets and NorthStar metadata      |
 
 ## Agent Reference
 

@@ -15,6 +15,15 @@ Everything below was checked against vendor documentation on 2026-09-03. The lin
 
 The short version: a **skill** is a procedure you or the model runs here, and an **agent** is a worker you hand a job to and get a report from.
 
+## Shipped skills
+
+| Skill                   | Use it for                                          |
+| :---------------------- | :-------------------------------------------------- |
+| `/zs-orchestrate`       | Running the implementation and review loop          |
+| `/zs-self-review`       | Reviewing your own change before push               |
+| `/zs-verify-references` | Verifying references a change introduces            |
+| `/zs-ticket-updates`    | Explicit GitHub issue and NorthStar project changes |
+
 ## The mistake this repository used to make
 
 Before this revision, every file in `agents/` was plain markdown with no YAML frontmatter. Claude Code only registers a file in `~/.claude/agents/` as a subagent when it opens with frontmatter carrying `name` and `description`. Without it, the file sits on disk and nothing loads it. `@dev-agent` did not invoke an agent, it was a file reference that usually resolved to nothing.
@@ -52,7 +61,9 @@ Write an **agent** when:
 - It should run on a different model, or with fewer tools than you have.
 - Several of them should run at the same time.
 
-`/zs-orchestrate` is a skill because it drives your session and delegates. `zs-code-review-agent` is an agent because it must not see the reasoning that produced the code it is reviewing.
+`/zs-orchestrate` drives the session and delegates. `zs-code-review-agent` is
+separate so it does not see the reasoning that produced the code. Use
+`/zs-ticket-updates` only for an explicit issue or project change.
 
 ## The same ideas in the other CLIs
 
@@ -126,7 +137,9 @@ Treat a Gemini review as advisory and check the diff afterwards, or run reviews 
 
 Two ways to get this repository's agents and skills onto a machine.
 
-**Plugin, for Claude Code.** Versioned, namespaced, and updated with one command. Agents arrive as `ai-craft:zs-code-review-agent`, skills as `/ai-craft:zs-orchestrate`.
+**Plugin, for Claude Code.** Versioned, namespaced, and updated with one
+command. Agents arrive as `ai-craft:zs-code-review-agent`. Skills include
+`/ai-craft:zs-orchestrate` and `/ai-craft:zs-ticket-updates`.
 
 ```
 /plugin marketplace add zsoftly/ai-craft

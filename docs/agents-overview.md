@@ -29,6 +29,18 @@ Pulls every URL, package, endpoint, version, flag, and identifier the change int
 - **File:** `skills/zs-verify-references/SKILL.md`
 - **Use it for:** anything an AI helped write
 
+### `/zs-ticket-updates`
+
+When installed through the Claude Code plugin, invoke it as
+`/ai-craft:zs-ticket-updates`.
+
+Creates or updates ZSoftly engineering tickets and NorthStar metadata. It
+preserves unspecified values and requires explicit engineer authorization before
+changing project state.
+
+- **File:** `skills/zs-ticket-updates/SKILL.md`
+- **Use it for:** an explicitly requested issue, project field, comment, or pull request update
+
 ## The workflow agents
 
 ### Code Agent (`@agent-zs-code-agent`)
@@ -132,6 +144,15 @@ ZSoftly-aligned proposal and message drafting
 - Writes proposal drafts after `zs-sniff` or `zs-dig`
 - Supports RFP sections, Upwork proposals, intent emails, and partner outreach
 - **File:** `agents/zs-wag.md`
+
+### 11. CMP Deploy Agent (`@agent-zs-cmp-deploy-agent`)
+
+Deploy ZCP CMP to an instance through Argo CD and verify the result
+
+- Pins image digests, runs the sync, verifies the rollout against running pods
+- Checks whether the chart is behind the backend before rolling forward
+- Prepares Git changes for a human to publish and never commits or pushes
+- **File:** `agents/zs-cmp-deploy-agent.md`
 
 ## Installation
 
@@ -371,12 +392,14 @@ Read the individual agent files:
 - `agents/zs-gemini-data.md` - Using Gemini for data analysis
 - `agents/zs-inter-ai-communication.md` - Claude and Gemini bidirectional communication
 - `agents/zs-git-workflow-agent.md` - Git commit and push with your credentials
+- `agents/zs-cmp-deploy-agent.md` - ZCP CMP deploy and rollout verification
 
 And the skills in `skills/`:
 
 - `skills/zs-orchestrate/SKILL.md` - The four agent loop
 - `skills/zs-self-review/SKILL.md` - Pre push review of your own work
 - `skills/zs-verify-references/SKILL.md` - Confirming external references
+- `skills/zs-ticket-updates/SKILL.md` - Engineering ticket and NorthStar updates
 
 ## Inter-AI Communication
 
