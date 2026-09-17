@@ -26,6 +26,159 @@ For an existing ticket, preserve every value not explicitly requested.
 Do not replace an assignee with `No one` or remove labels to produce `No labels`.
 Do not clear a milestone, change priority, or alter a project field unless the engineer explicitly asks.
 
+## Fast command playbook
+
+Use these commands directly. Do not rediscover basic `gh issue` syntax unless a
+command fails because the installed `gh` version lacks a flag.
+
+Set placeholders mentally or in a short script:
+
+- `<repo>` is `OWNER/REPO`, for example `zsoftly/platform`.
+- `<issue>` is the issue number.
+- `<issue-url>` is the full issue URL.
+- `<project-owner>` is `zsoftly`.
+- `<project-number>` is `44` for `NorthStar ⭐`.
+
+For bodies and long comments, write plain markdown to a temporary file and pass
+it with `--body-file`. Clean the file up after final verification. Do not inline
+multi-line markdown through shell variables, command substitution, heredocs,
+`echo`, or `printf`.
+
+### Inspect
+
+```bash
+gh issue view <issue> -R <repo> --comments --json number,title,body,state,stateReason,issueType,assignees,labels,milestone,parent,subIssues,projectItems,closedByPullRequestsReferences,url
+```
+
+```bash
+gh issue list -R <repo> --state all --limit 100 --json number,title,state,issueType,assignees,labels,milestone,parent,projectItems,url --search '<search query>'
+```
+
+### Create
+
+Use this for a normal new engineering ticket:
+
+```bash
+gh issue create -R <repo> --title '<title>' --body-file <body.md> --type Story --project 'NorthStar ⭐'
+```
+
+Use this when a parent issue was explicitly requested and verified:
+
+```bash
+gh issue create -R <repo> --title '<title>' --body-file <body.md> --type Story --parent <parent-issue> --project 'NorthStar ⭐'
+```
+
+Add only requested labels, assignees, milestones, dependencies, or a different
+type:
+
+```bash
+gh issue create -R <repo> --title '<title>' --body-file <body.md> --type '<type>' --assignee <login> --label '<label>' --milestone '<milestone>' --blocked-by <issue-or-url> --blocking <issue-or-url>
+```
+
+### Edit native issue fields
+
+Use one or more supported flags on the same command:
+
+```bash
+gh issue edit <issue> -R <repo> --title '<title>' --body-file <body.md>
+```
+
+```bash
+gh issue edit <issue> -R <repo> --type Story
+gh issue edit <issue> -R <repo> --remove-type
+gh issue edit <issue> -R <repo> --parent <parent-issue>
+gh issue edit <issue> -R <repo> --remove-parent
+gh issue edit <issue> -R <repo> --add-sub-issue <child-issue>
+gh issue edit <issue> -R <repo> --remove-sub-issue <child-issue>
+gh issue edit <issue> -R <repo> --add-assignee <login>
+gh issue edit <issue> -R <repo> --remove-assignee <login>
+gh issue edit <issue> -R <repo> --add-label '<label>'
+gh issue edit <issue> -R <repo> --remove-label '<label>'
+gh issue edit <issue> -R <repo> --milestone '<milestone>'
+gh issue edit <issue> -R <repo> --remove-milestone
+gh issue edit <issue> -R <repo> --add-blocked-by <issue-or-url>
+gh issue edit <issue> -R <repo> --remove-blocked-by <issue-or-url>
+gh issue edit <issue> -R <repo> --add-blocking <issue-or-url>
+gh issue edit <issue> -R <repo> --remove-blocking <issue-or-url>
+```
+
+### Comment and state
+
+```bash
+gh issue comment <issue> -R <repo> --body-file <comment.md>
+gh issue comment <issue> -R <repo> --edit-last --body-file <comment.md>
+gh issue close <issue> -R <repo> --reason completed --comment '<short closing comment>'
+gh issue close <issue> -R <repo> --reason 'not planned' --comment '<short closing comment>'
+gh issue close <issue> -R <repo> --duplicate-of <issue-or-url>
+gh issue reopen <issue> -R <repo> --comment '<short reopening comment>'
+```
+
+### NorthStar project fields
+
+First confirm fields and options:
+
+```bash
+gh project field-list 44 --owner zsoftly --format json
+```
+
+Add an issue to NorthStar if required:
+
+```bash
+gh project item-add 44 --owner zsoftly --url <issue-url> --format json
+```
+
+Set one field per invocation:
+
+```bash
+gh project item-edit 44 --owner zsoftly --url <issue-url> --field 'Status' --value 'Todo'
+gh project item-edit 44 --owner zsoftly --url <issue-url> --field 'Status' --value 'In progress'
+gh project item-edit 44 --owner zsoftly --url <issue-url> --field 'Status' --value 'Done'
+gh project item-edit 44 --owner zsoftly --url <issue-url> --field 'Tags' --value 'engineering'
+gh project item-edit 44 --owner zsoftly --url <issue-url> --field 'Extra Tags' --value 'Blocked'
+gh project item-edit 44 --owner zsoftly --url <issue-url> --field 'Start date' --date YYYY-MM-DD
+gh project item-edit 44 --owner zsoftly --url <issue-url> --field 'Due date' --date YYYY-MM-DD
+gh project item-edit 44 --owner zsoftly --url <issue-url> --field 'Effort' --number <number>
+```
+
+For iteration fields, use the iteration ID from `field-list`:
+
+```bash
+gh project item-edit 44 --owner zsoftly --url <issue-url> --field 'Sprints' --iteration-id <iteration-id>
+gh project item-edit 44 --owner zsoftly --url <issue-url> --field 'Month' --iteration-id <iteration-id>
+```
+
+Clear a supplied field only when explicitly requested:
+
+```bash
+gh project item-edit 44 --owner zsoftly --url <issue-url> --field '<field name>' --clear
+```
+
+### GraphQL fallback
+
+Use GraphQL only for fields or verification that `gh issue` and `gh project`
+cannot express. Put the request in a JSON file and call:
+
+```bash
+gh api graphql --input <request.json>
+```
+
+Use this inspection shape as the starting point:
+
+```json
+{
+  "query": "query($owner:String!,$repo:String!,$number:Int!){repository(owner:$owner,name:$repo){issue(number:$number){id number title url issueType{name} parent{number url} projectItems(first:20){nodes{id project{number title}}}}}}",
+  "variables": {
+    "owner": "<owner>",
+    "repo": "<repo>",
+    "number": 123
+  }
+}
+```
+
+For batches or many subtasks, prepare a JSON plan plus a short Node script that
+calls `gh` with an argument array. Do not build shell commands by interpolating
+issue bodies, GraphQL, titles, or user supplied text.
+
 ## New engineering ticket baseline
 
 For a new engineering ticket, set this baseline after verifying that each
@@ -113,8 +266,19 @@ and pull request. Do not claim that this creates a Development relationship.
 
 ## Ticket body
 
-For a new engineering ticket, use this structure. Keep it short, factual, and
-focused on the acceptance criteria.
+Keep issue bodies short. Use the fewest words needed to state the problem,
+desired outcome, and acceptance criteria.
+
+- Epic bodies are at most 5 lines unless the engineer explicitly approves a
+  longer manually written body.
+- Story bodies are at most 10 lines unless the engineer explicitly approves a
+  longer manually written body.
+- Task bodies may be longer only when the requested work needs concrete
+  reproduction steps, dated history, or review text that would be unsafe to
+  omit.
+
+For a new engineering ticket, use this structure. Keep it factual and focused on
+the acceptance criteria.
 
 ```markdown
 ## Summary
