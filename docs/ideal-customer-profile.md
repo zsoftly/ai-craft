@@ -3,128 +3,103 @@
 This profile is the shared business context for AI Craft opportunity
 qualification and proposal-writing agents.
 
+As of 2026-10-02. Source: ZSoftly sales offers & ICP (Phase 2 — pipeline &
+closes). Refine segment labels as closes happen; do not block quoting on perfect
+taxonomy.
+
 ## Company Positioning
 
-ZSoftly Technologies Inc. o/a ZSoftly is a cloud, DevOps, security, AI, and
-professional services company serving Canada, the United States, and the United
-Kingdom as primary markets. ZSoftly builds and operates ZSoftly Cloud Platform
-(ZCP), a public cloud platform product and sovereign/private cloud offering
-focused on jurisdiction-aware data residency, regional control, open-source
-infrastructure, predictable operations, and reduced hyperscaler lock-in.
+ZSoftly Technologies Inc. o/a ZSoftly is a Canadian cloud and DevOps team —
+without the customer building one. Work runs on their cloud, their hardware, or
+ZSoftly Cloud Platform (ZCP).
 
-ZSoftly also delivers customer IT projects through its Professional Services
-business unit, including cloud and platform builds, managed services,
-full-stack development, AI agent delivery, web/application development,
-maintenance, modernization, hosting, and operational support.
+ZCP is ZSoftly's public cloud / sovereign-leaning platform (Montreal + Ottawa)
+with CAD list prices and no charge for data leaving the platform. Use ZCP as a
+lever when residency, questionnaires, or egress cost helps a deal — not as a
+forced migration.
 
-## Best-Fit Buyers
+## What We Sell
 
-Prioritize organizations that need senior technical delivery, not commodity
-staff augmentation:
+### Customer-facing engagements (sales deck)
 
-- Public sector, municipalities, agencies, education, healthcare, Indigenous
-  organizations, legal, financial services, and critical infrastructure in
-  Canada, the United States, and the United Kingdom.
-- SaaS, fintech, healthcare technology, cybersecurity, data-intensive, and
-  regulated companies with production workloads.
-- Teams with existing cloud, Kubernetes, DevOps, security, data, or AI
-  infrastructure pain.
-- Buyers with a clear budget, business urgency, and decision-maker involvement.
-- Organizations that value jurisdiction-aware data residency, regional
-  operation, privacy, governance, and accountable engineering support.
+| Engagement | Meaning |
+| --- | --- |
+| **Run on ZCP** | Move their platform to ZCP (Montreal + Ottawa), stepwise with rollback |
+| **Your cloud + ZCP** | Stay on AWS/GCP/Azure/on-prem; add ZCP for backups, CI/CD runners, or monitoring |
+| **DevOps services** | Design, build, and operate infra / K8s / pipelines / monitoring on their stack |
 
-## Primary Service Areas
+**Delivery shape:** Assess → Design → Build → Operate (handover or ongoing
+managed ops).
 
-These are the highest-priority fits:
+### Capacity allocation (90-day window)
 
-1. **Sovereign Cloud and Private Cloud**
-   - ZCP public cloud, sovereign compute, jurisdiction-aware data residency,
-     private cloud build-out, hybrid cloud, bare metal, VMware migration,
-     Apache CloudStack/KVM, OpenStack, Proxmox cluster management, Ceph,
-     network isolation, backup, and disaster recovery.
-   - Public cloud compute: virtual machines, GPU-capable compute, operating
-     system images, console access, power management, snapshots, VM backups,
-     affinity groups, auto-scaling, and marketplace images.
-   - Storage: S3-compatible object storage, block storage, file storage
-     (CephFS), Ceph RBD/RGW, storage snapshots, replication, disaster recovery,
-     performance tiering, NVMe/SSD/HDD tiers, and storage operations.
-   - Networking: public networks, VPCs, subnets, virtual routers, virtual
-     firewalls, network ACLs, egress rules, public IPs, port forwarding,
-     site-to-site VPN, VPN users, load balancers, DNS domains, DNS records, and
-     secure connectivity.
-   - Managed private cloud: design, build, operate, maintain, and improve
-     CloudStack, OpenStack, Proxmox, Ceph, Kubernetes, identity/SSO, VPN,
-     observability, and customer portal environments.
+1. Deployment, training, and professional-services packages
+2. Recurring support / managed services
+3. Hosted / cloud / software — only when priced and margin-clear (separate line
+   items; services fee stands alone)
 
-2. **Managed Services, DevOps, and Platform Engineering**
-   - Level 3 support, cloud operations, Kubernetes, Terraform, CI/CD, GitOps,
-     observability, infrastructure as code, reliability, automation, full-stack
-     platform delivery, and continuous improvement.
+CRM tags such as Training, RFP, or Custom development are **labels, not product
+lines**. Do not invent wedges around tags. Offers are only the engagement models
+above.
 
-3. **Cloud Security and Compliance**
-   - Cloud security architecture, monitoring integration, identity and access,
-     zero trust, audit evidence, compliance automation, secure operations, and
-     remediation.
+## Geography
 
-4. **AI Infrastructure and Data Platforms**
-   - GPU and bare-metal infrastructure, private AI hosting, AI workload
-     deployment, data pipelines, analytics platforms, databases, dashboards, and
-     secure AI environments. Partner when the buyer needs mature model
-     development, 24/7 SOC/MDR, large HPC clusters, or specialized research
-     computing operations.
-   - AI agent services: design, build, deploy, manage, and maintain AI agents,
-     chatbots, RAG systems, workflow automation, and agent platforms for
-     customer service, sales, marketing, HR/people operations, finance,
-     IT/operations, legal/compliance, supply chain/logistics, real estate,
-     healthcare, clinics, and other business functions.
+- **Primary:** Canada
+- **Extended:** United Kingdom (Series A/B funded startups in scope)
+- UK entity registration is **parked** (SMB sales do not need it; revisit for
+  crown later)
 
-5. **Full-Stack and Digital Delivery**
-   - Full-stack developers, solutions architects, APIs, cloud-native
-     applications, portals, platform integrations, and Agile delivery where the
-     infrastructure and security context matters.
-   - Website and application development, modernization, maintenance,
-     management, hosting, security hardening, performance improvement,
-     integrations, content systems, IT project delivery, and ongoing support
-     through the ZSoftly Professional Services business unit.
+Do not treat geographic expansion (including a US push) as a near-term goal.
 
-## Secondary Fits
+## Fit Rule (Pursue vs Park)
 
-Consider these when they strengthen a primary service:
+**Pursue** only where ZSoftly can sell cloud / DevOps projects or managed ops at
+**≥ $125/hr** (or an approved band exception).
 
-- AWS, Azure, or GCP migrations and modernization.
-- FinOps and cost optimization.
-- Identity platforms such as Authentik, Keycloak, JumpCloud, Okta, OIDC, and
-  SAML.
-- Observability stacks such as Prometheus, Grafana, Loki, Tempo, CloudWatch,
-  Datadog, Elastic, or SigNoz.
-- Marketplace and application operations for platforms such as WordPress,
-  Drupal, Ghost, cPanel, Coolify, Dokploy-style deployments, GitLab, Gitea,
-  Forgejo, Jenkins, Harbor, Rancher, Portainer, Keycloak, Authentik, OpenBao,
-  Vaultwarden, PostgreSQL, MySQL, MariaDB, MongoDB, Supabase, Directus, NocoDB,
-  ClickHouse, Elasticsearch, Qdrant, RabbitMQ, Kafka, n8n, Dify, Ollama, and
-  similar open-source or cloud-native applications.
-- Proposal or procurement support where ZSoftly is a clear technical provider.
+**Park** (or archive with intent) when the opportunity is mostly:
 
-## Poor Fits
+- Pure product R&D / ML feature work with no infra or ops outcome
+- Pure hardware or domain work ZSoftly does not deliver
+- Unpriced “strategic” builds with no owner
+- Staff-aug on networks / classifications ZSoftly cannot access
+- Procurement > ~90 days with no paid discovery path
+- Rates below the commercial floor without leadership approval
+- Unpaid tests, speculative work, vague scopes, or lowest-hourly-rate buyers
 
-Avoid or partner instead of bidding directly when the opportunity is mostly:
+## ICP Segmentation (CRM)
 
-- Low-budget commodity development with no infrastructure, security, AI agent,
-  full-stack, or operational depth.
-- Entry-level admin work, generic WordPress tweaks, SEO-only tasks, design-only
-  work, or "do everything" generalist requests.
-- 24/7 SOC/MDR monitoring where ZSoftly is expected to be the mature SOC
-  operator without a partner.
-- Large HPC/AI model development where the buyer requires specialized OEM,
-  Slurm, InfiniBand/RDMA, research computing, or GPU-cluster references that
-  ZSoftly cannot prove alone.
-- Unpaid tests, speculative work, vague scopes, or buyers focused only on the
-  lowest hourly rate.
+| ICP | Working use | Phase-2 stance |
+| --- | --- | --- |
+| **ICP-1** | Funded tech / platform companies (Series A/B and similar) | Primary early-outreach pool |
+| **ICP-2** | Educational institutions | Scalable offer later; treat named edu cases (e.g. All Care) as a **use case**, not a rush one-off |
+| **ICP-3 / ICP-4** | Other tagged segments (e.g. SMB / professional-services buyers) | Chase only when a deck path and ≥ $125/hr outcome are clear |
+
+Prefer ICP-1 when capacity is tight. ICP-2 is not blocked, but do not prioritize
+building a full edu offer ahead of commercial closes. ICP-3 / ICP-4 need an
+explicit deck engagement and commercial floor before serious chase.
+
+## Commercial Defaults (for proposals)
+
+| Field | Default |
+| --- | --- |
+| Currency | CAD |
+| Rate basis | **$125/hr** (Base); day rate $1,000 |
+| Minimum engagement | **16 sold hours** / from **$2,000** unless leadership approves smaller |
+| Motion | Free consult → architecture overview → fixed-price recommendation |
+| Payment | **50%** deposit on signature · 50% on acceptance |
+| Validity | 30 days |
+| Change control | Out of scope = new quote |
+
+Prefer a bounded first project over a large open-ended SOW.
 
 ## Decision Rule
 
-Bid when ZSoftly can be the obvious choice because the work requires cloud,
-platform, security, jurisdiction-aware data residency, DevOps, AI
-infrastructure, Professional Services delivery, or full-stack engineering
-depth. Skip when the work is generic, low-value, unclear, or outside the
-delivery proof ZSoftly can credibly show.
+**BID** when the buyer needs cloud / DevOps / managed ops on a deck path, fits
+geography, clears the ≥ $125/hr floor, and has (or can name) an economic buyer
+and technical owner.
+
+**NO BID** when the work is generic, below floor, unclear, outside delivery
+proof, or fails the park list above.
+
+**MORE INFO** when ICP tag or deck path is unclear but a short discovery could
+still produce a priced Assess → Design package.
