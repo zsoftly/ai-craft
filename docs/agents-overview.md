@@ -125,7 +125,8 @@ Review changes, commit, and push using YOUR git credentials
 
 Fast opportunity screening against ZSoftly's current ICP
 
-- Flags BID, NO BID, PARTNER, or MORE INFO
+- Flags BID, NO BID, PARTNER, or MORE INFO for ordinary opportunities
+- Reports facts and unknowns for a user-selected Upwork job without a bid recommendation or score
 - Checks ICP fit, deadline risk, buyer quality, and feasibility
 - **File:** `agents/zs-sniff.md`
 
@@ -133,7 +134,8 @@ Fast opportunity screening against ZSoftly's current ICP
 
 Deep bid/no-bid and partner-fit analysis
 
-- Reviews RFPs, supplier lists, public tenders, Upwork jobs, and partner opportunities
+- Reviews RFPs, supplier lists, public tenders, and partner opportunities
+- Produces factual due diligence for a user-selected Upwork job without selecting or scoring it
 - Separates eligibility gates from capability fit
 - **File:** `agents/zs-dig.md`
 
@@ -141,7 +143,7 @@ Deep bid/no-bid and partner-fit analysis
 
 ZSoftly-aligned proposal and message drafting
 
-- Writes proposal drafts after `zs-sniff` or `zs-dig`
+- Writes proposal drafts after `zs-sniff` or `zs-dig`, or for a user-selected Upwork job
 - Supports RFP sections, Upwork proposals, intent emails, and partner outreach
 - **File:** `agents/zs-wag.md`
 

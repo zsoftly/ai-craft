@@ -4,6 +4,17 @@ All notable changes to this project are recorded here.
 
 The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/), and this project follows [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- `zs-sniff`, `zs-dig`, and `zs-wag` now have a human-directed Upwork MCP path.
+  The opportunity agents report facts and unknowns for user-selected jobs. They
+  do not select, rank, score, or recommend them. The proposal agent drafts from
+  verified or user-approved evidence only. The MCP-capable parent session keeps
+  account checks, previews, explicit confirmation, and submission in the live
+  workflow.
+
 ## [2.2.0] - 2026-09-12
 
 ### Added

@@ -297,6 +297,8 @@ Skills are invoked with `/`, agents with `@agent-`. With the plugin installed bo
 @agent-zs-content-review-agent review the README changes
 @agent-zs-tdd-agent write a failing test for login
 @agent-zs-sniff [paste job posting]
+@agent-zs-sniff summarize facts for this Upwork job I selected: [paste job]
+@agent-zs-wag draft an Upwork proposal for this specific job I selected using only this verified profile evidence: [job and evidence]
 ```
 
 Claude Code loads agents and skills when the session starts. If you install while Claude is already open, start a new session before relying on the updated files.
