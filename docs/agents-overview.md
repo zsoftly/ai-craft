@@ -47,6 +47,7 @@ Coordinates bounded native messages between already-running Claude and Codex pee
 
 - **File:** `skills/zs-agent-comms/SKILL.md`
 - **Use it for:** a task, status update, result, or handoff for an existing peer session
+- **Setup:** [autonomous-coordination.md](autonomous-coordination.md) covers the permission rules that let it run without prompts in every direction
 
 ## The workflow agents
 

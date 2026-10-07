@@ -9,10 +9,17 @@ The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/
 ### Added
 
 - `/zs-agent-comms` skill. Coordinates bounded native messages between already-running Claude and Codex peer sessions, with recipient verification, accurate delivery states, ownership-preserving handoffs, and a transport-only Claude relay when its current capabilities support it.
+- `skills/zs-agent-comms/relay.sh`. A transport-only relay from Codex or any other sender to a running Claude session. It fixes every Claude flag, so Codex can pre-approve one script path instead of each message.
+- `skills/zs-agent-comms/queue.sh`. A transport-only send from Claude or Codex to a running Codex session. It passes only the thread and the message, so a rule can pre-approve it without also allowing `codex queue` sandbox, approval, or config overrides.
+- `docs/autonomous-coordination.md`. Claude and Codex permission settings that let peer messaging run without prompts in every direction while chosen actions still ask.
+- `/zs-agent-comms` now has an "Escalate to the human" section listing what a session must hand back instead of acting on.
 
 ### Changed
 
 - `zs-inter-ai-communication` now routes Claude and Codex peer coordination to `/zs-agent-comms`. It no longer describes an unsupported Gemini relay.
+- `/zs-agent-comms` can now be loaded by the model, so a session that receives a handoff picks up the receiving rules. It pre-approves `ListAgents`, `SendMessage`, and `queue.sh` for the turn that loads it.
+- `/zs-agent-comms` now sends to Codex through `queue.sh` instead of calling `codex queue` directly, and documents the Claude orchestrator round trip.
+- `/zs-agent-comms` sends each message as one plain command with the text in single quotes, so a stable permission rule matches it. The relay system prompt is now fixed text instead of a placeholder.
 - Contributor tooling now uses pnpm with the committed `pnpm-lock.yaml`.
 
 ## [2.2.0] - 2026-09-12
