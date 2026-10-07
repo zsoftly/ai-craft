@@ -340,11 +340,14 @@ Together: Fix security issues (Claude) + performance (Gemini)
 
 - ✓ Just markdown files
 - ✓ No Docker
-- ✓ No npm install
+- ✓ End users install no JavaScript packages
 - ✓ No MCP servers
 - ✓ Just copy files and use with @
 
 Simple!
+
+Contributors run `pnpm install --frozen-lockfile` before formatting or changing
+these documents.
 
 ## Tips
 

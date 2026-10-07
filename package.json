@@ -2,6 +2,7 @@
   "name": "ai-craft",
   "version": "2.2.0",
   "private": true,
+  "packageManager": "pnpm@12.5.1",
   "scripts": {
     "fmt": "prettier --write \"**/*.md\"",
     "fmt:check": "prettier --check \"**/*.md\""
