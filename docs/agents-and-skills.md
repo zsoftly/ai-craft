@@ -17,12 +17,13 @@ The short version: a **skill** is a procedure you or the model runs here, and an
 
 ## Shipped skills
 
-| Skill                   | Use it for                                          |
-| :---------------------- | :-------------------------------------------------- |
-| `/zs-orchestrate`       | Running the implementation and review loop          |
-| `/zs-self-review`       | Reviewing your own change before push               |
-| `/zs-verify-references` | Verifying references a change introduces            |
-| `/zs-ticket-updates`    | Explicit GitHub issue and NorthStar project changes |
+| Skill                   | Use it for                                           |
+| :---------------------- | :--------------------------------------------------- |
+| `/zs-orchestrate`       | Running the implementation and review loop           |
+| `/zs-self-review`       | Reviewing your own change before push                |
+| `/zs-verify-references` | Verifying references a change introduces             |
+| `/zs-ticket-updates`    | Explicit GitHub issue and NorthStar project changes  |
+| `/zs-agent-comms`       | Coordinating an already-running Claude or Codex peer |
 
 ## The mistake this repository used to make
 

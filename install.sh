@@ -547,7 +547,7 @@ The sections below are reference documents, not agents you can spawn. Apply the 
 The subagents you can actually spawn are defined in ~/.codex/agents/*.toml:
 zs-code-agent, zs-code-review-agent, zs-context-review-agent, zs-content-review-agent.
 The skills you can invoke live in ~/.agents/skills/:
-zs-orchestrate, zs-self-review, zs-verify-references, zs-ticket-updates.
+zs-orchestrate, zs-self-review, zs-verify-references, zs-ticket-updates, zs-agent-comms.
 
 "
 
@@ -695,6 +695,7 @@ if [ "$CLAUDE_INSTALLED" = true ]; then
     echo "    /zs-self-review                   (run this before every push)"
     echo "    /zs-verify-references"
     echo "    /zs-ticket-updates create an engineering Story in NorthStar"
+    echo "    /zs-agent-comms coordinate work with an existing Codex peer"
     echo "    @agent-zs-code-review-agent review the changes on this branch"
     echo "    @agent-zs-sniff [paste opportunity]"
     echo ""
@@ -714,7 +715,7 @@ if [ "$CODEX_INSTALLED" = true ]; then
     echo ""
     print_info "  OpenAI Codex:"
     echo "    Skills in ~/.agents/skills/, invoke one with \$<name>"
-    echo "    Example: '\$zs-self-review', '\$zs-orchestrate add rate limiting', or '\$zs-ticket-updates update issue #123'"
+    echo "    Example: '\$zs-self-review', '\$zs-orchestrate add rate limiting', '\$zs-ticket-updates update issue #123', or '\$zs-agent-comms'"
     echo "    Subagents in ~/.codex/agents/, spawn one by name in your prompt"
     echo "    Example: 'Spawn the zs-code-review-agent to review this branch'"
     echo "    Inspect running threads with /agent"

@@ -11,6 +11,7 @@ An engineering loop, not a prompt box. One orchestrator plans and delegates, an 
 /zs-self-review                 # before every push, on every change
 /zs-verify-references           # every link, package, and endpoint the change introduced
 /zs-ticket-updates              # create or update a ZSoftly engineering ticket
+/zs-agent-comms                 # coordinate an already-running Claude or Codex peer
 ```
 
 Read [docs/workflow.md](docs/workflow.md) for how the loop runs and what is expected of you inside it. Read [docs/agents-and-skills.md](docs/agents-and-skills.md) if you are unclear on what an agent is versus a skill.
@@ -27,7 +28,8 @@ Versioned, namespaced, and updated with one command. This is the recommended pat
 ```
 
 Skills arrive as `/ai-craft:zs-orchestrate`, `/ai-craft:zs-self-review`,
-`/ai-craft:zs-verify-references`, and `/ai-craft:zs-ticket-updates`. Agents
+`/ai-craft:zs-verify-references`, `/ai-craft:zs-ticket-updates`, and
+`/ai-craft:zs-agent-comms`. Agents
 arrive as `ai-craft:zs-code-review-agent` and so on. Update with
 `/plugin update ai-craft@zsoftly`.
 
