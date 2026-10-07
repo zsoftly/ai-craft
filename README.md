@@ -11,9 +11,19 @@ An engineering loop, not a prompt box. One orchestrator plans and delegates, an 
 /zs-self-review                 # before every push, on every change
 /zs-verify-references           # every link, package, and endpoint the change introduced
 /zs-ticket-updates              # create or update a ZSoftly engineering ticket
+/zs-agent-comms                 # coordinate an already-running Claude or Codex peer
 ```
 
 Read [docs/workflow.md](docs/workflow.md) for how the loop runs and what is expected of you inside it. Read [docs/agents-and-skills.md](docs/agents-and-skills.md) if you are unclear on what an agent is versus a skill.
+
+## Contributor setup
+
+Install the repository's formatting dependency with pnpm, then run the check:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm run fmt:check
+```
 
 ## Install
 
@@ -27,7 +37,8 @@ Versioned, namespaced, and updated with one command. This is the recommended pat
 ```
 
 Skills arrive as `/ai-craft:zs-orchestrate`, `/ai-craft:zs-self-review`,
-`/ai-craft:zs-verify-references`, and `/ai-craft:zs-ticket-updates`. Agents
+`/ai-craft:zs-verify-references`, `/ai-craft:zs-ticket-updates`, and
+`/ai-craft:zs-agent-comms`. Agents
 arrive as `ai-craft:zs-code-review-agent` and so on. Update with
 `/plugin update ai-craft@zsoftly`.
 
@@ -135,6 +146,7 @@ ls ~/.claude/skills/
 # zs-self-review
 # zs-verify-references
 # zs-ticket-updates
+# zs-agent-comms
 ```
 
 **For Gemini CLI:**
@@ -336,7 +348,7 @@ Each CLI is stronger at different work.
 - **Gemini**: very large codebases, performance analysis, log and data patterns
 - **Codex**: parallel subagent fan out with per agent model and sandbox settings
 
-The `zs-gemini-dev` and `zs-gemini-data` agents let a Claude session hand work to Gemini and read the result back, which is useful when the context is larger than one model should carry. `zs-inter-ai-communication` documents the patterns.
+The `zs-gemini-dev` and `zs-gemini-data` agents support Gemini analysis. Use `zs-agent-comms` when an already-running Claude or Codex peer needs a verified native handoff. `zs-inter-ai-communication` remains the agent entry point for that skill.
 
 Running the same change past two model families is a real second opinion, and worth it when the change is risky.
 
@@ -360,6 +372,7 @@ Invoked with `/name`, or `/ai-craft:name` when installed as a plugin.
 | `zs-self-review`       | Review your own diff before asking a colleague. Run before every push    |
 | `zs-verify-references` | Confirm every link, package, endpoint, and version the change introduced |
 | `zs-ticket-updates`    | Create or update ZSoftly engineering tickets and NorthStar metadata      |
+| `zs-agent-comms`       | Coordinate an already-running Claude or Codex peer session               |
 
 ## Agent Reference
 
@@ -376,7 +389,7 @@ Invoked with `@agent-name`, or delegated to automatically.
 | `zs-git-workflow-agent`     | inherit | Inspect changes, commit and push with your own git identity   |
 | `zs-gemini-dev`             | inherit | Delegate development and performance work to Gemini           |
 | `zs-gemini-data`            | inherit | Delegate log and dataset analysis to Gemini                   |
-| `zs-inter-ai-communication` | inherit | Patterns for calling other AI CLIs and reading results back   |
+| `zs-inter-ai-communication` | inherit | Routes Claude and Codex peer messaging to `zs-agent-comms`    |
 | `zs-sniff`                  | sonnet  | Fast opportunity screen against the ZSoftly ICP               |
 | `zs-dig`                    | opus    | Deep bid or no bid and partner fit analysis                   |
 | `zs-wag`                    | inherit | Proposal and outreach drafting aligned to the ICP             |

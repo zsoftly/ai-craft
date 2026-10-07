@@ -41,6 +41,14 @@ changing project state.
 - **File:** `skills/zs-ticket-updates/SKILL.md`
 - **Use it for:** an explicitly requested issue, project field, comment, or pull request update
 
+### `/zs-agent-comms`
+
+Coordinates bounded native messages between already-running Claude and Codex peer sessions. It verifies recipients and capabilities before delivery, preserves existing ownership, and does not create duplicate workers.
+
+- **File:** `skills/zs-agent-comms/SKILL.md`
+- **Use it for:** a task, status update, result, or handoff for an existing peer session
+- **Setup:** [autonomous-coordination.md](autonomous-coordination.md) covers the permission rules that let it run without prompts in every direction
+
 ## The workflow agents
 
 ### Code Agent (`@agent-zs-code-agent`)
@@ -106,10 +114,10 @@ Review code for bugs, security, and quality
 
 ### 6. Inter-AI Communication (`@agent-zs-inter-ai-communication`)
 
-Guide for bidirectional Claude ↔ Gemini communication
+Routes Claude and Codex peer communication to the canonical skill
 
-- Real CLI commands for AI-to-AI calls
-- Working examples and patterns
+- Verifies the current native transport before delivery
+- Preserves peer ownership and avoids duplicate work
 - **File:** `agents/zs-inter-ai-communication.md`
 
 ### 7. Git Workflow Agent (`@agent-zs-git-workflow-agent`)
@@ -333,11 +341,14 @@ Together: Fix security issues (Claude) + performance (Gemini)
 
 - ✓ Just markdown files
 - ✓ No Docker
-- ✓ No npm install
+- ✓ End users install no JavaScript packages
 - ✓ No MCP servers
 - ✓ Just copy files and use with @
 
 Simple!
+
+Contributors run `pnpm install --frozen-lockfile` before formatting or changing
+these documents.
 
 ## Tips
 
@@ -390,7 +401,7 @@ Read the individual agent files:
 - `agents/zs-tdd-agent.md` - Test-driven development
 - `agents/zs-gemini-dev.md` - Using Gemini for development
 - `agents/zs-gemini-data.md` - Using Gemini for data analysis
-- `agents/zs-inter-ai-communication.md` - Claude and Gemini bidirectional communication
+- `agents/zs-inter-ai-communication.md` - Claude and Codex peer communication
 - `agents/zs-git-workflow-agent.md` - Git commit and push with your credentials
 - `agents/zs-cmp-deploy-agent.md` - ZCP CMP deploy and rollout verification
 
@@ -400,14 +411,8 @@ And the skills in `skills/`:
 - `skills/zs-self-review/SKILL.md` - Pre push review of your own work
 - `skills/zs-verify-references/SKILL.md` - Confirming external references
 - `skills/zs-ticket-updates/SKILL.md` - Engineering ticket and NorthStar updates
+- `skills/zs-agent-comms/SKILL.md` - Native Claude and Codex peer communication
 
 ## Inter-AI Communication
 
-The inter-ai-communication agent includes working examples of:
-
-1. **Claude → Gemini**: Performance analysis with real CLI commands
-2. **Claude implements**: Based on Gemini's suggestions
-3. **Claude → Gemini**: Validation loop
-4. **Complete patterns**: Full bidirectional communication examples
-
-All examples use actual `gemini -p` and `claude -p` commands you can run directly.
+Use `/zs-agent-comms` for current Claude and Codex peer messaging. The skill owns recipient verification, current capability checks, delivery status, and ownership-preserving handoffs. `zs-inter-ai-communication` remains available as the agent entry point and routes to that skill.

@@ -88,7 +88,7 @@ claude plugin validate .              # plugin and marketplace manifests
 claude --plugin-dir . --model haiku -p "list the agent types available to you"
 bash -n install.sh                    # installer syntax
 HOME=/tmp/aicraft-test ./install.sh   # installer against a throwaway home
-npm run fmt:check                     # prettier
+pnpm run fmt:check                    # prettier
 ```
 
 Never test the installer against your real home directory. It writes into `~/.claude`, `~/.gemini`, `~/.codex`, and `~/.agents`.
