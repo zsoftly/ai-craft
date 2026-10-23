@@ -8,12 +8,12 @@ The skill never changes these settings. You copy them in yourself. The installer
 
 Each CLI decides on its own whether a command needs you. The skill only shapes the commands so a rule can match them.
 
-| Direction       | Sender runs                     | What must be pre-approved                          |
-| :-------------- | :------------------------------ | :------------------------------------------------- |
-| Claude to Claude | native `SendMessage`           | `ListAgents` and `SendMessage` in Claude           |
-| Codex to Codex   | the skill's `queue.sh`         | a `queue.sh` prefix rule in Codex                  |
-| Claude to Codex  | the skill's `queue.sh`         | a `queue.sh` Bash rule in Claude                   |
-| Codex to Claude  | the skill's `relay.sh`         | a `relay.sh` prefix rule in Codex                  |
+| Direction        | Sender runs            | What must be pre-approved                |
+| :--------------- | :--------------------- | :--------------------------------------- |
+| Claude to Claude | native `SendMessage`   | `ListAgents` and `SendMessage` in Claude |
+| Codex to Codex   | the skill's `queue.sh` | a `queue.sh` prefix rule in Codex        |
+| Claude to Codex  | the skill's `queue.sh` | a `queue.sh` Bash rule in Claude         |
+| Codex to Claude  | the skill's `relay.sh` | a `relay.sh` prefix rule in Codex        |
 
 A rule that names one exact command, with the message text inside it, approves that one message only. The next message is a different command, so the CLI asks again. Approve the stable prefix instead.
 
@@ -29,7 +29,12 @@ Add this to `~/.claude/settings.json`, merging with what is already there:
       "SendMessage",
       "Bash(bash ~/.claude/skills/zs-agent-comms/queue.sh *)"
     ],
-    "ask": ["Bash(git push *)", "Bash(gh pr merge *)", "Bash(kubectl apply *)", "Bash(terraform apply *)"]
+    "ask": [
+      "Bash(git push *)",
+      "Bash(gh pr merge *)",
+      "Bash(kubectl apply *)",
+      "Bash(terraform apply *)"
+    ]
   },
   "crossSessionInbound": "accept",
   "isolatePeerMachines": true
@@ -43,11 +48,11 @@ Add this to `~/.claude/settings.json`, merging with what is already there:
 
 Then pick a permission mode per session:
 
-| Mode                   | Peer messaging | Your `ask` rules | Everything else                      |
-| :--------------------- | :------------- | :--------------- | :----------------------------------- |
-| `auto` (recommended)   | runs           | prompts you      | reviewed by the auto mode classifier |
-| `dontAsk`              | runs           | denied           | denied unless allowed                |
-| `default`              | runs           | prompts you      | prompts you                          |
+| Mode                 | Peer messaging | Your `ask` rules | Everything else                      |
+| :------------------- | :------------- | :--------------- | :----------------------------------- |
+| `auto` (recommended) | runs           | prompts you      | reviewed by the auto mode classifier |
+| `dontAsk`            | runs           | denied           | denied unless allowed                |
+| `default`            | runs           | prompts you      | prompts you                          |
 
 Use `auto` for "never ask me except for these". Use `dontAsk` for unattended runs, where an `ask` rule becomes a hard stop and the agent reports the blocker instead. Avoid `bypassPermissions` for coordinating sessions. When neither side sets `crossSessionInbound`, Claude Code holds messages arriving between a bypassing and a prompting session for your approval.
 
@@ -78,7 +83,6 @@ codex execpolicy check --rules ~/.codex/rules/zs-agent-comms.rules \
 A match prints `"decision":"allow"`. A command wrapped in `zsh -lc`, or one that uses `$(...)`, does not match. That is why the skill tells agents to send one plain command.
 
 Allow the two scripts, never a bare `codex queue` or `claude` prefix. `codex queue` also accepts `--dangerously-bypass-approvals-and-sandbox`, `-s danger-full-access`, and `-c` overrides, so a rule on `codex queue --thread` would let a sender append them. A rule on `claude -p` would also allow `claude -p --tools Bash`. `queue.sh` passes only the thread and the message. `relay.sh` fixes every Claude flag and limits the relay to `ListAgents` and `SendMessage`.
-
 
 For approvals outside these rules, `~/.codex/config.toml` decides:
 

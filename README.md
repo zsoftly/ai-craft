@@ -12,6 +12,7 @@ An engineering loop, not a prompt box. One orchestrator plans and delegates, an 
 /zs-verify-references           # every link, package, and endpoint the change introduced
 /zs-ticket-updates              # create or update a ZSoftly engineering ticket
 /zs-agent-comms                 # coordinate an already-running Claude or Codex peer
+/zs-motion-design               # build a motion graphics clip as a deterministic program
 ```
 
 Read [docs/workflow.md](docs/workflow.md) for how the loop runs and what is expected of you inside it. Read [docs/agents-and-skills.md](docs/agents-and-skills.md) if you are unclear on what an agent is versus a skill.
