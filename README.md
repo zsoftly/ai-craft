@@ -135,6 +135,7 @@ ls ~/.claude/agents/
 # zs-gemini-data.md
 # zs-gemini-dev.md
 # zs-git-workflow-agent.md
+# zs-hub-sales-agent.md
 # zs-inter-ai-communication.md
 # zs-sniff.md
 # zs-tdd-agent.md
@@ -165,6 +166,7 @@ ls ~/.codex/agents/
 # zs-code-review-agent.toml
 # zs-content-review-agent.toml
 # zs-context-review-agent.toml
+# zs-hub-sales-agent.toml
 
 # List installed skills
 ls ~/.agents/skills/
@@ -393,6 +395,7 @@ Invoked with `@agent-name`, or delegated to automatically.
 | `zs-sniff`                  | sonnet  | Fast opportunity screen against the ZSoftly ICP               |
 | `zs-dig`                    | opus    | Deep bid or no bid and partner fit analysis                   |
 | `zs-wag`                    | inherit | Proposal and outreach drafting aligned to the ICP             |
+| `zs-hub-sales-agent`        | sonnet  | Maintains Hub (ERPNext) sales pipeline hygiene and follow-up  |
 
 ## Naming
 

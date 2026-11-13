@@ -471,7 +471,7 @@ if ($CODEX_INSTALLED) {
 The sections below are reference documents, not agents you can spawn. Apply the relevant guidance when working on a matching task.
 
 The subagents you can actually spawn are defined in ~/.codex/agents/*.toml:
-zs-code-agent, zs-code-review-agent, zs-context-review-agent, zs-content-review-agent.
+zs-code-agent, zs-code-review-agent, zs-context-review-agent, zs-content-review-agent, zs-hub-sales-agent.
 The skills you can invoke live in ~/.agents/skills/:
 zs-orchestrate, zs-self-review, zs-verify-references, zs-ticket-updates, zs-agent-comms.
 

@@ -162,6 +162,15 @@ Deploy ZCP CMP to an instance through Argo CD and verify the result
 - Prepares Git changes for a human to publish and never commits or pushes
 - **File:** `agents/zs-cmp-deploy-agent.md`
 
+### 12. Hub Sales Agent (`@agent-zs-hub-sales-agent`)
+
+Manage day-to-day sales execution in Hub (ERPNext)
+
+- Keeps opportunities current, unambiguous, and owned
+- Enforces next-action hygiene and quote-to-opportunity linkage
+- Surfaces blocked records and follow-ups for cadence reviews
+- **File:** `agents/zs-hub-sales-agent.md`
+
 ## Installation
 
 ```bash
@@ -404,6 +413,7 @@ Read the individual agent files:
 - `agents/zs-inter-ai-communication.md` - Claude and Codex peer communication
 - `agents/zs-git-workflow-agent.md` - Git commit and push with your credentials
 - `agents/zs-cmp-deploy-agent.md` - ZCP CMP deploy and rollout verification
+- `agents/zs-hub-sales-agent.md` - Hub (ERPNext) sales pipeline execution
 
 And the skills in `skills/`:
 
